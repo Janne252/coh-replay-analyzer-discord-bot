@@ -54,29 +54,29 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                 if (scenariosRoot == null)
                 {
                     noScenarioRootArchives.Add(archive);
-                } 
-                else
+                    continue;
+                }
+
+                var scenarioFolders = getScenarioFolders(scenariosRoot);
+                foreach (var scenario in scenarioFolders)
                 {
-                    var scenarioFolders = getScenarioFolders(scenariosRoot);
-                    foreach (var scenario in scenarioFolders)
+                    var preview = getScenarioPreviewImage(scenario);
+                    if (preview == null)
                     {
-                        var preview = getScenarioPreviewImage(scenario);
-                        if (preview == null)
-                        {
-                            noPreviewImageFoundScenarios.Add(scenario);
-                            continue;
-                        }
-                        var imageFilename = Path.Join(mapPreviewImageRoot, $"{scenario.ScenarioName}.jpg");
-                        var image = SixLabors.ImageSharp.Image.Load(preview.GetData());
-                        if (image.Width >= 256 && image.Height >= 256)
-                        {
-                            image.Mutate(x => x
-                                .Resize(256, 256)
-                            );
-                        }
-                        image.Save(imageFilename, jpgEncoder);
-                        Console.WriteLine($"{scenario.ScenarioName}: {preview.Name}");
+                        noPreviewImageFoundScenarios.Add(scenario);
+                        continue;
                     }
+
+                    var imageFilename = Path.Join(mapPreviewImageRoot, $"{scenario.ScenarioName}.jpg");
+                    var image = SixLabors.ImageSharp.Image.Load(preview.GetData());
+                    if (image.Width >= 256 && image.Height >= 256)
+                    {
+                        image.Mutate(x => x
+                            .Resize(256, 256)
+                        );
+                    }
+                    image.Save(imageFilename, jpgEncoder);
+                    Console.WriteLine($"{scenario.ScenarioName}: {preview.Name}");
                 }
             }
 
@@ -125,6 +125,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             public string ScenarioName { get; set; }
             public RelicCore.Archive.Folder Folder { get; set; }
         }
+
         private static IEnumerable<ScenarioFolder> getScenarioFolders(INode root)
         {
             var result = new List<ScenarioFolder>();
