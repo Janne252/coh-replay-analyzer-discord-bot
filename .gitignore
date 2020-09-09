@@ -1,0 +1,5 @@
+node_modules
+/.replays
+/.flank-bin
+/.discord.token
+/dist

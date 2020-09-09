@@ -1,0 +1,3 @@
+[submodule "flank"]
+	path = flank
+	url = https://github.com/ryantaylor/flank.git
