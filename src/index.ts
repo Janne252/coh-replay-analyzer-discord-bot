@@ -54,7 +54,8 @@ client.on('message', async message => {
             
             const reply = new Discord.MessageEmbed();
             // Attach the map preview image to the message if there's one available.
-            // TODO: Use a CDN to host these images, even though they're <= 20KB.
+            // TODO: Use a CDN to host these images (see readme.md in the project root)
+            // TODO: use an async operation for checking if the file exists
             if (fs.existsSync(mapPreviewImageFilepath)) {
                 reply.attachFiles([mapPreviewImageFilepath]);
                 reply.setImage(`attachment://${mapPreviewImageFilename}`)
