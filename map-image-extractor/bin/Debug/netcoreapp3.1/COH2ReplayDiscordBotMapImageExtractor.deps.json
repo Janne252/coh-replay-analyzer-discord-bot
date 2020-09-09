@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "COH2ReplayDiscordBotMapImageExtractor/1.0.0": {
+        "dependencies": {
+          "RelicCore": "1.0.23380.0"
+        },
+        "runtime": {
+          "COH2ReplayDiscordBotMapImageExtractor.dll": {}
+        }
+      },
+      "RelicCore/1.0.23380.0": {
+        "runtime": {
+          "RelicCore.dll": {
+            "assemblyVersion": "1.0.23380.0",
+            "fileVersion": "1.0.23380.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "COH2ReplayDiscordBotMapImageExtractor/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "RelicCore/1.0.23380.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "xsdVOEVwR9umGnwQkIqe+B1dOaSbIud1mbpLtEePQyTds3/HAeRXkIlt5HYG+xvspCXCAnR3VeTxDQB270q7CA==",
+  "success": true,
+  "projectFilePath": "E:\\dev\\coh2-replay-discord-bot\\map-image-extractor\\COH2ReplayDiscordBotMapImageExtractor.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Janne\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
+    "C:\\Users\\Janne\\.nuget\\packages\\microsoft.win32.systemevents\\4.7.0\\microsoft.win32.systemevents.4.7.0.nupkg.sha512",
+    "C:\\Users\\Janne\\.nuget\\packages\\pfim\\0.9.1\\pfim.0.9.1.nupkg.sha512",
+    "C:\\Users\\Janne\\.nuget\\packages\\sixlabors.imagesharp\\1.0.1\\sixlabors.imagesharp.1.0.1.nupkg.sha512",
+    "C:\\Users\\Janne\\.nuget\\packages\\system.drawing.common\\4.7.0\\system.drawing.common.4.7.0.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "COH2ReplayDiscordBotMapImageExtractor": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\SteamLibrary\\steamapps\\common\\Company of Heroes 2\" \"../data/map-preview-images\""
+    }
+  }
+}
