@@ -14,7 +14,9 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
 - [ ] Use the "home" discord server as a CDN For map images?
     - [ ] Increase image quality to 85% (JPG)
     - [ ] Increase resolution to 512x512
-    - [ ] See if `"{0}_mm_preview_high.tga"` should have a higher priority than `"{0}_mm_preview.tga"` (Higher resolution, still the same artistic render of the tactical map)
+- [ ] See if `"{0}_mm_preview_high.tga"` should have a higher priority than `"{0}_mm_preview.tga"` (Higher resolution, still the same artistic render of the tactical map)
+- [ ] Use full scenario paths for identifting preview images. Replace path separators with underscores.
+- [ ] Preview image generation step should empty the destination directory before outputting any files.
 - [ ] Show player loadouts?
     - [ ] Commanders
     - [ ] Intel bulletins (likely not relevant)
