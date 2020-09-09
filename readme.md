@@ -28,6 +28,8 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
     - Maybe a bot command to include chat?
 - [ ] render map images with resource & strategic point icons overlay
     - This algorithm can be copied from https://github.com/Janne252/coh2-tactical-map-icons-renderer
+- [ ] Test with custom maps. If the Steam Workshop item id is present in the replay data somehow, we might be able to fetch the image from Steam (Open Graph meta tags).
+    - Owner of the map who uses a local copy likely won't have this data present, but it's a minor inconvenience. And it's known!
 
 # License
 [Zlib License](./LICENSE)
