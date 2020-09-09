@@ -160,7 +160,7 @@ function formatPlayer(player: Replay['players'][0]) {
     return `${FACTION_EMOJIS[player.faction]} ${playerNameDisplay}`
 }
 
-client.login(fs.readFileSync('.discord.token', {encoding: 'utf8'}));
+client.login(fs.readFileSync('.discord.token', {encoding: 'utf8'}).trim());
 
 async function shutdown(code = 0) {
     try {
