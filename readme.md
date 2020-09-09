@@ -5,8 +5,8 @@ The bot is being tested on https://discord.com/invite/coh2org.
 # Manual setup
 - Bot authentication link: https://discord.com/api/oauth2/authorize?client_id=753206700655378523&permissions=280640&scope=bot
     - Scopes: `Send Messages`, `Embed Links`, `Use External Emojis`, `Add Reactions`
-    Currently set to "private" - sorry! Only the author can add it to a server. And even then the author has to be the owner of the server.
-    The bot will be made public later on. Assuming all goes well.
+    - Currently set to "private" - sorry! Only the author can add it to a server. And even then the author has to be the owner of the server.
+    - The bot will be made public later on. Assuming all goes well.
 
 # TODO
 - [ ] Use the "home" discord server as a CDN For map images?
