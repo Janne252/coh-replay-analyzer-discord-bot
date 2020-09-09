@@ -1,5 +1,6 @@
 node_modules
 /.replays
-/.flank-bin
+/.flank.bin
+/.map-image-extractor.bin
 /.discord.token
 /dist

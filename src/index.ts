@@ -18,12 +18,27 @@ function run(command: string,): Promise<{stdout: string, stderr: string}> {
 }
 
 const replayTempRoot = path.join(root, '.replays');
-const flankPath = path.join(root, '.flank-bin/release/flank');
+const flankPath = path.join(root, '.flank.bin/release/flank');
 
 const client = new Discord.Client({
 
 });
 
+const FACTION_NAMES: Record<string, string> = {
+    german: 'Ostheer',
+    soviet: 'Soviets',
+    west_german: 'Oberkommando West',
+    aef: 'US. Forces',
+    british: 'British',
+};
+
+const FACTION_EMOJIS: Record<string, string> = {
+    german: '<:german:753277450171056208>',
+    soviet: '<:soviet:753277450489954375>',
+    west_german: '<:west_german:753277450217062411>',
+    aef: '<:aef:753277449944432830>',
+    british: '<:british:753277449957277867>',
+};
 
 class Locale {
     private readonly messages: Record<string, string> = {};
@@ -44,7 +59,7 @@ class Locale {
     }
 }
 
-const locale = new Locale(path.join(root, 'data', 'RelicCoH2.English.ucs'));
+const locale = new Locale(path.join(root, 'data', 'coh2', 'RelicCoH2.English.ucs'));
 
 client.on('ready', async () => {
     await fs.ensureDir(replayTempRoot);
@@ -55,6 +70,7 @@ client.on('ready', async () => {
 });
 
 interface Replay {
+    version: string;
     chat: ReadonlyArray<any>;
     date_time: string;
     duration: number;
@@ -75,6 +91,13 @@ interface Replay {
         steam_id: number;
         steam_id_str: string;
         team: 0 | 1;
+        faction: string;
+        commander: number;
+        items: {
+            selection_id: number;
+            server_id: number;
+            item_type: string;
+        }[];
     }>;
 }
 
@@ -89,19 +112,53 @@ client.on('message', async message => {
             const data = await download(attachment.url);
             await fs.writeFile(replayFilename, data);
             
-            const {stdout} = await run(`${flankPath} ${replayFilename}`);
+            /**
+                FLAGS:
+                    -l, --log        Enables debug logging to stdout
+                    -n, --nocmd      Skips command parsing
+                    -s, --strict     Rejects files without the .rec extension
+                    -w, --wipecmd    Parses command info but wipes them before output
+                    -h, --help       Prints help information
+                    -V, --version    Prints version information
+             */
+            const {stdout} = await run(`${flankPath} --wipecmd ${replayFilename}`);
             const replay: Replay = JSON.parse(stdout);
             await fs.unlink(replayFilename);
-            const mapName = locale.get(replay.map.name) || `(${replay.map.players}) ${capitalize(replay.map.file.split('\\').reverse()[0])}`;
-            message.reply(
-`
-${mapName}
-${replay.players.filter(p => p.team == 0).map(p => p.name).join(', ')} vs. ${replay.players.filter(p => p.team == 1).map(p => p.name).join(', ')}
-`
-);
+            const mapSgbFileNameWithoutExtension = replay.map.file.split('\\').reverse()[0];
+            const mapDisplayLabel = locale.get(replay.map.name) || `(${replay.map.players}) ${capitalize(mapSgbFileNameWithoutExtension)}`;
+            const mapPreviewImageFilename = `${mapSgbFileNameWithoutExtension}.jpg`;
+            const mapPreviewImageFilepath = path.join(root, 'data', 'map-preview-images', mapPreviewImageFilename);
+            const reply = new Discord.MessageEmbed();
+            if (fs.existsSync(mapPreviewImageFilepath)) {
+                reply.attachFiles([mapPreviewImageFilepath]);
+                reply.setImage(`attachment://${mapPreviewImageFilename}`)
+            }
+            reply.setTitle(mapDisplayLabel);
+            reply.addFields(
+                { inline: true, name: 'Team 1', value: replay.players.filter(p => p.team == 0).map(p => formatPlayer(p)).join('\n')},
+                { inline: true, name: 'Team 2', value: replay.players.filter(p => p.team == 1).map(p => formatPlayer(p)).join('\n')},
+            );
+            reply.addField('\u200b', '\u200b');
+            reply.addFields(
+                { name: 'Uploader', value: message.author.toString(), inline: true},
+                { name: 'Replay file', value: `[${attachment.name}](${attachment.url})`, inline: true},
+                { name: 'Game version', value: replay.version, inline: true},
+            );
+            reply.setFooter(client.user?.username, client.user?.avatarURL() as string);
+            message.channel.send(reply);
         }
     }
 });
+
+function formatPlayer(player: Replay['players'][0]) {
+    let playerNameDisplay = player.name;
+    if (player.steam_id && player.steam_id != 0) {
+        const url = `http://www.companyofheroes.com/leaderboards#profile/steam/${player.steam_id_str}/standings`;
+        playerNameDisplay = `[${player.name}](${url})`;
+    }
+
+    return `${FACTION_EMOJIS[player.faction]} ${playerNameDisplay}`
+}
 
 client.login(fs.readFileSync('.discord.token', {encoding: 'utf8'}));
 

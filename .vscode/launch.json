@@ -12,7 +12,8 @@
                 "<node_internals>/**"
             ],
             "outputCapture": "std",
-            "program": "${workspaceFolder}\\index.js",
+            "program": "${workspaceFolder}\\dist\\index.js",
+            "sourceMaps": true,
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ]
