@@ -2,7 +2,7 @@
 This Discord bot is currently under development.
 The bot is being tested on https://discord.com/invite/coh2org.
 
-Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault](https://github.com/ryantaylor/vault) and [ryantaylor/vlank](https://github.com/ryantaylor/flank).
+Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault](https://github.com/ryantaylor/vault) and [ryantaylor/flank](https://github.com/ryantaylor/flank).
 
 # Manual setup
 - Bot authentication link: https://discord.com/api/oauth2/authorize?client_id=753206700655378523&permissions=280640&scope=bot
