@@ -4,3 +4,7 @@ node_modules
 /.map-image-extractor.bin
 /.discord.token
 /dist
+
+# Visual Studio 2015/2017 cache/options directory
+/map-image-extractor/.vs/
+/map-image-extractor/[Oo]bj/
