@@ -1,16 +1,25 @@
 {
   "name": "coh2-replay-bot",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "discord": {
+    "log": {
+      "guild": "753277157027086427",
+      "channel": "753552456574697522",
+      "administrators": [
+        "163578909965811712"
+      ]
+    }
+  },
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
     "build:flank": "cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.bin",
-    "start": "node ./dist/index.js"
+    "start": "node ./dist/index.js --enable-source-maps"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Janne Varjo",
+  "license": "MIT",
   "dependencies": {
     "@types/fs-extra": "^9.0.1",
     "discord.js": "^12.3.1",
