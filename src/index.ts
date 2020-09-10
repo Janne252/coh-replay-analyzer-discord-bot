@@ -3,18 +3,23 @@ import path from 'path';
 import fs from 'fs-extra';
 import download from 'download';
 import { v4 as uuidv4 } from 'uuid';
-import { exec, Locale, capitalize } from './helpers';
+import { exec, capitalize } from './helpers/misc';
 import { FACTION_EMOJIS } from './config';
+import { Locale } from './helpers/coh2';
+import { ChannelLogger, getDiscordConfig, ShutdownManager } from './helpers/discord';
 
+// Paths
 const root = process.cwd();
-
 const replayTempRoot = path.join(root, '.replays');
 const flankPath = path.join(root, '.flank.bin/release/flank');
-const locale = new Locale(path.join(root, 'data', 'coh2', 'RelicCoH2.English.ucs'));
 
+// Instances
+const locale = new Locale(path.join(root, 'data', 'coh2', 'RelicCoH2.English.ucs'));
 const client = new Discord.Client({
 
 });
+const logger = new ChannelLogger(client);
+const shutdownManager = new ShutdownManager(client);
 
 client.on('ready', async () => {
     // Prepare .replays folder
@@ -22,6 +27,7 @@ client.on('ready', async () => {
     await fs.emptyDir(replayTempRoot);
 
     await locale.init();
+    await logger.init();
     console.log('Ready!');
 });
 
@@ -62,8 +68,8 @@ client.on('message', async message => {
             }
             reply.setTitle(mapDisplayLabel);
             reply.addFields(
-                { inline: true, name: 'Team 1', value: replay.players.filter(p => p.team == 0).map(p => formatPlayer(p)).join('\n')},
-                { inline: true, name: 'Team 2', value: replay.players.filter(p => p.team == 1).map(p => formatPlayer(p)).join('\n')},
+                { inline: true, name: 'Team 1', value: replay.players.filter(p => p.team == 0).map(p => formatPlayer(p)).join('\n') || '_No players available._'},
+                { inline: true, name: 'Team 2', value: replay.players.filter(p => p.team == 1).map(p => formatPlayer(p)).join('\n') || '_No players available._'},
             );
             // Blank row according to https://discordjs.guide/popular-topics/embeds.html#embeds
             reply.addField('\u200b', '\u200b');
@@ -96,17 +102,6 @@ function formatPlayer(player: Replay['players'][0]) {
 // Login with a locally stored utf8 encoded text file.
 // This file is ignored in .gitignore
 client.login(fs.readFileSync('.discord.token', {encoding: 'utf8'}).trim());
-
-// Uniform exit handing (logout from discord & safely exit)
-async function shutdown(code = 0) {
-    try {
-        client.destroy();
-    }
-    finally {
-        process.exit(code);
-    }
-}
-
-process.on('SIGINT', () => shutdown());
-process.on('SIGABRT', () => shutdown());
-process.on('SIGTERM', () => shutdown());
+// Add global event listeners
+logger.addGlobalListeners();
+shutdownManager.addGlobalListeners();
