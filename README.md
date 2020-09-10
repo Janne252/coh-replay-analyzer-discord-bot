@@ -34,4 +34,4 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
     - Owner of the map who uses a local copy likely won't have this data present, but it's a minor inconvenience. And it's known!
 
 # License
-[Zlib License](./LICENSE)
+[MIT License](./LICENSE.txt)
