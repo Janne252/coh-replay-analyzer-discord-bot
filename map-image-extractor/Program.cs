@@ -127,6 +127,11 @@ namespace COH2ReplayDiscordBotMapImageExtractor
         static string ScenarioPreviewImageDestinationRoot;
         static string ScenarioIconsRoot;
 
+        static double scale(double value, double fromMin, double fromMax, double toMin, double toMax)
+        {
+            return (value - fromMin) * (toMax - toMin) / (fromMax - fromMin) + toMin;
+        }
+
         static void Main(string[] args)
         {
             if (args.Length < 3)
@@ -162,6 +167,9 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                 var scenarioFolders = getScenarioFolders(scenariosRoot);
                 foreach (var scenario in scenarioFolders)
                 {
+                    //if (scenario.ScenarioName != "1941_smolensk")
+                    //    continue;
+
                     var preview = getScenarioPreviewImage(scenario);
                     if (preview == null)
                     {
@@ -173,7 +181,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                     var image = SixLabors.ImageSharp.Image.Load(preview.GetData());
 
                     var icons = scenario.GetIcons();
-                    var iconOverlayScale = Math.Max(scenario.ScenarioWidth, scenario.ScenarioHeight) / image.Width;
+                    var iconOverlayScale = image.Width * 1.0 / Math.Max(scenario.ScenarioWidth, scenario.ScenarioHeight);
 
                     foreach (var icon in icons)
                     {
@@ -193,9 +201,16 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                         var iconImage = getScenarioIconImage(icon);
                         // Translate center origin coordinates to top left coordinates.
                         // Scale coordinates by ratio between source image size and map size.
-                        var x = (scenario.ScenarioWidth / 2.0 + (icon.X - iconImage.Width / 2)) * (image.Width / scenario.ScenarioWidth);
-                        var y = (scenario.ScenarioHeight / 2.0 + (Flip(icon.Y) - iconImage.Height / 2)) * (image.Height / scenario.ScenarioHeight);
+                        var x = (scenario.ScenarioWidth * iconOverlayScale / 2.0 + (icon.X * iconOverlayScale - iconImage.Width / 2.0));
+                        var y = (scenario.ScenarioHeight * iconOverlayScale / 2.0 + (Flip(icon.Y) * iconOverlayScale - iconImage.Height / 2.0));
 
+                        var x2 = scale(icon.X, scenario.ScenarioWidth / -2, scenario.ScenarioWidth / 2, 0, image.Width);
+                        var y2 = scale(Flip(icon.Y), scenario.ScenarioHeight / -2, scenario.ScenarioHeight / 2, 0, image.Height);
+                        if (scenario.ScenarioName == "1941_smolensk" || true)
+                        {
+                            x = x2;
+                            y = y2;
+                        }
                         try
                         {
                             image.Mutate(_ => _
@@ -208,12 +223,12 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                         }
                     }
 
-                    if (image.Width >= 256 && image.Height >= 256)
+                    /*if (image.Width >= 256 && image.Height >= 256)
                     {
                         image.Mutate(_ => _
                             .Resize(256, 256)
                         );
-                    }
+                    }*/
                     image.Save(imageFilename, jpgEncoder);
                     Console.WriteLine($"{scenario.ScenarioName}: {preview.Name}");
                 }
@@ -350,8 +365,6 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                     mapsize.MoveNext();
                     ScenarioHeight = double.Parse((mapsize.Current as System.Collections.DictionaryEntry?).Value.Value.ToString());
 
-                    //ScenarioWidth = float.Parse((;
-                    //ScenarioHeight = float.Parse((mapsize.Values as System.Collections.Specialized.ListDictionary)[1].ToString());
 
                     var point_positions = lua["HeaderInfo.point_positions"] as LuaTable;
                     if (point_positions == null)
