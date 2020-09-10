@@ -13,6 +13,7 @@
             ],
             "outputCapture": "std",
             "program": "${workspaceFolder}\\dist\\index.js",
+            "runtimeArgs": ["--enable-source-maps"],
             "sourceMaps": true,
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
