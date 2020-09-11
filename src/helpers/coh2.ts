@@ -26,3 +26,11 @@ export class Locale {
         return this.messages[id];
     }
 }
+
+export function getReplayDurationDisplay(duration: number) {
+    let [hh, mm, ss] = new Date(100 * 24168).toISOString().substring(11, 19).split(':');
+    hh = hh != '00' ? `${hh}h ` : '';
+    mm = mm != '00' ? `${mm}m ` : '';
+    ss = `${ss}s`;
+    return `${hh}${mm}${ss}`;
+}
