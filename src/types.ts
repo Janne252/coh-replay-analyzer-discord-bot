@@ -1,7 +1,7 @@
 /**
  * Definition for https://github.com/ryantaylor/vault JSON output.
  */
-interface Replay {
+export interface Replay {
     version: string;
     chat: {
         tick: number;

@@ -1,0 +1,680 @@
+{
+    "error": null,
+    "file": {
+        "name": "e:\\dev\\coh2-replay-discord-bot\\.replays\\4c311db8-b5c5-4897-91f8-906c5e676bf7.rec",
+        "data": [],
+        "cursor": 3952233
+    },
+    "version": 23468,
+    "game_type": "COH2_REC",
+    "date_time": "07.09.2020 21:02",
+    "map": {
+        "file": "DATA:scenarios\\mp\\8p_roadtoarnhem\\roadtoarnhem",
+        "name": "$11180885",
+        "description": "$11180884",
+        "description_long": "R2A",
+        "width": 512,
+        "height": 512,
+        "players": 8
+    },
+    "players": [
+        {
+            "id": 0,
+            "name": "Gabbocombinaguai",
+            "steam_id": 76561198387936340,
+            "steam_id_str": "76561198387936329",
+            "team": 0,
+            "faction": "soviet",
+            "commander": 5924,
+            "items": [
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "FacePlate"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "VictoryStrike"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "Decal"
+                },
+                {
+                    "selection_id": 289333750,
+                    "server_id": 5925,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 290303711,
+                    "server_id": 5924,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 300848277,
+                    "server_id": 7546,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 331295062,
+                    "server_id": 388304,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 291474135,
+                    "server_id": 5806,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 283433071,
+                    "server_id": 396520,
+                    "item_type": "Bulletin"
+                }
+            ],
+            "cpm": 77.67538644470868
+        },
+        {
+            "id": 5,
+            "name": "Sir Culito",
+            "steam_id": 76561198335861780,
+            "steam_id_str": "76561198335861771",
+            "team": 1,
+            "faction": "west_german",
+            "commander": 186419,
+            "items": [
+                {
+                    "selection_id": 223643066,
+                    "server_id": 451347,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 223643065,
+                    "server_id": 451348,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 223643067,
+                    "server_id": 451346,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "FacePlate"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "VictoryStrike"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "Decal"
+                },
+                {
+                    "selection_id": 213992860,
+                    "server_id": 186417,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 213992863,
+                    "server_id": 186419,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 229944671,
+                    "server_id": 257800,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 237001952,
+                    "server_id": 259746,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 232006951,
+                    "server_id": 259861,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 235034186,
+                    "server_id": 388306,
+                    "item_type": "Bulletin"
+                }
+            ],
+            "cpm": 51.26040428061831
+        },
+        {
+            "id": 3,
+            "name": "Coast",
+            "steam_id": 76561198015447040,
+            "steam_id_str": "76561198015447043",
+            "team": 0,
+            "faction": "soviet",
+            "commander": 5924,
+            "items": [
+                {
+                    "selection_id": 237484966,
+                    "server_id": 396492,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 204815454,
+                    "server_id": 396493,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 207681752,
+                    "server_id": 396491,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "FacePlate"
+                },
+                {
+                    "selection_id": 58631958,
+                    "server_id": 260900,
+                    "item_type": "VictoryStrike"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "Decal"
+                },
+                {
+                    "selection_id": 204414232,
+                    "server_id": 7246,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 95082965,
+                    "server_id": 5924,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 11659340,
+                    "server_id": 5575,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 81409203,
+                    "server_id": 387934,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 11659405,
+                    "server_id": 5821,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 11659475,
+                    "server_id": 6110,
+                    "item_type": "Bulletin"
+                }
+            ],
+            "cpm": 39.720570749108205
+        },
+        {
+            "id": 6,
+            "name": "Swedish tactics",
+            "steam_id": 76561198015818690,
+            "steam_id_str": "76561198015818685",
+            "team": 1,
+            "faction": "west_german",
+            "commander": 186419,
+            "items": [
+                {
+                    "selection_id": 218113565,
+                    "server_id": 451347,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 218113564,
+                    "server_id": 451348,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 218113566,
+                    "server_id": 451346,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 383947721,
+                    "server_id": 346849,
+                    "item_type": "FacePlate"
+                },
+                {
+                    "selection_id": 205338777,
+                    "server_id": 260896,
+                    "item_type": "VictoryStrike"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "Decal"
+                },
+                {
+                    "selection_id": 8377774,
+                    "server_id": 186418,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 305245666,
+                    "server_id": 259929,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 8377772,
+                    "server_id": 186419,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 340103320,
+                    "server_id": 348149,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 340186035,
+                    "server_id": 394349,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 166943690,
+                    "server_id": 260244,
+                    "item_type": "Bulletin"
+                }
+            ],
+            "cpm": 119.64328180737216
+        },
+        {
+            "id": 2,
+            "name": "SoE-Sturmpanther-",
+            "steam_id": 76561198046481660,
+            "steam_id_str": "76561198046481660",
+            "team": 0,
+            "faction": "aef",
+            "commander": 186413,
+            "items": [
+                {
+                    "selection_id": 291616543,
+                    "server_id": 451739,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 291616542,
+                    "server_id": 451740,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 291616544,
+                    "server_id": 451738,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 278394515,
+                    "server_id": 69276,
+                    "item_type": "FacePlate"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "VictoryStrike"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "Decal"
+                },
+                {
+                    "selection_id": 174014194,
+                    "server_id": 450479,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 343313563,
+                    "server_id": 452456,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 7305194,
+                    "server_id": 186413,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 118144344,
+                    "server_id": 396514,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 156942119,
+                    "server_id": 395923,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 156942102,
+                    "server_id": 395930,
+                    "item_type": "Bulletin"
+                }
+            ],
+            "cpm": 56.36147443519619
+        },
+        {
+            "id": 7,
+            "name": "㏒㏑『Reegar』",
+            "steam_id": 76561198101026750,
+            "steam_id_str": "76561198101026759",
+            "team": 1,
+            "faction": "west_german",
+            "commander": 452452,
+            "items": [
+                {
+                    "selection_id": 345496349,
+                    "server_id": 450756,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 344270742,
+                    "server_id": 450757,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 340758820,
+                    "server_id": 450755,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 380216091,
+                    "server_id": 348129,
+                    "item_type": "FacePlate"
+                },
+                {
+                    "selection_id": 391378169,
+                    "server_id": 260900,
+                    "item_type": "VictoryStrike"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "Decal"
+                },
+                {
+                    "selection_id": 343624829,
+                    "server_id": 452452,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 316849004,
+                    "server_id": 186419,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 391275121,
+                    "server_id": 259929,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 334733002,
+                    "server_id": 259272,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 334732725,
+                    "server_id": 259274,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 354184399,
+                    "server_id": 396529,
+                    "item_type": "Bulletin"
+                }
+            ],
+            "cpm": 86.5398335315101
+        },
+        {
+            "id": 1,
+            "name": "代号 『粤』",
+            "steam_id": 76561198837352110,
+            "steam_id_str": "76561198837352119",
+            "team": 0,
+            "faction": "soviet",
+            "commander": 7546,
+            "items": [
+                {
+                    "selection_id": 329759968,
+                    "server_id": 450762,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 334858966,
+                    "server_id": 450763,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 330955119,
+                    "server_id": 450761,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 352102692,
+                    "server_id": 451452,
+                    "item_type": "FacePlate"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "VictoryStrike"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "Decal"
+                },
+                {
+                    "selection_id": 303001442,
+                    "server_id": 5925,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 326152551,
+                    "server_id": 5924,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 349758109,
+                    "server_id": 7546,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 335781885,
+                    "server_id": 388789,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 328726399,
+                    "server_id": 5827,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 338132560,
+                    "server_id": 5790,
+                    "item_type": "Bulletin"
+                }
+            ],
+            "cpm": 65.99286563614744
+        },
+        {
+            "id": 4,
+            "name": "fermi",
+            "steam_id": 76561198156561650,
+            "steam_id_str": "76561198156561651",
+            "team": 1,
+            "faction": "west_german",
+            "commander": 186417,
+            "items": [
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "Skin"
+                },
+                {
+                    "selection_id": 99060704,
+                    "server_id": 450003,
+                    "item_type": "FacePlate"
+                },
+                {
+                    "selection_id": 325880752,
+                    "server_id": 388856,
+                    "item_type": "VictoryStrike"
+                },
+                {
+                    "selection_id": 0,
+                    "server_id": 0,
+                    "item_type": "Decal"
+                },
+                {
+                    "selection_id": 99060733,
+                    "server_id": 186417,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 99060725,
+                    "server_id": 186419,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 266872869,
+                    "server_id": 450494,
+                    "item_type": "Commander"
+                },
+                {
+                    "selection_id": 99060723,
+                    "server_id": 259078,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 290595189,
+                    "server_id": 259099,
+                    "item_type": "Bulletin"
+                },
+                {
+                    "selection_id": 266072436,
+                    "server_id": 396530,
+                    "item_type": "Bulletin"
+                }
+            ],
+            "cpm": 37.580261593341255
+        }
+    ],
+    "commands": {},
+    "duration": 26912,
+    "rng_seed": 1747616465,
+    "opponent_type": 1,
+    "chat": [
+        {
+            "tick": 103,
+            "name": "SoE-Sturmpanther-",
+            "message": "hi again"
+        },
+        {
+            "tick": 123,
+            "name": "fermi",
+            "message": "gl hf"
+        },
+        {
+            "tick": 193,
+            "name": "Coast",
+            "message": "yo"
+        },
+        {
+            "tick": 7150,
+            "name": "SoE-Sturmpanther-",
+            "message": "every maxrage hits? from rakten"
+        },
+        {
+            "tick": 8616,
+            "name": "Sir Culito",
+            "message": "rly"
+        },
+        {
+            "tick": 12425,
+            "name": "Swedish tactics",
+            "message": "mother of.-."
+        },
+        {
+            "tick": 21124,
+            "name": "Sir Culito",
+            "message": "ofc"
+        },
+        {
+            "tick": 21999,
+            "name": "㏒㏑『Reegar』",
+            "message": "isu s a joke"
+        },
+        {
+            "tick": 22965,
+            "name": "fermi",
+            "message": "gg"
+        },
+        {
+            "tick": 23656,
+            "name": "㏒㏑『Reegar』",
+            "message": "no that isu is broken"
+        },
+        {
+            "tick": 26019,
+            "name": "Sir Culito",
+            "message": "gg"
+        },
+        {
+            "tick": 26814,
+            "name": "Sir Culito",
+            "message": "200 munitinos for nothing"
+        },
+        {
+            "tick": 26902,
+            "name": "SoE-Sturmpanther-",
+            "message": "gg"
+        },
+        {
+            "tick": 26912,
+            "name": "Gabbocombinaguai",
+            "message": "gg"
+        }
+    ],
+    "config": {
+        "strict": false,
+        "commands": true,
+        "command_bytes": false,
+        "clean_file": true
+    }
+}

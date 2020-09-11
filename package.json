@@ -6,11 +6,13 @@
   "discord": {
     "log": {
       "guild": "753277157027086427",
-      "channel": "753552456574697522",
-      "administrators": [
-        "163578909965811712"
-      ]
-    }
+      "channel": "753552456574697522"
+    },
+    "test": {
+      "guild": "753277157027086427",
+      "channel": "754050938066436153"
+    },
+    "author": "163578909965811712"
   },
   "scripts": {
     "dev": "tsc --project ./tsconfig.json --watch",

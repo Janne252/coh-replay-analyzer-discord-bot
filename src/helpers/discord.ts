@@ -3,20 +3,47 @@ import path from 'path';
 import Discord from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
 
-export interface ChannelLoggerConfig {
-    log: {
-        guild: string;
-        channel: string;
-        administrators: string[];
-    }
-}
 
 /* istanbul ignore next */
 /**
  * package.json section "discord".
  */
-export async function getDiscordConfig() {
-    return JSON.parse(await fs.readFile(path.join(process.cwd(), 'package.json'), {encoding: 'utf8'})).discord as ChannelLoggerConfig;
+export class PackageDiscordConfig {
+    //@ts-expect-error 2564
+    private _log: {
+        readonly guild: string;
+        readonly channel: string;
+    };
+    //@ts-expect-error 2564
+    private _test: {
+        readonly guild: string;
+        readonly channel: string;
+    };
+    //@ts-expect-error 2564
+    private _author: string;
+
+    get log() {
+        return this._log;
+    }
+
+    get test() {
+        return this._test;
+    }
+
+    get author() {
+        return this._author;
+    }
+
+    constructor() {
+
+    }
+
+    async init() {
+        const config = JSON.parse(await fs.readFile(path.join(process.cwd(), 'package.json'), {encoding: 'utf8'})).discord;
+        this._log = config.log;
+        this._test = config.test;
+        this._author = config.author;
+    }
 }
 
 /* istanbul ignore next */
@@ -29,21 +56,13 @@ export class ChannelLogger {
         Warning: 0xffc107, // Orange
         Error: 0xf44336, // Red
     };
-
-    private _config: ChannelLoggerConfig | null;
-
-    get config() {
-        return this._config as ChannelLoggerConfig;
-    }
     
-    constructor(private readonly client: Discord.Client, config: ChannelLoggerConfig | null = null) {
-        this._config = config;
+    constructor(private readonly client: Discord.Client, private readonly config: PackageDiscordConfig) {
+
     }
 
     async init() {
-        if (this._config == null) {
-            this._config = await getDiscordConfig();
-        }
+
     }
 
     async log(options: Discord.MessageEmbedOptions = {}) {
@@ -139,5 +158,11 @@ export class ShutdownManager {
         process.on('SIGINT', () => this.exit());
         process.on('SIGABRT', () => this.exit());
         process.on('SIGTERM', () => this.exit());
+    }
+}
+
+export class MessageHelpers {
+    public static withoutMentions(message: {content: string}) {
+        return message.content.replace(/<@!\d+>/g, '').trim();
     }
 }
