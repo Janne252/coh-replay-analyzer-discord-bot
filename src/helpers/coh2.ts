@@ -27,10 +27,14 @@ export class Locale {
     }
 }
 
-export function getReplayDurationDisplay(duration: number) {
-    let [hh, mm, ss] = new Date(100 * 24168).toISOString().substring(11, 19).split(':');
-    hh = hh != '00' ? `${hh}h ` : '';
-    mm = mm != '00' ? `${mm}m ` : '';
-    ss = `${ss}s`;
+export function getReplayTimestamp(ticks: number) {
+    return new Date(ticks / 8 * 1000).toISOString().substring(11, 19);
+}
+
+export function getReplayDurationDisplay(ticks: number, {verbose}: {verbose?: boolean} = {}) {
+    let [hh, mm, ss] = getReplayTimestamp(ticks).split(':');
+    hh = (hh != '00') ? `${Number(hh)}${' '}${(verbose ? (Number(hh) == 1 ? 'hour' : 'hours') : 'h')} ` : '';
+    mm = (mm != '00') ? `${Number(mm)}${' '}${(verbose ? (Number(mm) == 1 ? 'minute' : 'minutes') : 'm')} ` : '';
+    ss = `${Number(ss)}${' '}${(verbose ? (Number(ss) == 1 ? 'second' : 'seconds') : 's')}`;
     return `${hh}${mm}${ss}`;
 }
