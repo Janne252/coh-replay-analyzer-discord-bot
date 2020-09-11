@@ -5,7 +5,7 @@ import download from 'download';
 import { v4 as uuidv4 } from 'uuid';
 import { exec, capitalize } from './helpers/misc';
 import { FACTION_EMOJIS } from './config';
-import { Locale } from './helpers/coh2';
+import { Locale, getReplayDurationDisplay } from './helpers/coh2';
 import { ChannelLogger, getDiscordConfig, ShutdownManager } from './helpers/discord';
 
 // Paths
@@ -57,7 +57,7 @@ client.on('message', async message => {
             const mapDisplayLabel = locale.get(replay.map.name) || `(${replay.map.players}) ${capitalize(mapSgbFileNameWithoutExtension)}`;
             const mapPreviewImageFilename = `${mapSgbFileNameWithoutExtension}.jpg`;
             const mapPreviewImageFilepath = path.join(root, 'data', 'map-preview-images', mapPreviewImageFilename);
-            
+   
             const reply = new Discord.MessageEmbed();
             // Attach the map preview image to the message if there's one available.
             // TODO: Use a CDN to host these images (see readme.md in the project root)
@@ -74,8 +74,9 @@ client.on('message', async message => {
             // Blank row according to https://discordjs.guide/popular-topics/embeds.html#embeds
             reply.addField('\u200b', '\u200b');
             reply.addFields(
-                { name: 'Uploader', value: message.author.toString(), inline: true},
-                { name: 'Replay file', value: `[${attachment.name}](${attachment.url})`, inline: true},
+                // { name: 'Uploader', value: message.author.toString(), inline: true},
+                // { name: 'Replay file', value: `[${attachment.name}](${attachment.url})`, inline: true},
+                { name: 'Match duration', value: `||${getReplayDurationDisplay(replay.duration)}||`, inline: true},
                 { name: 'Game version', value: replay.version, inline: true},
             );
             reply.setFooter(client.user?.username, client.user?.avatarURL() as string);
