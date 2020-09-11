@@ -31,13 +31,13 @@ client.on('ready', async () => {
     await locale.init();
     await config.init();
     await logger.init();
-    await client.user?.setPresence({
-        activity: {
-            name: 'Calculating flanking paths...',
-            type: "CUSTOM_STATUS",
-        },
-    });
+   
     console.log('Ready!');
+
+    await client.user?.setActivity({
+        name: 'Replays',
+        type: 'WATCHING'
+    });
 });
 
 client.on('message', async message => {
