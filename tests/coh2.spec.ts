@@ -1,6 +1,6 @@
 import assert from 'assert';
 import {describe, it} from 'mocha';
-import { getReplayDurationDisplay, getReplayTimestamp, resolveMapDisplayName } from '../src/helpers/coh2';
+import { getReplayDurationDisplay, getReplayTimestamp, resolveMapDisplayName, resolveScenarioId } from '../src/helpers/coh2';
 import * as factory from './factory';
 import * as mocking from './mocking';
 
@@ -63,6 +63,15 @@ describe('helpers.coh2', () => {
             resolveMapDisplayName(factory.replay({name: '$1'}), new mocking.Locale({'$1': '(2) Map'})), 
             '(2) Map'
         );
+    });
+
+    it('resolveScenarioId', () => {
+        assert.strictEqual(resolveScenarioId(factory.replay({file: 'Data://scenarios\\mp\\2p_map//2p_map'})), 'scenarios-mp-2p-map-2p-map');
+        assert.strictEqual(resolveScenarioId(factory.replay({file: 'Data:\\scenarios\\mp\\2p_map\\2p_map'})), 'scenarios-mp-2p-map-2p-map');
+        assert.strictEqual(resolveScenarioId(factory.replay({file: 'Data:\\scenarios\\mp\\2p map\\2p map'})), 'scenarios-mp-2p-map-2p-map');
+        assert.strictEqual(resolveScenarioId(factory.replay({file: 'Data:\\scenarios\\mp\\2p _map\\2p map'})), 'scenarios-mp-2p-map-2p-map');
+        assert.strictEqual(resolveScenarioId(factory.replay({file: 'Data:\\scenarios\\mp\\2p--map\\2p map'})), 'scenarios-mp-2p-map-2p-map');
+        assert.strictEqual(resolveScenarioId(factory.replay({file: 'Data:\\scenarios\\mp\\ _ 2p--map\\2p map'})), 'scenarios-mp-2p-map-2p-map');
     });
 
     it('getReplayTimestamp', () => {
