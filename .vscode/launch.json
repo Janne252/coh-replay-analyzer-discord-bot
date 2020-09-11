@@ -7,7 +7,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Discord Bot",
             "skipFiles": [
                 "<node_internals>/**"
             ],
@@ -18,6 +18,19 @@
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Tests",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/ts-mocha",
+            "args": [
+                "${workspaceFolder}/tests/**/*.spec.ts",
+            ],
+            "protocol": "inspector"
         }
     ]
 }

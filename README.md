@@ -15,23 +15,27 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
     - [ ] Increase image quality to 85% (JPG)
     - [ ] Increase resolution to 512x512
 - [ ] See if `"{0}_mm_preview_high.tga"` should have a higher priority than `"{0}_mm_preview.tga"` (Higher resolution, still the same artistic render of the tactical map)
-- [ ] Use full scenario paths for identifting preview images. Replace path separators with underscores.
-- [ ] Preview image generation step should empty the destination directory before outputting any files.
+- [x] Use full scenario paths for identifying preview images. Replace path separators with underscores.
+- [x] Preview image generation step should empty the destination directory before outputting any files.
 - [ ] Show player loadouts?
     - [ ] Commanders
     - [ ] Intel bulletins (likely not relevant)
     - [ ] Skins (likely not relevant)
-- [ ] Show match length
+- [x] Show match length
     - Really not a spoiler as it's both displayed in the list of replays and in-game.
-- [ ] Show chat?
+    - Implemented using Discord's spoiler tag
+- [x] Show chat?
     - How do we limit the number of lines; The embed likely cannot scroll overflowing content.
     - Perhaps there is a markdown notation for code / quote blocks with scrolling?
     - Considered a spoiler; Chat often reveals the winning player.
     - Maybe a bot command to include chat?
-- [ ] render map images with resource & strategic point icons overlay
+    - Can probably be rendered with a spoiler tag, has to be limited to 1024 characters similar to other embed fields.
+- [x] render map images with resource & strategic point icons overlay
     - This algorithm can be copied from https://github.com/Janne252/coh2-tactical-map-icons-renderer
-- [ ] Test with custom maps. If the Steam Workshop item id is present in the replay data somehow, we might be able to fetch the image from Steam (Open Graph meta tags).
+- [x] Test with custom maps. If the Steam Workshop item id is present in the replay data somehow, we might be able to fetch the image from Steam (Open Graph meta tags).
     - Owner of the map who uses a local copy likely won't have this data present, but it's a minor inconvenience. And it's known!
-- [ ] Add a status message to the bot
+    - Nope, cannot be done. The replay file contains the asset path of the map.
+- [x] Add a status message to the bot
+    - Done, does not seem to work though.
 # License
 [MIT License](./LICENSE.txt)

@@ -5,6 +5,10 @@ node_modules
 /.discord.token
 /dist
 
+# test and coverage
+/.nyc.temp
+/.nyc.coverage
+
 # Visual Studio 2015/2017 cache/options directory
 /map-image-extractor/.vs/
 /map-image-extractor/[Oo]bj/

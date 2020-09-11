@@ -13,10 +13,12 @@
     }
   },
   "scripts": {
-    "dev": "tsc --watch",
-    "build": "tsc",
+    "dev": "tsc --project ./tsconfig.json --watch",
+    "build": "tsc --project ./tsconfig.json",
     "build:flank": "cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.bin",
-    "start": "node ./dist/index.js --enable-source-maps"
+    "start": "node ./dist/index.js --enable-source-maps",
+    "test": "ts-mocha -p ./tsconfig.json tests/**/*.spec.ts",
+    "test:coverage": "nyc --reporter=text --reporter=html npm test"
   },
   "author": "Janne Varjo",
   "license": "MIT",
@@ -30,7 +32,12 @@
   "devDependencies": {
     "@tsconfig/node12": "^1.0.7",
     "@types/download": "^6.2.4",
+    "@types/mocha": "^8.0.3",
     "@types/uuid": "^8.3.0",
+    "mocha": "^8.1.3",
+    "nyc": "^15.1.0",
+    "ts-mocha": "^7.0.0",
+    "type-fest": "^0.16.0",
     "typescript": "^4.0.2"
   }
 }
