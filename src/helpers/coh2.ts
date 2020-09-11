@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+import { Replay } from '../types';
 import { capitalize } from './misc';
 
 /**
@@ -55,9 +56,9 @@ export function resolveMapDisplayName(replay: Replay, locale?: LocaleLike) {
     if (!result && replay.map.file) {
         const mapFilename = replay.map.file
             // Normalize path separator
-            .replace(/\//g, '\\')
+            .replace(/\\/g, '/')
             // Split by path separator
-            .split('\\')
+            .split('/')
             // Take last part (filename)
             .reverse()[0]
         
@@ -75,4 +76,19 @@ export function resolveMapDisplayName(replay: Replay, locale?: LocaleLike) {
         result = `(${replay.map.players}) ${capitalize(mapFilename)}`;
     }
     return result;
+}
+
+export function resolveScenarioId(replay: Replay) {
+    return replay.map.file
+        .replace(/data:/gi, '')
+        .replace(/\\/g, '/')
+        .replace(/\//g, '-')
+        .replace(/ /g, '-')
+        .replace(/_/g, '-')
+        .replace(/:/g, '')
+        .replace(/[\-]+/g, '-')
+        .replace(/^\//g, '').replace(/\/$/g, '')  // Same as C# .Trim('\\')
+        .replace(/^-/g, '').replace(/-$/g, '')  // Same as C# .Trim('-')
+        .toLowerCase()
+    ;
 }

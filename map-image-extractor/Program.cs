@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace COH2ReplayDiscordBotMapImageExtractor
@@ -201,11 +202,18 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                     var scenarioId = scenario.File.FullName
                         .Substring(0, scenario.File.FullName.Length - ".sgb".Length)
                         .Replace("Data:", "", StringComparison.OrdinalIgnoreCase)
-                        .Trim('\\')
-                        .Replace("\\", "-")
+                        .Replace("\\", "/")
+                        .Replace("/", "-")
+                        .Replace(" ", "-")
+                        .Replace("_", "-")
                         .Replace(":", "")
+                        .Trim('/')
+                        .Trim('-')
                         .ToLower()
                     ;
+                    // Normalize repeated dashes to one
+                    scenarioId = Regex.Replace(scenarioId, "[\\-]+", "-");
+
                     var imageFilename = Path.Join(ScenarioPreviewImageDestinationRoot, $"{scenarioId}.jpg");
                     var image = SixLabors.ImageSharp.Image.Load(preview.GetData());
 
