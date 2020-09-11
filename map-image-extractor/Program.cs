@@ -18,7 +18,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
 {
     class Program
     {
-        static List<string> Errors = new List<string>();
+        static List<string> Output = new List<string>();
 
         /// <summary>
         /// List of possible candiates for scenario preview image in the order of importance (first available will be used).
@@ -121,6 +121,16 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             "watchtower", "tow_kalach_watchtower",
         };
 
+        static readonly string[] ExcludeArchives = new string[]
+        {
+            "DLC1Scenarios.sga",
+            "DLC2Scenarios.sga",
+            "DLC3Scenarios.sga",
+            "SPScenariosAA.sga",
+            "SPScenariosEF.sga",
+            "TOWScenarios.sga",
+        };
+
         static Dictionary<string, Image> ScenarioIconCache = new Dictionary<string, Image>();
 
         static string Coh2RootPath;
@@ -154,9 +164,20 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                 Quality = 75,
             };
 
+            if (Directory.Exists(ScenarioPreviewImageDestinationRoot))
+                Directory.Delete(ScenarioPreviewImageDestinationRoot, true);
+
+            Directory.CreateDirectory(ScenarioPreviewImageDestinationRoot);
+
             foreach (var filename in archives)
             {
                 var archive = new Archive(filename);
+                if (ExcludeArchives.Contains(Path.GetFileName(filename)))
+                {
+                    Output.Add($"[info] {archive.Name} excluded.");
+                    continue;
+                }
+
                 var scenariosRoot = getScenariosRoot(archive);
                 if (scenariosRoot == null)
                 {
@@ -167,7 +188,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                 var scenarioFolders = getScenarioFolders(scenariosRoot);
                 foreach (var scenario in scenarioFolders)
                 {
-                    //if (scenario.ScenarioName != "1941_smolensk")
+                    //if (scenario.ScenarioName != "1941_smolensk"/* && scenario.ScenarioName != "4p_crossing_in_the_woods"*/)
                     //    continue;
 
                     var preview = getScenarioPreviewImage(scenario);
@@ -177,11 +198,43 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                         continue;
                     }
 
-                    var imageFilename = Path.Join(ScenarioPreviewImageDestinationRoot, $"{scenario.ScenarioName}.jpg");
+                    var scenarioId = scenario.File.FullName
+                        .Substring(0, scenario.File.FullName.Length - ".sgb".Length)
+                        .Replace("Data:", "", StringComparison.OrdinalIgnoreCase)
+                        .Trim('\\')
+                        .Replace("\\", "-")
+                        .Replace(":", "")
+                        .ToLower()
+                    ;
+                    var imageFilename = Path.Join(ScenarioPreviewImageDestinationRoot, $"{scenarioId}.jpg");
                     var image = SixLabors.ImageSharp.Image.Load(preview.GetData());
 
                     var icons = scenario.GetIcons();
+
+                    if (image.Width > 300 && image.Height > 300)
+                    {
+                        image.Mutate(_ => _
+                            .Resize(300, 300)
+                        );
+                    }
+                    else
+                    {
+                        Output.Add($"Warning: Low resolution preview image: {scenario.ScenarioName} in {scenario.Folder.Archive}");
+                    }
+
                     var iconOverlayScale = image.Width * 1.0 / Math.Max(scenario.ScenarioWidth, scenario.ScenarioHeight);
+                    var xScale = image.Width * 1.0 / scenario.ScenarioWidth;
+                    var yScale = image.Height * 1.0 / scenario.ScenarioHeight;
+
+                    var scenarioWidthMin = 1 - (scenario.ScenarioWidth / 2);
+                    var scenarioWidthMax = scenario.ScenarioWidth / 2;
+                    var scenarioHeightMin = 1 - (scenario.ScenarioHeight / 2);
+                    var scenarioHeightMax = scenario.ScenarioHeight / 2;
+
+                    var imageWidthMin = 1 - (image.Width / 2.0);
+                    var imageWidthMax = image.Width / 2.0;
+                    var imageHeightMin = 1 - (image.Height / 2.0);
+                    var imageHeightMax = image.Height / 2.0;
 
                     foreach (var icon in icons)
                     {
@@ -194,23 +247,14 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                             )
                         )
                         {
-                            Errors.Add($"[info] Ignoring icon {icon.EbpName} for {scenario.ScenarioName} in {scenario.Folder.Archive}");
+                            Output.Add($"[info] Ignoring icon {icon.EbpName} for {scenario.ScenarioName} in {scenario.Folder.Archive}");
                             continue;
                         }
 
                         var iconImage = getScenarioIconImage(icon);
-                        // Translate center origin coordinates to top left coordinates.
-                        // Scale coordinates by ratio between source image size and map size.
-                        var x = (scenario.ScenarioWidth * iconOverlayScale / 2.0 + (icon.X * iconOverlayScale - iconImage.Width / 2.0));
-                        var y = (scenario.ScenarioHeight * iconOverlayScale / 2.0 + (Flip(icon.Y) * iconOverlayScale - iconImage.Height / 2.0));
+                        var x = (image.Width / 2.0) + scale(icon.X * iconOverlayScale / xScale, scenarioWidthMin, scenarioWidthMax, imageWidthMin, imageWidthMax) - iconImage.Width / 2.0;
+                        var y = (image.Height / 2.0) + scale(Flip(icon.Y) * iconOverlayScale / yScale, scenarioHeightMin, scenarioHeightMax, imageHeightMin, imageHeightMax) - iconImage.Height / 2.0;
 
-                        var x2 = scale(icon.X, scenario.ScenarioWidth / -2, scenario.ScenarioWidth / 2, 0, image.Width);
-                        var y2 = scale(Flip(icon.Y), scenario.ScenarioHeight / -2, scenario.ScenarioHeight / 2, 0, image.Height);
-                        if (scenario.ScenarioName == "1941_smolensk" || true)
-                        {
-                            x = x2;
-                            y = y2;
-                        }
                         try
                         {
                             image.Mutate(_ => _
@@ -223,12 +267,6 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                         }
                     }
 
-                    /*if (image.Width >= 256 && image.Height >= 256)
-                    {
-                        image.Mutate(_ => _
-                            .Resize(256, 256)
-                        );
-                    }*/
                     image.Save(imageFilename, jpgEncoder);
                     Console.WriteLine($"{scenario.ScenarioName}: {preview.Name}");
                 }
@@ -236,16 +274,16 @@ namespace COH2ReplayDiscordBotMapImageExtractor
 
             foreach (var ignoredArchive in noScenarioRootArchives)
             {
-                Errors.Add($"[warning] Ignored achive {ignoredArchive.Name}: No scenario root folder found.");
+                Output.Add($"[warning] Ignored achive {ignoredArchive.Name}: No scenario root folder found.");
             }
 
             foreach (var scenario in noPreviewImageFoundScenarios)
             {
-                Errors.Add($"[warning] Ignored scenario {scenario.ScenarioName} in {scenario.Folder.Archive.Name}: No preview image found.");
+                Output.Add($"[warning] Ignored scenario {scenario.ScenarioName} in {scenario.Folder.Archive.Name}: No preview image found.");
             }
 
             Console.WriteLine($"Errors:\n----------------\n");
-            foreach (var error in Errors)
+            foreach (var error in Output)
             {
                 Console.WriteLine(error);
             }
@@ -266,7 +304,14 @@ namespace COH2ReplayDiscordBotMapImageExtractor
 
             if (!ScenarioIconCache.ContainsKey(iconKey))
             {
-                ScenarioIconCache[iconKey] = SixLabors.ImageSharp.Image.Load(iconKey);
+                var image = SixLabors.ImageSharp.Image.Load(iconKey); ;
+                ScenarioIconCache[iconKey] = image;
+                if (image.Width > 24 && image.Height > 24)
+                {
+                    image.Mutate(_ => _
+                        .Resize(24, 24)
+                    );
+                }
             }
 
             return ScenarioIconCache[iconKey];
@@ -337,6 +382,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                 }
             }
 
+            public RelicCore.Archive.File File { get; set; }
             public string ScenarioName { get; set; }
             public RelicCore.Archive.Folder Folder { get; set; }
             public RelicCore.Archive.File InfoFile { get; set; }
@@ -349,7 +395,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                 var lua = new Lua();
                 if (InfoFile == null)
                 {
-                    Errors.Add($"[warning] Map {ScenarioName} in {Folder.Archive} does not have an info file.");
+                    Output.Add($"[warning] Map {ScenarioName} in {Folder.Archive} does not have an info file.");
                     return result;
                 }
 
@@ -369,7 +415,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                     var point_positions = lua["HeaderInfo.point_positions"] as LuaTable;
                     if (point_positions == null)
                     {
-                        Errors.Add($"[warning] Map {ScenarioName} in {Folder.Archive} info file does not have any point_positions.");
+                        Output.Add($"[warning] Map {ScenarioName} in {Folder.Archive} info file does not have any point_positions.");
                     }
                     else
                     {
@@ -381,7 +427,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                 }
                 catch (LuaException execption)
                 {
-                    Errors.Add($"[error] Unable to parse icons for map {ScenarioName} in {Folder.Archive} ({InfoFile.Name}):\n\t{execption}");
+                    Output.Add($"[error] Unable to parse icons for map {ScenarioName} in {Folder.Archive} ({InfoFile.Name}):\n\t{execption}");
                 }
                 return result;
             }
@@ -399,6 +445,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                     result.Add(new ScenarioFolder
                     {
                         ScenarioName = scenarioName,
+                        File = node as RelicCore.Archive.File,
                         Folder = node.Parent as RelicCore.Archive.Folder,
                         InfoFile = node.Parent.Children.FirstOrDefault(file => file.Name == $"{scenarioName}.info") as RelicCore.Archive.File,
                     });
