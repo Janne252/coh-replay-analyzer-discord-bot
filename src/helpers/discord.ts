@@ -3,7 +3,6 @@ import path from 'path';
 import Discord from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
 
-
 export interface ChannelLoggerConfig {
     log: {
         guild: string;
@@ -11,6 +10,8 @@ export interface ChannelLoggerConfig {
         administrators: string[];
     }
 }
+
+/* istanbul ignore next */
 /**
  * package.json section "discord".
  */
@@ -18,6 +19,7 @@ export async function getDiscordConfig() {
     return JSON.parse(await fs.readFile(path.join(process.cwd(), 'package.json'), {encoding: 'utf8'})).discord as ChannelLoggerConfig;
 }
 
+/* istanbul ignore next */
 /**
  * Helper for writing log messages to a discord channel.
  */
@@ -71,9 +73,9 @@ export class ChannelLogger {
         await this.log({
             title: `❗ ${error}`,
             fields: [
-                truncatedEmbedCodeField('Name', error.name || '_No error available._'),
-                truncatedEmbedCodeField('Message', error.message || '_No message available._'),
-                truncatedEmbedCodeField('Stacktrace', error.stack || '_No stacktrace available._'),
+                truncatedEmbedCodeField({name: 'Name', value: error.name || '_No error available._'}),
+                truncatedEmbedCodeField({name: 'Message', value: error.message || '_No message available._'}),
+                truncatedEmbedCodeField({name: 'Stacktrace', value: error.stack || '_No stacktrace available._'}),
             ],
             color: ChannelLogger.Color.Error,
         });
@@ -102,16 +104,21 @@ export class ChannelLogger {
 /**
  * Truncates a value to the maximum length and wraps it in code markdown tags (```).
  */
-export function truncatedEmbedCodeField(name: string, value: string, inline: boolean = false, maxLength = 1024): Discord.EmbedFieldData {
-    const extra = 8; // 2 x ```\n (4 characters)
-    const max = maxLength - extra;
+export function truncatedEmbedCodeField(
+    {name, value, inline}: {name: string, value: string, inline?: boolean}, 
+    {maxLength}: {maxLength: number} = {maxLength: 1024}
+): Discord.EmbedFieldData {
+    const prefix = '```\n';
+    const suffix = '\n```';
+    const max = maxLength - (prefix.length + suffix.length);
     return {
         name,
         inline,
-        value: '```\n' + (value.length > max ? value.substring(0, max) : value) + '\n```',
+        value: prefix + (value.length > max ? value.substring(0, max) : value) + suffix,
     };
 }
 
+/* istanbul ignore next */
 /**
  * Uniform exit handing (logout from discord & safely exit)
  */
