@@ -3,7 +3,11 @@
  */
 interface Replay {
     version: string;
-    chat: ReadonlyArray<any>;
+    chat: {
+        tick: number;
+        name: string;
+        message: string;
+    }[];
     date_time: string;
     duration: number;
     game_type: string;
