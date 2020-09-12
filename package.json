@@ -19,7 +19,7 @@
     "build": "tsc --project ./tsconfig.json",
     "build:flank": "cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.bin",
     "start": "node ./dist/index.js --enable-source-maps",
-    "test": "ts-mocha -p ./tsconfig.json tests/**/*.spec.ts",
+    "test": "ts-mocha -p ./tsconfig.json ./src/**/*.spec.ts",
     "test:coverage": "nyc --reporter=text --reporter=html npm test"
   },
   "author": "Janne Varjo",

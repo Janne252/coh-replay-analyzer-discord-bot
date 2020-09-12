@@ -1,4 +1,4 @@
-import { Replay } from "../src/types";
+import { Replay } from "../../types";
 
 export function replay(options: Partial<Replay['map']>): Replay {
     return {

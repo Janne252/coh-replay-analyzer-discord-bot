@@ -1,4 +1,4 @@
-import { LocaleLike } from "../src/helpers/coh2";
+import { LocaleLike } from "../coh2";
 
 export class Locale implements LocaleLike {
     public static readonly Empty = new Locale();

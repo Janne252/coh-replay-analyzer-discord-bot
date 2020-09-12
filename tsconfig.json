@@ -3,7 +3,7 @@
     "compilerOptions": {
         "module": "commonjs",
         "sourceMap": true,
-        "outDir": "dist",
+        "outDir": "dist"
     },
     "files": ["src/index.ts"],
     "exclude": [

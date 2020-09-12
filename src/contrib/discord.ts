@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import Discord from 'discord.js';
+import Discord, { MessageEmbed } from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -165,4 +165,12 @@ export class MessageHelpers {
     public static withoutMentions(message: {content: string}) {
         return message.content.replace(/<@!\d+>/g, '').trim();
     }
+}
+
+export function isAdminCommand(message: Discord.Message, client: Discord.Client, config: PackageDiscordConfig) {
+    return (
+        message.author.id !== client.user?.id && 
+        message.mentions.users.has(client.user?.id as string) && 
+        message.author.id === config.author
+    );
 }

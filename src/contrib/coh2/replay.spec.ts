@@ -1,10 +1,11 @@
 import assert from 'assert';
 import {describe, it} from 'mocha';
-import { getReplayDurationDisplay, getReplayTimestamp, resolveMapDisplayName, resolveScenarioId } from '../src/helpers/coh2';
-import * as factory from './factory';
-import * as mocking from './mocking';
+import { formatChatMessage, getReplayDurationDisplay, getReplayTimestamp, ReplayChatMessage, resolveMapDisplayName, resolveScenarioId, splitChat } from './replay';
+import * as factory from '../testing/factory';
+import * as mocking from '../testing/mocking';
+import { makeLength } from '../testing/generator';
 
-describe('helpers.coh2', () => {
+describe('contrib.coh2.replay', () => {
     it('resolveMapDisplayName: From replay.map.name', () => {
         assert.strictEqual(
             resolveMapDisplayName(factory.replay({name: 'Foo bar'}), mocking.Locale.Empty), 
@@ -89,6 +90,50 @@ describe('helpers.coh2', () => {
         assert.strictEqual(getReplayDurationDisplay(8 * 60, {verbose: true}), '1 minute');
         assert.strictEqual(getReplayDurationDisplay(8 * 3600, {verbose: true}), '1 hour');
         assert.strictEqual(getReplayDurationDisplay(8 * 3600 * 2, {verbose: true}), '2 hours');
+    });
+
+    it ('splitChat', () => {
+        let chat: ReplayChatMessage[];
+        assert.deepStrictEqual(
+            splitChat({duration: 30 * 60 * 8, chat: [
+                {name: 'player', tick: 0, message: 'Hi'},
+            ]}),
+            [{
+                content: `||${formatChatMessage({name: 'player', tick: 0, message: 'Hi'})}||`,
+                count: 1
+            }]
+        );
+            
+        // Last long chat message causes a split
+        chat = [
+            {name: 'player', tick: 0, message: 'Hi'},
+            {name: 'player', tick: 0, message: 'Hey'},
+            {name: 'player', tick: 0, message: 'Yo yo what is going on'},
+            {name: 'player', tick: 0, message: makeLength('foo bar', 1024)},
+        ];
+        assert.deepStrictEqual(
+            splitChat({duration: 30 * 60 * 8, chat}),
+            [
+                { content: `||${[chat[0], chat[1], chat[2]].map(o => formatChatMessage(o)).join('')}||`, count: 3},
+                { content: `||${formatChatMessage(chat[3])}||`, count: 1},
+            ]
+        );
+        
+        // Long chat message in the middle causes a split 
+        chat = [
+            {name: 'player', tick: 0, message: 'Hi'},
+            {name: 'player', tick: 0, message: 'Hey'},
+            {name: 'player', tick: 0, message: makeLength('foo bar', 1024)},
+            {name: 'player', tick: 0, message: 'Yo yo what is going on'},
+        ];
+        assert.deepStrictEqual(
+            splitChat({duration: 30 * 60 * 8, chat}),
+            [
+                { content: `||${[chat[0], chat[1]].map(o => formatChatMessage(o)).join('')}||`, count: 2},
+                { content: `||${formatChatMessage(chat[2])}||`, count: 1},
+                { content: `||${[chat[3]].map(o => formatChatMessage(o)).join('')}||`, count: 1},
+            ]
+        );
     });
 });
 

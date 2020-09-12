@@ -1,8 +1,8 @@
 import assert from 'assert';
 import {describe, it} from 'mocha';
-import { capitalize } from '../src/helpers/misc';
+import { capitalize } from './misc';
 
-describe('helpers.misc', () => {
+describe('contrib.misc', () => {
     it('capitalize', () => {
         assert.strictEqual(capitalize('foo'), 'Foo');
         assert.strictEqual(capitalize('_foo'), '_foo');

@@ -1,8 +1,8 @@
 import assert from 'assert';
 import {describe, it} from 'mocha';
-import { MessageHelpers, truncatedEmbedCodeField } from '../src/helpers/discord';
+import { MessageHelpers, truncatedEmbedCodeField } from './discord';
 
-describe('helpers.discord', () => {
+describe('contrib.discord', () => {
     it('truncatedEmbedCodeField', () => {
         assert.strictEqual(truncatedEmbedCodeField({name: '', value: 'foo bar'}, {maxLength: 1024}).value, '```\nfoo bar\n```');
         assert.strictEqual(truncatedEmbedCodeField({name: '', value: 'foo bar'}, {maxLength: 11}).value, '```\nfoo\n```');
