@@ -5,7 +5,7 @@ The bot is being tested on https://discord.com/invite/coh2org.
 Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault](https://github.com/ryantaylor/vault) and [ryantaylor/flank](https://github.com/ryantaylor/flank).
 
 # Manual setup
-- Bot authentication link: https://discord.com/api/oauth2/authorize?client_id=753206700655378523&permissions=280640&scope=bot
+- Bot authentication link: https://discord.com/api/oauth2/authorize?client_id=753206700655378523&permissions=321600&scope=bot
     - Scopes: `Send Messages`, `Embed Links`, `Use External Emojis`, `Add Reactions`
     - Currently set to "private" - sorry! Only the author can add it to a server. And even then the author has to be the owner of the server.
     - The bot will be made public later on. Assuming all goes well.
