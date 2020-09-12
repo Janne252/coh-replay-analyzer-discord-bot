@@ -6,7 +6,7 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
 
 # Manual setup
 - Bot authentication link: https://discord.com/api/oauth2/authorize?client_id=753206700655378523&permissions=321600&scope=bot
-    - Scopes: `Send Messages`, `Embed Links`, `Use External Emojis`, `Add Reactions`
+    - Scopes: `Send Messages`, `Manage Messages`, `Embed Links`, `Attach Files`, `Use External Emojis`, `Add Reactions`
     - Currently set to "private" - sorry! Only the author can add it to a server. And even then the author has to be the owner of the server.
     - The bot will be made public later on. Assuming all goes well.
 
