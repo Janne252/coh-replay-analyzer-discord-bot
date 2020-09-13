@@ -23,6 +23,10 @@
     "scenarioPreviewImageRootPath": "./data/map-preview-images",
     "localeFilePath": "./data/coh2/RelicCoH2.English.ucs",
     "leaderboardUrl": "http://www.companyofheroes.com/leaderboards#profile/steam/{steamId}/standings",
+    "expandChatPreview": {
+      "reaction": "💬",
+      "timeoutSeconds": 30
+    },
     "factionEmojis": {
       "german": "<:german:753277450171056208>",
       "soviet": "<:soviet:753277450489954375>",

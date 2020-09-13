@@ -53,7 +53,7 @@ export default async (message: Discord.Message, client: Discord.Client, config: 
                 Replay.getPlayerListEmbed(replay, 1, config),
             );
 
-            const loadAllChatTip = `\n${message.author}: React with \xa0 💬 \xa0 to load all chat messages.`;
+            const loadAllChatTip = `\n${message.author}: React with \xa0 ${config.expandChatPreview.reaction} \xa0 to load all chat messages.`;
             const chatPreview = getChatPreviewEmbed(replay, {charsPerChunk: 1024 - loadAllChatTip.length});
             if (!chatPreview.complete) {
                 chatPreview.field.value += loadAllChatTip;
@@ -79,11 +79,14 @@ export default async (message: Discord.Message, client: Discord.Client, config: 
             const result = await message.channel.send(embed);
             if (!chatPreview.complete) {
                 // Placeholder reaction for the user
-                const selfReaction = await result.react('💬');
+                const selfReaction = await result.react(config.expandChatPreview.reaction);
                 const chatOutputMessages: Discord.Message[] = [];
                 try {
-                    const reactions = await result.awaitReactions((reaction, user) => user.id == message.author.id && reaction.emoji.name == '💬', {time: 30000, max: 1});
-                    if (reactions.array().some(reaction => reaction.emoji.name == '💬')) {
+                    const reactions = await result.awaitReactions(
+                        (reaction, user) => user.id == message.author.id && reaction.emoji.name == config.expandChatPreview.reaction, 
+                        {time: config.expandChatPreview.timeoutSeconds * 1000, max: 1}
+                    );
+                    if (reactions.array().some(reaction => reaction.emoji.name == config.expandChatPreview.reaction)) {
                         await selfReaction.remove();
                         // Send replay chat as block quote messages
                         // Utilize Discord's automatic splitting functionality when passing message data as an array

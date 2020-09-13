@@ -22,10 +22,18 @@ export default class ReplaysConfig extends PackageJsonConfig {
 
     //@ts-expect-error 2564
     minDataLength: number;
+    
     //@ts-expect-error 2564
     magic: string;
+
     //@ts-expect-error 2564
     minVersion: number;
+
+    //@ts-expect-error 2564
+    expandChatPreview: {
+        reaction: string;
+        timeoutSeconds: number;
+    }
 
     constructor(private readonly root: string = process.cwd()) {
         super();
@@ -43,5 +51,7 @@ export default class ReplaysConfig extends PackageJsonConfig {
 
         this.factionEmojis = config.replays.factionEmojis;
         this.leaderboardUrl = config.replays.leaderboardUrl;
+
+        this.expandChatPreview = config.replays.expandChatPreview;
     }
 }
