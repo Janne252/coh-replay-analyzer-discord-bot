@@ -1,6 +1,6 @@
 import assert from 'assert';
 import {describe, it} from 'mocha';
-import { MessageHelpers, truncatedEmbedCodeField } from './discord';
+import { MessageHelpers, truncatedEmbedCodeField } from '.';
 
 describe('contrib.discord', () => {
     it('truncatedEmbedCodeField', () => {

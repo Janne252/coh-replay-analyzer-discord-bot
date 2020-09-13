@@ -1,6 +1,6 @@
 import assert from 'assert';
 import {describe, it} from 'mocha';
-import { formatChatMessage, getReplayDurationDisplay, getReplayTimestamp, ReplayChatMessage, resolveMapDisplayName, resolveScenarioId, splitChat } from './replay';
+import { formatChatMessage, formatPlayer, getPlayerListEmbed, getReplayDurationDisplay, getReplayTimestamp, ReplayChatMessage, resolveMapDisplayName, resolveScenarioId, splitChat } from './replay';
 import * as factory from '../testing/factory';
 import * as mocking from '../testing/mocking';
 import { makeLength } from '../testing/generator';
@@ -95,7 +95,7 @@ describe('contrib.coh2.replay', () => {
     it ('splitChat', () => {
         let chat: ReplayChatMessage[];
         assert.deepStrictEqual(
-            splitChat({duration: 30 * 60 * 8, chat: [
+            splitChat({chat: [
                 {name: 'player', tick: 0, message: 'Hi'},
             ]}),
             [{
@@ -112,7 +112,7 @@ describe('contrib.coh2.replay', () => {
             {name: 'player', tick: 0, message: makeLength('foo bar', 1024)},
         ];
         assert.deepStrictEqual(
-            splitChat({duration: 30 * 60 * 8, chat}),
+            splitChat({chat}),
             [
                 { content: `||${[chat[0], chat[1], chat[2]].map(o => formatChatMessage(o)).join('')}||`, count: 3},
                 { content: `||${formatChatMessage(chat[3])}||`, count: 1},
@@ -127,13 +127,101 @@ describe('contrib.coh2.replay', () => {
             {name: 'player', tick: 0, message: 'Yo yo what is going on'},
         ];
         assert.deepStrictEqual(
-            splitChat({duration: 30 * 60 * 8, chat}),
+            splitChat({chat}),
             [
                 { content: `||${[chat[0], chat[1]].map(o => formatChatMessage(o)).join('')}||`, count: 2},
                 { content: `||${formatChatMessage(chat[2])}||`, count: 1},
                 { content: `||${[chat[3]].map(o => formatChatMessage(o)).join('')}||`, count: 1},
             ]
         );
+        // Custom chunk size
+        let extraLength = formatChatMessage({name: '2', tick: 0, message: ''}).length;
+        chat = [
+            {name: '2', tick: 0, message: makeLength('foo bar', 100 - extraLength)},
+            {name: '2', tick: 0, message: makeLength('zoo bar', 100 - extraLength)},
+            {name: '2', tick: 0, message: makeLength('bar bar', 100 - extraLength)},
+        ];
+        assert.deepStrictEqual(
+            splitChat({chat}, {charsPerChunk: 100}),
+            [
+                { content: `||${[chat[0]].map(o => formatChatMessage(o)).join('')}||`, count: 1},
+                { content: `||${[chat[1]].map(o => formatChatMessage(o)).join('')}||`, count: 1},
+                { content: `||${[chat[2]].map(o => formatChatMessage(o)).join('')}||`, count: 1},
+            ]
+        );
+        
+        // test with noNewline
+        extraLength = formatChatMessage({name: '2', tick: 0, message: ''}, {noNewline: true}).length;
+        chat = [
+            {name: '2', tick: 0, message: makeLength('foo bar', 100 - extraLength)},
+            {name: '2', tick: 0, message: makeLength('zoo bar', 100 - extraLength)},
+            {name: '2', tick: 0, message: makeLength('bar bar', 100 - extraLength)},
+        ];
+        assert.deepStrictEqual(
+            splitChat({chat}, {charsPerChunk: 100}),
+            [
+                { content: `||${[chat[0]].map(o => formatChatMessage(o), {noNewline: true}).join('')}||`, count: 1},
+                { content: `||${[chat[1]].map(o => formatChatMessage(o), {noNewline: true}).join('')}||`, count: 1},
+                { content: `||${[chat[2]].map(o => formatChatMessage(o), {noNewline: true}).join('')}||`, count: 1},
+            ]
+        );
+    });
+
+    it ('formatPlayer', () => {
+        // No emoji found
+        assert.strictEqual(
+            formatPlayer({name: 'Player', steam_id_str: '', faction: 'foo'}, {factionEmojis: {}}),
+            'Player'
+        );
+        // Emoji found
+        assert.strictEqual(
+            formatPlayer({name: 'Player', steam_id_str: '', faction: 'foo'}, {factionEmojis: {'foo': '<emoji>'}}),
+            '<emoji> Player'
+        );
+        // Link to leaderboards
+        assert.strictEqual(
+            formatPlayer({name: 'Player', steam_id_str: '123', faction: 'foo'}, {factionEmojis: {'foo': '<emoji>'}, leaderboardUrl: 'http://example.com/{steamId}'}),
+            '<emoji> [Player](http://example.com/123)'
+        );
+        // Steam Id present multiple times in the url template
+        assert.strictEqual(
+            formatPlayer({name: 'Player', steam_id_str: '123', faction: 'foo'}, {factionEmojis: {'foo': '<emoji>'}, leaderboardUrl: 'http://example.com/{steamId}/{steamId}'}),
+            '<emoji> [Player](http://example.com/123/123)'
+        );
+        assert.match(
+            formatPlayer({name: 'Player', steam_id_str: '123', faction: 'foo'}, {factionEmojis: {'foo': '<emoji>'}}),
+            new RegExp(`\\<emoji\\> \\[Player\\]\\(.*?123.*?\\)`)
+        );
+    });
+
+    it('getPlayerListEmbed', () => {
+        // No players
+        assert.deepStrictEqual(
+            getPlayerListEmbed({players: []}, 0, {factionEmojis: {}}), {
+                name: 'Team 1',
+                inline: true,
+                value: '_No players available._'
+            }
+        );
+        
+        // With player
+        assert.deepStrictEqual(
+            getPlayerListEmbed({players: [{name: 'Player', faction: 'faction', team: 0, steam_id_str: '0'}]}, 0, {factionEmojis: {'faction': '<emoji>'}}), {
+                name: 'Team 1',
+                inline: true,
+                value: '<emoji> Player'
+            }
+        );
+        // With multiple players
+        assert.deepStrictEqual(
+            getPlayerListEmbed({players: [
+                {name: 'P1', faction: 'faction', team: 0, steam_id_str: '0'},
+                {name: 'P2', faction: 'faction', team: 0, steam_id_str: '0'},
+            ]}, 0, {factionEmojis: {'faction': '<emoji>'}}), {
+                name: 'Team 1',
+                inline: true,
+                value: '<emoji> P1\n<emoji> P2'
+            }
+        );
     });
 });
-

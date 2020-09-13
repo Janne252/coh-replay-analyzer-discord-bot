@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "description": "",
   "main": "./dist/index.js",
-  "discord": {
+  "admin": {
     "log": {
       "guild": "753277157027086427",
       "channel": "753552456574697522"
@@ -12,7 +12,24 @@
       "guild": "753277157027086427",
       "channel": "754050938066436153"
     },
-    "author": "163578909965811712"
+    "user": "163578909965811712"
+  },
+  "replays": {
+    "magic": "COH2_REC",
+    "minVersion": 19545,
+    "minDataLength": 12,
+    "flankExecutablePath": "./.flank.bin/release/flank",
+    "replaysTempPath": "./.replays",
+    "scenarioPreviewImageRootPath": "./data/map-preview-images",
+    "localeFilePath": "./data/coh2/RelicCoH2.English.ucs",
+    "leaderboardUrl": "http://www.companyofheroes.com/leaderboards#profile/steam/{steamId}/standings",
+    "factionEmojis": {
+      "german": "<:german:753277450171056208>",
+      "soviet": "<:soviet:753277450489954375>",
+      "west_german": "<:west_german:753277450217062411>",
+      "aef": "<:aef:753277449944432830>",
+      "british": "<:british:753277449957277867>"
+    }
   },
   "scripts": {
     "dev": "tsc --project ./tsconfig.json --watch",
@@ -20,11 +37,12 @@
     "build:flank": "cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.bin",
     "start": "node ./dist/index.js --enable-source-maps",
     "test": "ts-mocha -p ./tsconfig.json ./src/**/*.spec.ts",
-    "test:coverage": "nyc --reporter=text --reporter=html npm test"
+    "test:coverage": "nyc --cache false --reporter=text --reporter=html npm test"
   },
   "author": "Janne Varjo",
   "license": "MIT",
   "dependencies": {
+    "@types/assert": "^1.5.2",
     "discord.js": "^12.3.1",
     "download": "^8.0.0",
     "fs-extra": "^9.0.1",

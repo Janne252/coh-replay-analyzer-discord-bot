@@ -1,6 +1,4 @@
 import * as child_process from 'child_process';
-import fs from 'fs-extra';
-import path from 'path';
 
 /* istanbul ignore next */
 /**
@@ -25,4 +23,3 @@ export function exec(command: string): Promise<{stdout: string, stderr: string}>
 export function capitalize(str: string) { 
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
-
