@@ -204,31 +204,6 @@ function getChatPreviewEmbed(replay: Replay, {charsPerChunk}: {charsPerChunk?: n
     };
 }
 
-function embedChat(chunks: ReturnType<typeof splitChat>, embed: Discord.MessageEmbed) {
-    const totalCount = chunks.reduce((total, chunk) => total + chunk.count, 0);
-
-    for (let i = 0; i < chunks.length; i++) {
-        const field = {
-            name: i == 0 ? `Chat (${totalCount} messages)` : '\u200b',
-            value: chunks[i].content,
-        };
-
-        const remainingChatMessageCount = chunks.slice(i).reduce((total, remainingChunk) => total + remainingChunk.count, 0);
-        const chatLengthWarning = {
-            name: '\u200b',
-            value: `||_Too much chat to display - ${remainingChatMessageCount} ${remainingChatMessageCount == 1 ? 'message' : 'messages'} skipped._||`,
-        };
-        if ((embed.length + field.name.length + field.value.length) > (6000 - (chatLengthWarning.name.length + chatLengthWarning.value.length))) {
-            embed.addFields(chatLengthWarning);
-            break;
-        } else {
-            embed.addFields(field);
-        }
-    }
-}
-
-
-
 /**
  * Prefixes player name with the faction emoji.
  * Adds a link to the official leaderboards if the player has a valid Steam ID available.
