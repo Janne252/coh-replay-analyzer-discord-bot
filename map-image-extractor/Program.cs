@@ -222,7 +222,11 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                     if (image.Width > 300 && image.Height > 300)
                     {
                         image.Mutate(_ => _
-                            .Resize(300, 300)
+                            .Resize(new ResizeOptions()
+                            {
+                                Mode = ResizeMode.Max,
+                                Size = new SixLabors.ImageSharp.Size(300, 300)
+                            })
                         );
                     }
                     else
