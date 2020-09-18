@@ -11,6 +11,7 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
     - The bot will be made public later on. Assuming all goes well.
 
 # TODO
+- [ ] Set activity status message periodically, e.g. every 60 minutes (appears to disappear/clear after some time)
 - [ ] Use the "home" discord server as a CDN For map images?
     - [ ] Increase image quality to 85% (JPG)
     - [ ] Increase resolution to 512x512
