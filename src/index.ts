@@ -34,13 +34,22 @@ client.on('ready', async () => {
         locale.init(replaysConfig.localeFilePath),
         adminConfig.init(),
         logger.init(),
-        client.user?.setActivity({
-            name: 'Replays',
-            type: 'WATCHING'
-        }),
     ]);
    
     console.log('Ready!');
+
+    const updateStatus = async () => {
+        try {
+            await client.user?.setActivity({
+                name: 'Replays',
+                type: 'WATCHING'
+            });
+        } finally {
+            setTimeout(updateStatus, 30 * 60 * 1000);
+        }
+    }
+
+    updateStatus();
 });
 
 client.on('message', async message => {
