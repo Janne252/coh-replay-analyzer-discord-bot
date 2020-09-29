@@ -7,26 +7,33 @@ import { exec } from '../../contrib/misc';
 import * as Replay from '../../contrib/coh2/replay';
 import Config from './config';
 
-export default async (message: Discord.Message, client: Discord.Client, config: Config) => {
+export default async (message: Discord.Message, client: Discord.Client, config: Config): Promise<boolean> => {
     const attachments = message.attachments.array();
-    if (attachments.length == 0 || !attachments.some(shouldProceedBasedOnFilename)) {
-        return false;
-    }
+    let isHandled = false;
 
     for (const attachment of attachments) {
-        if (shouldProceedBasedOnFilename(attachment)) {
-            // Download replay file contents to a temporary file
-            const replayFilename = path.join(config.replaysTempPath, `${uuidv4()}.rec`);
-            const data = await download(attachment.url);
-            if (data.length < config.minDataLength) {
-                return;
-            }
-            const [, , version, magic] = [data[0], data[1], data.readInt16LE(2), String.fromCharCode.apply(null, [...data.slice(4, 4 + 8)])];
-            
-            // Not a CoH2 replay or too early version for https://github.com/ryantaylor/vault
-            if (magic != config.magic || version < config.minVersion) {
-                return;
-            }
+        if (!shouldProceedBasedOnFilename(attachment)) {
+            continue;
+        }
+        // Mark message as handled - no other handler should attempt to process it
+        isHandled = true;
+        // Download replay file contents to a temporary file
+        const replayFilename = path.join(config.replaysTempPath, `${uuidv4()}.rec`);
+        const data = await download(attachment.url);
+        if (data.length < config.minDataLength) {
+            throw new Error(`Invalid replay file data length ${data.length}, expected at least ${config.minDataLength}`);
+        }
+        const [, , version, magic] = [data[0], data[1], data.readInt16LE(2), String.fromCharCode.apply(null, [...data.slice(4, 4 + 8)])];
+        
+        // Not a CoH2 replay or too early version for https://github.com/ryantaylor/vault
+        if (magic != config.magic) {
+            throw new Error(`Unexpected replay header magic "${magic}", expected "${config.magic}"`);
+        }
+        if (version < config.minVersion) {
+            throw new Error(`Unexpected replay header version ${version}, expected at least ${config.minVersion}`);
+        }
+
+        try {
             await fs.writeFile(replayFilename, data);
             
             /**
@@ -40,8 +47,6 @@ export default async (message: Discord.Message, client: Discord.Client, config: 
             */
             const {stdout} = await exec(`${config.flankExecutablePath} --wipecmd ${replayFilename}`);
             const replay: Replay.Data = JSON.parse(stdout);
-            // Delete temporarily stored replay file
-            await fs.unlink(replayFilename);
 
             const mapPreviewImageFilename = `${Replay.resolveScenarioId(replay)}.jpg`;
             const mapPreviewImageFilepath = path.join(config.scenarioPreviewImageRootPath, mapPreviewImageFilename);
@@ -81,40 +86,39 @@ export default async (message: Discord.Message, client: Discord.Client, config: 
                 // Placeholder reaction for the user
                 const selfReaction = await result.react(config.expandChatPreview.reaction);
                 const chatOutputMessages: Discord.Message[] = [];
-                try {
-                    const reactions = await result.awaitReactions(
-                        (reaction, user) => user.id == message.author.id && reaction.emoji.name == config.expandChatPreview.reaction, 
-                        {time: config.expandChatPreview.timeoutSeconds * 1000, max: 1}
-                    );
-                    if (reactions.array().some(reaction => reaction.emoji.name == config.expandChatPreview.reaction)) {
-                        await selfReaction.remove();
-                        // Send replay chat as block quote messages
-                        // Utilize Discord's automatic splitting functionality when passing message data as an array
-                        const result = await message.channel.send(
-                            replay.chat.map(message => `> ${Replay.formatChatMessage(message, {noNewline: true})}`), 
-                            {split: true}
-                        );
-                        chatOutputMessages.push(...(!Array.isArray(result) ? [result] : result));
-                    }
-                } catch {
-
-                } finally {
-                    if (chatOutputMessages.length > 0) {
-                        embed.fields[chatPreviewIndex].name = 'Chat';
-                        embed.fields[chatPreviewIndex].value = `[Show](${chatOutputMessages[0].url})`;
-                    } else {
-                        embed.fields[chatPreviewIndex] = getChatPreviewEmbed(replay).field;
-                    }
-                    await result.edit(embed);
+                const reactions = await result.awaitReactions(
+                    (reaction, user) => user.id == message.author.id && reaction.emoji.name == config.expandChatPreview.reaction, 
+                    {time: config.expandChatPreview.timeoutSeconds * 1000, max: 1}
+                );
+                if (reactions.array().some(reaction => reaction.emoji.name == config.expandChatPreview.reaction)) {
                     await selfReaction.remove();
+                    // Send replay chat as block quote messages
+                    // Utilize Discord's automatic splitting functionality when passing message data as an array
+                    const result = await message.channel.send(
+                        replay.chat.map(message => `> ${Replay.formatChatMessage(message, {noNewline: true})}`), 
+                        {split: true}
+                    );
+                    chatOutputMessages.push(...(!Array.isArray(result) ? [result] : result));
                 }
+                if (chatOutputMessages.length > 0) {
+                    embed.fields[chatPreviewIndex].name = 'Chat';
+                    embed.fields[chatPreviewIndex].value = `[Show](${chatOutputMessages[0].url})`;
+                } else {
+                    embed.fields[chatPreviewIndex] = getChatPreviewEmbed(replay).field;
+                }
+                await result.edit(embed);
+                await selfReaction.remove();
             }
-
-            return true;
+        } catch (error) {
+            // Raise to an outer scope handler
+            throw error;
+        } finally {
+            // Always (try) delete temporarily stored replay file
+            await fs.unlink(replayFilename);
         }
     }
-
-    return false;
+    // at least one attachment was successfully processed
+    return isHandled;
 };
 
 function getChatPreviewEmbed(replay: Replay.Data, {charsPerChunk}: {charsPerChunk?: number} = {}) {
