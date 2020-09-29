@@ -23,6 +23,36 @@ export class ChannelLogger {
 
     }
 
+    /**
+     * Appends a reference of the guild to the embed.
+     */
+    private appendGuild(embed: Discord.MessageEmbed, guild: Discord.Guild) {
+        embed.fields.push({ name: 'Server', value: `[${guild}](https://discord.com/channels/${guild.id})`, inline: false });
+    }
+
+    /**
+     * Appends a reference of the channel to the embed.
+     */
+    private appendChannel(embed: Discord.MessageEmbed, channel: Discord.Channel | null) {
+        if (channel instanceof Discord.GuildChannel) {
+            this.appendGuild(embed, channel.guild);
+        }
+        embed.fields.push({ name: 'Channel', value: `${channel}`, inline: false });
+    }
+
+    /**
+     * Appends a reference of the message to the embed.
+     */
+    private appendMessage(embed: Discord.MessageEmbed, message: Discord.Message) {
+        if (message.channel) {
+            this.appendChannel(embed, message.channel);
+        }
+        embed.fields.push({ name: 'Message', value: `[${message.id}](${message.url})`, inline: false });
+    }
+
+    /**
+     * Initializes the logger by fetching guild, channel, and admin user.
+     */
     async init() {
         this.guild = await this.client.guilds.fetch(this.config.log.guild);
         this.channel = this.guild.channels.resolve(this.config.log.channel) as Discord.TextChannel;
@@ -64,33 +94,6 @@ export class ChannelLogger {
     }
 
     /**
-     * Appends a reference of the guild to the embed.
-     */
-    private appendGuild(embed: Discord.MessageEmbed, guild: Discord.Guild) {
-        embed.fields.push({ name: 'Server', value: `[${guild}](https://discord.com/channels/${guild.id})`, inline: false });
-    }
-
-    /**
-     * Appends a reference of the channel to the embed.
-     */
-    private appendChannel(embed: Discord.MessageEmbed, channel: Discord.Channel | null) {
-        if (channel instanceof Discord.GuildChannel) {
-            this.appendGuild(embed, channel.guild);
-        }
-        embed.fields.push({ name: 'Channel', value: `${channel}`, inline: false });
-    }
-
-    /**
-     * Appends a reference of the message to the embed.
-     */
-    private appendMessage(embed: Discord.MessageEmbed, message: Discord.Message) {
-        if (message.channel) {
-            this.appendChannel(embed, message.channel);
-        }
-        embed.fields.push({ name: 'Message', value: `[${message.id}](${message.url})`, inline: false });
-    }
-
-    /**
      * Writes an error message.
      */
     async error(error: Error, context?: LoggerContext) {
@@ -124,7 +127,7 @@ export class ChannelLogger {
      * Attempts to send an error message when process receives an error event.
      * Supported error events: uncaughtException, unhandledRejection.
      */
-    addGlobalListeners() {
+    addGlobalErrorListeners() {
         const callback = async (error: Error) => {
             try {
                 await this.error(error);
