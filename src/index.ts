@@ -25,14 +25,14 @@ const shutdownManager = new ShutdownManager(client);
 
 client.on('ready', async () => {
     await replaysConfig.init();
+    await adminConfig.init();
 
     // Prepare .replays folder
     await fs.ensureDir(replaysConfig.replaysTempPath);
+    await fs.emptyDir(replaysConfig.replaysTempPath);
 
     await Promise.all([
-        fs.emptyDir(replaysConfig.replaysTempPath),
         locale.init(replaysConfig.localeFilePath),
-        adminConfig.init(),
         logger.init(),
     ]);
    
@@ -53,16 +53,22 @@ client.on('ready', async () => {
 });
 
 client.on('message', async message => {
-    if (await tryParseCoH2Replay(message, client, replaysConfig))
-        return;
-    
-    if (await tryExecuteAdminCommand(message, client, adminConfig))
-        return;
+    try {
+        if (await tryParseCoH2Replay(message, client, replaysConfig))
+            return;
+        
+        if (await tryExecuteAdminCommand(message, client, adminConfig))
+            return;
+    } catch (error) {
+        // Catch errors with context
+        await logger.error(error, message);
+    }
 });
 
 // Login with a locally stored utf8 encoded text file.
 // This file is ignored in .gitignore
 client.login(fs.readFileSync('.discord.token', {encoding: 'utf8'}).trim());
 // Add global event listeners
-logger.addGlobalListeners();
-shutdownManager.addGlobalListeners();
+logger.addGlobalErrorListeners();
+// Add global signal listeners such as SIGTERM
+shutdownManager.addGlobalSignalListeners();
