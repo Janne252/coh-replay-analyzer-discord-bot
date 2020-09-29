@@ -35,6 +35,6 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
     - Owner of the map who uses a local copy likely won't have this data present, but it's a minor inconvenience. And it's known!
     - Nope, cannot be done. The replay file contains the asset path of the map.
 - [x] Add a status message to the bot
-    - Done, does not seem to work though.
+- [ ] `try(parse replay)` ... `finally (try delete downloaded file)`
 # License
 [MIT License](./LICENSE.txt)
