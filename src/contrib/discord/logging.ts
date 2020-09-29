@@ -1,7 +1,5 @@
 import * as Discord from 'discord.js';
 import { truncatedEmbedCodeField } from '../../contrib/discord';
-import { PackageJsonConfig, PackageConfig } from '../config';
-import { AdminConfig } from './config';
 
 /* istanbul ignore next */
 /**
@@ -14,17 +12,24 @@ export class ChannelLogger {
         Error: 0xf44336, // Red
     };
     
-    constructor(private readonly client: Discord.Client, private readonly config: AdminConfig) {
+    //@ts-expect-error 2564
+    private guild: Discord.Guild;
+    //@ts-expect-error 2564
+    private channel: Discord.TextChannel;
+    //@ts-expect-error 2564
+    private admin: Discord.GuildMember;
+
+    constructor(private readonly client: Discord.Client, private readonly config: {log: {guild: string, channel: string}, user: string}) {
 
     }
 
     async init() {
-        
+        this.guild = await this.client.guilds.fetch(this.config.log.guild);
+        this.channel = this.guild.channels.resolve(this.config.log.channel) as Discord.TextChannel;
+        this.admin = await this.guild.members.fetch(this.config.user);
     }
-
-    async log(options: Discord.MessageEmbedOptions = {}) {
-        const guild = await this.client.guilds.fetch(this.config.log.guild);
-        const channel = guild.channels.resolve(this.config.log.channel) as Discord.TextChannel;
+    
+    async log(options: Discord.MessageEmbedOptions = {}, context?: LoggerContext) {
         const timestamp = new Date();
         options = {
             // defaults
@@ -35,26 +40,84 @@ export class ChannelLogger {
             ...options,
         }
         const embed = new Discord.MessageEmbed(options);
+        if (context) {
+            if (context instanceof Discord.Guild) {
+                this.appendGuild(embed, context);
+
+            } else if (context instanceof Discord.Channel) {
+                this.appendChannel(embed, context);
+
+            } else if (context instanceof Discord.Message) {
+                this.appendMessage(embed, context);
+            }
+        }
         embed.addFields(
             { name: 'Timestamp', value: timestamp.toISOString(), inline: true },
         );
-    
-        await channel.send(embed);
+        
+        // Tag admin first
+        // If we tag them in the embed, they will not get a notification
+        // https://discordjs.guide/popular-topics/embeds.html#notes
+        await this.channel.send(`${this.admin}`);
+        const result = await this.channel.send(embed);
+        return {embed, result};
+    }
+
+    /**
+     * Appends a reference of the guild to the embed.
+     */
+    private appendGuild(embed: Discord.MessageEmbed, guild: Discord.Guild) {
+        embed.fields.push({ name: 'Server', value: `[${guild}](https://discord.com/channels/${guild.id})`, inline: false });
+    }
+
+    /**
+     * Appends a reference of the channel to the embed.
+     */
+    private appendChannel(embed: Discord.MessageEmbed, channel: Discord.Channel | null) {
+        if (channel instanceof Discord.GuildChannel) {
+            this.appendGuild(embed, channel.guild);
+        }
+        embed.fields.push({ name: 'Channel', value: `${channel}`, inline: false });
+    }
+
+    /**
+     * Appends a reference of the message to the embed.
+     */
+    private appendMessage(embed: Discord.MessageEmbed, message: Discord.Message) {
+        if (message.channel) {
+            this.appendChannel(embed, message.channel);
+        }
+        embed.fields.push({ name: 'Message', value: `[${message.id}](${message.url})`, inline: false });
     }
 
     /**
      * Writes an error message.
      */
-    async error(error: Error) {
-        await this.log({
+    async error(error: Error, context?: LoggerContext) {
+        const fields: Discord.EmbedFieldData[] = [
+            truncatedEmbedCodeField({name: 'Name', value: error.name || '_No error available._'}),
+            truncatedEmbedCodeField({name: 'Message', value: error.message || '_No message available._'}),
+            truncatedEmbedCodeField({name: 'Stacktrace', value: error.stack ? 'Loading...' : '_No stacktrace available._'}),
+        ];
+      
+        const {embed, result} = await this.log({
             title: `❗ ${error}`,
-            fields: [
-                truncatedEmbedCodeField({name: 'Name', value: error.name || '_No error available._'}),
-                truncatedEmbedCodeField({name: 'Message', value: error.message || '_No message available._'}),
-                truncatedEmbedCodeField({name: 'Stacktrace', value: error.stack || '_No stacktrace available._'}),
-            ],
+            fields,
             color: ChannelLogger.Color.Error,
-        });
+        }, context);
+
+        if (error.stack) {
+            const stacktraceMessages = await this.channel.send(
+                error.stack
+                    .split('\n')
+                    .map(line => `> ${line}`), 
+                { split: true }
+            );
+            
+            const url = Array.isArray(stacktraceMessages) ? (stacktraceMessages as Discord.Message[])[0].url : stacktraceMessages.url;
+            embed.fields[2].value = `[Show](${url})`;
+            await result.edit(embed);
+        }
     }
 
     /**
@@ -76,3 +139,5 @@ export class ChannelLogger {
         process.on('unhandledRejection', callback);
     }
 }
+
+export type LoggerContext = Discord.Guild | Discord.Channel | Discord.Message;
