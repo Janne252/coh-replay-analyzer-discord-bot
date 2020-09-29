@@ -34,7 +34,7 @@ export class ShutdownManager {
         }
     }
 
-    addGlobalListeners() {
+    addGlobalSignalListeners() {
         process.on('SIGINT', () => this.exit());
         process.on('SIGABRT', () => this.exit());
         process.on('SIGTERM', () => this.exit());
