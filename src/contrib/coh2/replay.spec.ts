@@ -188,9 +188,11 @@ describe('contrib.coh2.replay', () => {
             formatPlayer({name: 'Player', steam_id_str: '123', faction: 'foo'}, {factionEmojis: {'foo': '<emoji>'}, leaderboardUrl: 'http://example.com/{steamId}/{steamId}'}),
             '<emoji> [Player](http://example.com/123/123)'
         );
-        assert.match(
-            formatPlayer({name: 'Player', steam_id_str: '123', faction: 'foo'}, {factionEmojis: {'foo': '<emoji>'}}),
-            new RegExp(`\\<emoji\\> \\[Player\\]\\(.*?123.*?\\)`)
+        assert.strictEqual(
+            new RegExp(`\\<emoji\\> \\[Player\\]\\(.*?123.*?\\)`).test(
+                formatPlayer({name: 'Player', steam_id_str: '123', faction: 'foo'}, {factionEmojis: {'foo': '<emoji>'}}),
+            ),
+            true
         );
     });
 
