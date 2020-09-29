@@ -35,6 +35,10 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
     - Owner of the map who uses a local copy likely won't have this data present, but it's a minor inconvenience. And it's known!
     - Nope, cannot be done. The replay file contains the asset path of the map.
 - [x] Add a status message to the bot
-- [ ] `try(parse replay)` ... `finally (try delete downloaded file)`
+- [x] `try(parse replay)` ... `finally (try delete downloaded file)`
+- [ ] Handle replay data parser errors. Currently does not affect the bot as players and map info are still parsed.
+    - Wikinger mod discord has several mod replay files that will likely recreate this error.
+- [ ] Figure out a better way of signaling handled messages than boolean
+
 # License
 [MIT License](./LICENSE.txt)
