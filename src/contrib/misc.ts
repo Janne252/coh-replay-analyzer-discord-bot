@@ -28,7 +28,11 @@ export interface StringFormatArgs {
     [key: string]: number | string;
 }
 
-// TODO add unit tests
+/**
+ * Formats a string with parameters, e.g. "Value is {value}" + {value: 1} becomes "Value is 1"
+ * @param str 
+ * @param args 
+ */
 export function formatString(str: string, args?: StringFormatArgs) {
     if (args != null) {
         return str.replace(/\{(.*?)\}/g, (match, key) => {
