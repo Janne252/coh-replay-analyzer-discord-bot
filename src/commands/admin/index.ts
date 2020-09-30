@@ -1,9 +1,10 @@
 import path from 'path';
 import fs from 'fs-extra';
 import * as Discord from "discord.js";
-import { MessageHelpers } from '../../contrib/discord';
+import { getGuildUrl, MessageHelpers } from '../../contrib/discord';
 import { makeLength } from '../../contrib/testing/generator';
 import { AdminConfig } from '../../contrib/discord/config';
+import moment from 'moment';
 
 const root = process.cwd();
 
@@ -16,6 +17,29 @@ export default async (message: Discord.Message, client: Discord.Client, config: 
         const channel = guild?.channels.resolve(config.test.channel) as Discord.TextChannel;
 
         switch (command) {
+            // Used to get a quick overview of the servers the bot is currently in
+            case 'list-servers': {
+                const guilds = client.guilds.cache.array();
+                await message.reply(`${client.user} is currently active on ${guilds.length} server${guilds.length == 1 ? '' : 's'}.`);
+                for (const guild of guilds) {
+                    const iconUrl = guild.iconURL();
+                    const guildMember = guild.member(client.user?.id as string) as Discord.GuildMember;
+                    await message.reply(new Discord.MessageEmbed({
+                        title: guild.name,
+                        thumbnail: iconUrl ? {url: iconUrl } : undefined,
+                        description: `[View in browser](${getGuildUrl(guild)})`,
+                        fields: [
+                            { name: 'Owner', value: `${guild.owner}`, inline: true },
+                            { name: 'Members', value: guild.memberCount, inline: true },
+                            { name: 'Created', value: `${moment(guild.createdAt).from(moment.utc())}\n_${guild.createdAt.toDateString()}_`, inline: true },
+                            { name: 'Added', value: `${moment(guildMember.joinedAt).from(moment.utc())}\n_${guildMember.joinedAt?.toDateString()}_`, inline: true }
+                        ],
+                        footer: guild.description ? {text: guild.description} : undefined,
+                    }));
+                }
+                break;
+            }
+            // Used to test replay parsing by posting all the test replays
             case 'test:replays': {
                 for (const file of await fs.readdir(path.join(root, 'tests/replays'))) {
                     const attachment = new Discord.MessageAttachment(path.join(root, 'tests/replays', file));
@@ -26,6 +50,7 @@ export default async (message: Discord.Message, client: Discord.Client, config: 
                 }
                 return true;
             }
+            // Used to test embed character count limitations
             case 'test:embed': {
                 const embed = new Discord.MessageEmbed();
                 const url = client.user?.avatarURL() as string;
