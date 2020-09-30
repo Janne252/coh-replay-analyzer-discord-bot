@@ -48,11 +48,11 @@ export default async (message: Discord.Message, client: Discord.Client, config: 
             const {stdout} = await exec(`${config.flankExecutablePath} --wipecmd ${replayFilename}`);
             const replay: Replay.Data = JSON.parse(stdout);
 
-            const mapPreviewImageFilename = `${Replay.resolveScenarioId(replay)}.jpg`;
-            const mapPreviewImageFilepath = path.join(config.scenarioPreviewImageRootPath, mapPreviewImageFilename);
+            const scenarioPreviewImageFilename = `${Replay.resolveScenarioId(replay)}.jpg`;
+            const scenarioPreviewImageFilepath = path.join(config.scenarioPreviewImageRootPath, scenarioPreviewImageFilename);
    
             const embed = new Discord.MessageEmbed();
-            embed.setTitle(Replay.resolveMapDisplayName(replay));
+            embed.setTitle(Replay.resolveScenarioDisplayName(replay));
             embed.addFields(
                 Replay.getPlayerListEmbed(replay, 0, config),
                 Replay.getPlayerListEmbed(replay, 1, config),
@@ -70,12 +70,12 @@ export default async (message: Discord.Message, client: Discord.Client, config: 
                 { name: 'Match duration', value: `||${Replay.getReplayDurationDisplay(replay.duration, {verbose: true})}||`, inline: true},
                 { name: 'Game version', value: `4.0.0.${replay.version}`, inline: true},
             );
-            // Attach the map preview image to the message if there's one available.
+            // Attach the scenario preview image to the message if there's one available.
             // TODO: Use a CDN to host these images (see readme.md in the project root)
             // TODO: use an async operation for checking if the file exists
-            if (fs.existsSync(mapPreviewImageFilepath)) {
-                embed.attachFiles([mapPreviewImageFilepath]);
-                embed.setImage(`attachment://${mapPreviewImageFilename}`);
+            if (fs.existsSync(scenarioPreviewImageFilepath)) {
+                embed.attachFiles([scenarioPreviewImageFilepath]);
+                embed.setImage(`attachment://${scenarioPreviewImageFilename}`);
             } else {
                 embed.addField('\u200b', '_No map preview image available. If this is an official map, please contact an admin on the server._');
             }

@@ -1,67 +1,67 @@
 import assert from 'assert';
 import {describe, it} from 'mocha';
-import { formatChatMessage, formatPlayer, getPlayerListEmbed, getReplayDurationDisplay, getReplayTimestamp, ReplayChatMessage, resolveMapDisplayName, resolveScenarioId, splitChat } from './replay';
+import { formatChatMessage, formatPlayer, getPlayerListEmbed, getReplayDurationDisplay, getReplayTimestamp, ReplayChatMessage, resolveScenarioDisplayName, resolveScenarioId, splitChat } from './replay';
 import * as factory from '../testing/factory';
 import * as mocking from '../testing/mocking';
 import { makeLength } from '../testing/generator';
 
 describe('contrib.coh2.replay', () => {
-    it('resolveMapDisplayName: From replay.map.name', () => {
+    it('resolveScenarioDisplayName: From replay.map.name', () => {
         assert.strictEqual(
-            resolveMapDisplayName(factory.replay({name: 'Foo bar'}), mocking.Locale.Empty), 
+            resolveScenarioDisplayName(factory.replay({name: 'Foo bar'}), mocking.Locale.Empty), 
             'Foo bar'
         );
     });
     
-    it('resolveMapDisplayName: From replay.map.file', () => {
+    it('resolveScenarioDisplayName: From replay.map.file', () => {
         // numeric player count
         assert.strictEqual(
-            resolveMapDisplayName(factory.replay({name: '$124', players: 4, file: 'Data:/scenarios/mp/4p_some_map/4p_some_map'}), mocking.Locale.Empty), 
+            resolveScenarioDisplayName(factory.replay({name: '$124', players: 4, file: 'Data:/scenarios/mp/4p_some_map/4p_some_map'}), mocking.Locale.Empty), 
             '(4) Some map'
         );
         // numeric player count
         assert.strictEqual(
-            resolveMapDisplayName(factory.replay({name: '$124', players: 4, file: 'Data:/scenarios/mp/4p_some_map/4P_some_map'}), mocking.Locale.Empty), 
+            resolveScenarioDisplayName(factory.replay({name: '$124', players: 4, file: 'Data:/scenarios/mp/4p_some_map/4P_some_map'}), mocking.Locale.Empty), 
             '(4) Some map'
         );
         // No player count 
         assert.strictEqual(
-            resolveMapDisplayName(factory.replay({name: '$124', players: 4, file: 'Data:/scenarios/mp/some_map/some_map'}), mocking.Locale.Empty), 
+            resolveScenarioDisplayName(factory.replay({name: '$124', players: 4, file: 'Data:/scenarios/mp/some_map/some_map'}), mocking.Locale.Empty), 
             '(4) Some map'
         );
         // short player count
         assert.strictEqual(
-            resolveMapDisplayName(factory.replay({name: '$124', players: 2, file: 'Data:/scenarios/mp/some map/(2)_some map'}), mocking.Locale.Empty), 
+            resolveScenarioDisplayName(factory.replay({name: '$124', players: 2, file: 'Data:/scenarios/mp/some map/(2)_some map'}), mocking.Locale.Empty), 
             '(2) Some map'
         );
         // verbose player count
         assert.strictEqual(
-            resolveMapDisplayName(factory.replay({name: '$124', players: 6, file: 'Data:/scenarios/mp/some map/(4 - 6)_some-map'}), mocking.Locale.Empty), 
+            resolveScenarioDisplayName(factory.replay({name: '$124', players: 6, file: 'Data:/scenarios/mp/some map/(4 - 6)_some-map'}), mocking.Locale.Empty), 
             '(6) Some map'
         );
         // no whitespace in player count
         assert.strictEqual(
-            resolveMapDisplayName(factory.replay({name: '$124', players: 6, file: 'Data:/scenarios/mp/some map/(4-6)_some-map'}), mocking.Locale.Empty), 
+            resolveScenarioDisplayName(factory.replay({name: '$124', players: 6, file: 'Data:/scenarios/mp/some map/(4-6)_some-map'}), mocking.Locale.Empty), 
             '(6) Some map'
         );
         // partial player count
         assert.strictEqual(
-            resolveMapDisplayName(factory.replay({name: '$124', players: 6, file: 'Data:/scenarios/mp/some map/(4-)_some-map'}), mocking.Locale.Empty), 
+            resolveScenarioDisplayName(factory.replay({name: '$124', players: 6, file: 'Data:/scenarios/mp/some map/(4-)_some-map'}), mocking.Locale.Empty), 
             '(6) Some map'
         );
         assert.strictEqual(
-            resolveMapDisplayName(factory.replay({name: '', file: ''}), mocking.Locale.Empty), 
+            resolveScenarioDisplayName(factory.replay({name: '', file: ''}), mocking.Locale.Empty), 
             ''
         );
         assert.strictEqual(
-            resolveMapDisplayName(factory.replay({name: '', file: ''})), 
+            resolveScenarioDisplayName(factory.replay({name: '', file: ''})), 
             ''
         );
     });
 
-    it('resolveMapDisplayName: From locale', () => {
+    it('resolveScenarioDisplayName: From locale', () => {
         assert.strictEqual(
-            resolveMapDisplayName(factory.replay({name: '$1'}), new mocking.Locale({'$1': '(2) Map'})), 
+            resolveScenarioDisplayName(factory.replay({name: '$1'}), new mocking.Locale({'$1': '(2) Map'})), 
             '(2) Map'
         );
     });

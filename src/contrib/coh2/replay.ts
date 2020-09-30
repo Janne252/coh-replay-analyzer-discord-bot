@@ -82,7 +82,7 @@ export function resolveScenarioId(replay: Data) {
     ;
 }
 
-export function resolveMapDisplayName(replay: InputData<ReplayData, 'map'>, locale?: LocaleLike) {
+export function resolveScenarioDisplayName(replay: InputData<ReplayData, 'map'>, locale?: LocaleLike) {
     let result = (locale ? locale.get(replay.map.name) : '') || '';
     // Fallback to provided name if it is not a LocString reference
     if (!result && !/\$[abcdef\d]+(:[abcdef\d]+)?/.test(replay.map.name)) {
