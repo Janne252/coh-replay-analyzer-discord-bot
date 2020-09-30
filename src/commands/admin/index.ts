@@ -18,7 +18,7 @@ export default async (message: Discord.Message, client: Discord.Client, config: 
 
         switch (command) {
             // Used to get a quick overview of the servers the bot is currently in
-            case 'list-servers': {
+            case 'telemetry:servers': {
                 const guilds = client.guilds.cache.array();
                 await message.reply(`${client.user} is currently active on ${guilds.length} server${guilds.length == 1 ? '' : 's'}.`);
                 for (const guild of guilds) {
@@ -41,6 +41,7 @@ export default async (message: Discord.Message, client: Discord.Client, config: 
             }
             // Used to test replay parsing by posting all the test replays
             case 'test:replays': {
+                await message.reply(new Discord.MessageEmbed({description: `Beginning to upload replays to ${guild.name}: ${channel}...`}));
                 for (const file of await fs.readdir(path.join(root, 'tests/replays'))) {
                     const attachment = new Discord.MessageAttachment(path.join(root, 'tests/replays', file));
                     await channel.send(attachment);
