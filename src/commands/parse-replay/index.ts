@@ -83,31 +83,7 @@ export default async (message: Discord.Message, client: Discord.Client, config: 
             
             const result = await message.channel.send(embed);
             if (!chatPreview.complete) {
-                // Placeholder reaction for the user
-                const selfReaction = await result.react(config.expandChatPreview.reaction);
-                const chatOutputMessages: Discord.Message[] = [];
-                const reactions = await result.awaitReactions(
-                    (reaction, user) => user.id == message.author.id && reaction.emoji.name == config.expandChatPreview.reaction, 
-                    {time: config.expandChatPreview.timeoutSeconds * 1000, max: 1}
-                );
-                if (reactions.array().some(reaction => reaction.emoji.name == config.expandChatPreview.reaction)) {
-                    await selfReaction.remove();
-                    // Send replay chat as block quote messages
-                    // Utilize Discord's automatic splitting functionality when passing message data as an array
-                    const result = await message.channel.send(
-                        replay.chat.map(message => `> ${Replay.formatChatMessage(message, {noNewline: true})}`), 
-                        {split: true}
-                    );
-                    chatOutputMessages.push(...(!Array.isArray(result) ? [result] : result));
-                }
-                if (chatOutputMessages.length > 0) {
-                    embed.fields[chatPreviewIndex].name = 'Chat';
-                    embed.fields[chatPreviewIndex].value = `[Show](${chatOutputMessages[0].url})`;
-                } else {
-                    embed.fields[chatPreviewIndex] = getChatPreviewEmbed(replay).field;
-                }
-                await result.edit(embed);
-                await selfReaction.remove();
+                await awaitPostExpandedChat(replay, result, message.author, embed, config, { chatPreviewIndex });
             }
         } catch (error) {
             // Raise to an outer scope handler
@@ -144,4 +120,39 @@ function getChatPreviewEmbed(replay: Replay.Data, {charsPerChunk}: {charsPerChun
 
 function shouldProceedBasedOnFilename(attachment: Discord.MessageAttachment) {
     return attachment && attachment.name && attachment.name.endsWith('.rec');
+}
+
+async function awaitPostExpandedChat(
+    replay: Replay.Data, 
+    message: Discord.Message, 
+    author: Discord.User,
+    embed: Discord.MessageEmbed, 
+    config: Config, 
+    {chatPreviewIndex}: {chatPreviewIndex: number}
+) {
+    // Placeholder reaction for the user
+    const selfReaction = await message.react(config.expandChatPreview.reaction);
+    const chatOutputMessages: Discord.Message[] = [];
+    const reactions = await message.awaitReactions(
+        (reaction, user) => user.id == author.id && reaction.emoji.name == config.expandChatPreview.reaction, 
+        {time: config.expandChatPreview.timeoutSeconds * 1000, max: 1}
+    );
+    if (reactions.array().some(reaction => reaction.emoji.name == config.expandChatPreview.reaction)) {
+        await selfReaction.remove();
+        // Send replay chat as block quote messages
+        // Utilize Discord's automatic splitting functionality when passing message data as an array
+        const result = await message.channel.send(
+            replay.chat.map(message => `> ${Replay.formatChatMessage(message, {noNewline: true})}`), 
+            {split: true}
+        );
+        chatOutputMessages.push(...(!Array.isArray(result) ? [result] : result));
+    }
+    if (chatOutputMessages.length > 0) {
+        embed.fields[chatPreviewIndex].name = 'Chat';
+        embed.fields[chatPreviewIndex].value = `[Show](${chatOutputMessages[0].url})`;
+    } else {
+        embed.fields[chatPreviewIndex] = getChatPreviewEmbed(replay).field;
+    }
+    await message.edit(embed);
+    await selfReaction.remove();
 }
