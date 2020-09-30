@@ -32,7 +32,9 @@ export default async (message: Discord.Message, client: Discord.Client, config: 
                             { name: 'Owner', value: `${guild.owner}`, inline: true },
                             { name: 'Members', value: guild.memberCount, inline: true },
                             { name: 'Created', value: `${moment(guild.createdAt).from(moment.utc())}\n_${guild.createdAt.toDateString()}_`, inline: true },
-                            { name: 'Added', value: `${moment(guildMember.joinedAt).from(moment.utc())}\n_${guildMember.joinedAt?.toDateString()}_`, inline: true }
+                            { name: 'Added', value: `${moment(guildMember.joinedAt).from(moment.utc())}\n_${guildMember.joinedAt?.toDateString()}_`, inline: true },
+                            { name: 'Locale', value: `\`${guild.preferredLocale}\``, inline: true, },
+                            { name: 'Region', value: `\`${guild.region}\``, inline: true, },
                         ],
                         footer: guild.description ? {text: guild.description} : undefined,
                     }));
