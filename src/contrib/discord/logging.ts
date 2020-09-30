@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js';
-import { getGuildUrl, truncatedEmbedCodeField } from '../../contrib/discord';
+import { getGuildUrl, truncatedEmbedCodeField } from './index';
 import { DiagnosticsConfig } from './config';
 import os from 'os';
 
