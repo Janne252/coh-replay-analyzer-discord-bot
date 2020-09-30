@@ -1,26 +1,24 @@
 import * as Discord from 'discord.js';
 import { getGuildUrl, truncatedEmbedCodeField } from '../../contrib/discord';
+import { DiagnosticsConfig } from './config';
+import os from 'os';
 
 /* istanbul ignore next */
 /**
  * Helper for writing log messages to a discord channel.
  */
 export class ChannelLogger {
-    public static readonly Color = {
-        Info: 0x2196f3, // Blue
-        Warning: 0xffc107, // Orange
-        Error: 0xf44336, // Red
-    };
     
     //@ts-expect-error 2564
-    private guild: Discord.Guild;
-    //@ts-expect-error 2564
-    private channel: Discord.TextChannel;
-    //@ts-expect-error 2564
     private admin: Discord.GuildMember;
+    private destination: Record<string, {guild: Discord.Guild, channel: Discord.TextChannel}> = {};
 
-    constructor(private readonly client: Discord.Client, private readonly config: {log: {guild: string, channel: string}, user: string}) {
+    constructor(private readonly client: Discord.Client, private readonly config: DiagnosticsConfig) {
 
+    }
+
+    private getChannel(level: LogLevelOption) {
+        return this.destination[level.name].channel;
     }
 
     /**
@@ -54,22 +52,37 @@ export class ChannelLogger {
      * Initializes the logger by fetching guild, channel, and admin user.
      */
     async init() {
-        this.guild = await this.client.guilds.fetch(this.config.log.guild);
-        this.channel = this.guild.channels.resolve(this.config.log.channel) as Discord.TextChannel;
-        this.admin = await this.guild.members.fetch(this.config.user);
+        for (const logLevelName in LogLevel) {
+            const logLevel = LogLevel[logLevelName as keyof LogLevel] as LogLevelOption;
+            const loggerConfig = this.config[logLevel.name as keyof DiagnosticsConfig] as {guild: string, channel: string};
+            if (loggerConfig === undefined) {
+                var b =  1;
+            }
+            const guild = await this.client.guilds.fetch(loggerConfig.guild);
+            this.destination[logLevel.name] = {
+                guild,
+                channel: guild.channels.resolve(loggerConfig.channel) as Discord.TextChannel,
+            }
+        }
+        this.admin = await (await this.client.guilds.fetch(this.config.admin.guild)).members.fetch(this.config.admin.user);
     }
     
-    async log(options: Discord.MessageEmbedOptions = {}, context?: LoggerContext) {
+    async log(content: Discord.MessageEmbedOptions = {}, options?: {context?: LoggerContext, level?: LogLevelOption, environmentInfo?: boolean}) {
         const timestamp = new Date();
-        options = {
+        const level = options?.level ?? LogLevel.Log;
+        const context = options?.context;
+        const environmentInfo = options?.environmentInfo ?? false;
+        const tagAdmin = level.tagAdmin ?? false;
+
+        content = {
             // defaults
             title:  `ℹ️ ${timestamp.toLocaleString('en-US')}`,
             footer: {text: this.client.user?.username as string, iconURL: this.client.user?.avatarURL() ?? undefined},
-            color: ChannelLogger.Color.Info,
+            color: level.color,
             // Overrides
-            ...options,
+            ...content,
         }
-        const embed = new Discord.MessageEmbed(options);
+        const embed = new Discord.MessageEmbed(content);
         if (context) {
             if (context instanceof Discord.Guild) {
                 this.appendGuild(embed, context);
@@ -81,15 +94,21 @@ export class ChannelLogger {
                 this.appendMessage(embed, context);
             }
         }
+        if (environmentInfo) {
+            embed.addFields({name: 'Hostname', value: os.hostname()})
+        }
         embed.addFields(
             { name: 'Timestamp', value: timestamp.toISOString(), inline: true },
         );
         
+        const channel = this.getChannel(level);
         // Tag admin first
         // If we tag them in the embed, they will not get a notification
         // https://discordjs.guide/popular-topics/embeds.html#notes
-        await this.channel.send(`${this.admin}`);
-        const result = await this.channel.send(embed);
+        if (tagAdmin) {
+            await channel.send(`${this.admin}`);
+        }
+        const result = await channel.send(embed);
         return {embed, result};
     }
 
@@ -106,11 +125,13 @@ export class ChannelLogger {
         const {embed, result} = await this.log({
             title: `❗ ${error}`,
             fields,
-            color: ChannelLogger.Color.Error,
-        }, context);
+        }, {
+            context, 
+            level: LogLevel.Error
+        });
 
         if (error.stack) {
-            const stacktraceMessages = await this.channel.send(
+            const stacktraceMessages = await this.destination[LogLevel.Error.name].channel.send(
                 error.stack
                     .split('\n')
                     .map(line => `> ${line}`), 
@@ -144,3 +165,29 @@ export class ChannelLogger {
 }
 
 export type LoggerContext = Discord.Guild | Discord.Channel | Discord.Message;
+export interface LogLevelOption {
+    readonly name: string;
+    readonly color: number;
+    readonly tagAdmin?: boolean;
+}
+
+export class LogLevel {
+    // Value should match the name of LogColor value
+    public static readonly Log: LogLevelOption = {
+        name: 'log', 
+        color: 0x2196f3, // Blue
+    };
+    public static readonly Warning: LogLevelOption = {
+        name: 'warning', 
+        color: 0xffc107, // Orange
+    };
+    public static readonly Error: LogLevelOption = {
+        name: 'error', 
+        color: 0xf44336, // Red
+        tagAdmin: true,
+    };
+    public static readonly Test: LogLevelOption = {
+        name: 'test', 
+        color: 0x9c27b0, // Purple
+    };
+}

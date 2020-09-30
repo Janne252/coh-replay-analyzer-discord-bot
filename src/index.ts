@@ -1,5 +1,4 @@
 import * as Discord from 'discord.js';
-import path from 'path';
 import fs from 'fs-extra';
 import { Locale } from './contrib/coh2';
 
@@ -9,8 +8,8 @@ import tryParseCoH2Replay from './commands/parse-replay';
 import tryExecuteAdminCommand from './commands/admin';
 
 import { ShutdownManager } from './contrib/discord';
-import { AdminConfig } from './contrib/discord/config';
-import { ChannelLogger } from './contrib/discord/logging';
+import { DiagnosticsConfig } from './contrib/discord/config';
+import { ChannelLogger, LogLevel } from './contrib/discord/logging';
 
 // Instances
 const client = new Discord.Client({
@@ -18,14 +17,14 @@ const client = new Discord.Client({
 });
 
 const locale = new Locale();
-const adminConfig = new AdminConfig();
+const diagnosticsConfig = new DiagnosticsConfig();
 const replaysConfig = new ReplaysConfig();
-const logger = new ChannelLogger(client, adminConfig);
-const shutdownManager = new ShutdownManager(client);
+const logger = new ChannelLogger(client, diagnosticsConfig);
+const shutdownManager = new ShutdownManager(client, logger);
 
 client.on('ready', async () => {
     await replaysConfig.init();
-    await adminConfig.init();
+    await diagnosticsConfig.init();
 
     // Prepare .replays folder
     await fs.ensureDir(replaysConfig.replaysTempPath);
@@ -50,6 +49,14 @@ client.on('ready', async () => {
     }
 
     updateStatus();
+
+    logger.log({
+        title: 'Startup',
+        description: `Process started.`
+    }, {
+        level: LogLevel.Log,
+        environmentInfo: true,
+    });
 });
 
 client.on('message', async message => {
@@ -57,7 +64,7 @@ client.on('message', async message => {
         if (await tryParseCoH2Replay(message, client, replaysConfig))
             return;
         
-        if (await tryExecuteAdminCommand(message, client, adminConfig))
+        if (await tryExecuteAdminCommand(message, client, diagnosticsConfig))
             return;
     } catch (error) {
         // Catch errors with context

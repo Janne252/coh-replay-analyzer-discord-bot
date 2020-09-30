@@ -3,12 +3,12 @@ import fs from 'fs-extra';
 import * as Discord from "discord.js";
 import { getGuildUrl, MessageHelpers } from '../../contrib/discord';
 import { makeLength } from '../../contrib/testing/generator';
-import { AdminConfig } from '../../contrib/discord/config';
+import { DiagnosticsConfig } from '../../contrib/discord/config';
 import moment from 'moment';
 
 const root = process.cwd();
 
-export default async (message: Discord.Message, client: Discord.Client, config: AdminConfig) => {
+export default async (message: Discord.Message, client: Discord.Client, config: DiagnosticsConfig) => {
     const isAdmin = isAdminCommand(message, client, config);
     const command = MessageHelpers.withoutMentions(message);
 
@@ -94,10 +94,10 @@ export default async (message: Discord.Message, client: Discord.Client, config: 
     return false;
 }
 
-export function isAdminCommand(message: Discord.Message, client: Discord.Client, config: AdminConfig) {
+export function isAdminCommand(message: Discord.Message, client: Discord.Client, config: DiagnosticsConfig) {
     return (
         message.author.id !== client.user?.id && 
         message.mentions.users.has(client.user?.id as string) && 
-        message.author.id === config.user
+        message.author.id === config.admin.user
     );
 }

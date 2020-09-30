@@ -39,6 +39,7 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
 - [ ] Handle replay data parser errors. Currently does not affect the bot as players and map info are still parsed.
     - Wikinger mod discord has several mod replay files that will likely recreate this error.
 - [ ] Figure out a better way of signaling handled messages than boolean
-
+- [ ] "Self-made" configuration system (loads package.json via JSON.parse and takes a section of it) works but probably isn't the best way of doing things
+    - Separate config file?
 # License
 [MIT License](./LICENSE.txt)

@@ -1,4 +1,5 @@
 import Discord, { Guild, TextChannel } from 'discord.js';
+import { ChannelLogger, LogLevel } from './logging';
 
 /**
  * Truncates a value to the maximum length and wraps it in code markdown tags (```).
@@ -22,22 +23,31 @@ export function truncatedEmbedCodeField(
  * Uniform exit handing (logout from discord & safely exit)
  */
 export class ShutdownManager {
-    constructor(private readonly client: Discord.Client) {
+    constructor(private readonly client: Discord.Client, private readonly logger: ChannelLogger) {
     }
 
-    async exit(code = 0) {
+    async exit(params?: {code?: number, signal?: NodeJS.Signals}) {
         try {
+            try {
+                await this.logger.log({
+                    title: 'Shutdown',
+                    fields: [
+                        { name: 'Exit code', value: `${params?.code ?? '_Unknown_'}`},
+                        { name: 'Signal', value: `${params?.signal ?? '_Unknown_'}`},
+                    ]
+                }, {level: LogLevel.Error, environmentInfo: true});
+            } catch (_) {}
             this.client.destroy();
         }
         finally {
-            process.exit(code);
+            process.exit(params?.code ?? 0);
         }
     }
 
     addGlobalSignalListeners() {
-        process.on('SIGINT', () => this.exit());
-        process.on('SIGABRT', () => this.exit());
-        process.on('SIGTERM', () => this.exit());
+        process.on('SIGINT', (e) => this.exit({signal: e}));
+        process.on('SIGABRT', (e) => this.exit({signal: e}));
+        process.on('SIGTERM', (e) => this.exit({signal: e}));
     }
 }
 
