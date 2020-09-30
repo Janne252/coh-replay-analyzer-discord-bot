@@ -1,7 +1,7 @@
 import * as Discord from 'discord.js';
 import fs from 'fs-extra';
+import path from 'path';
 import { Locale } from './contrib/coh2';
-
 import ReplaysConfig from './commands/parse-replay/config';
 import tryParseCoH2Replay from './commands/parse-replay';
 
@@ -10,13 +10,15 @@ import tryExecuteAdminCommand from './commands/admin';
 import { ShutdownManager } from './contrib/discord';
 import { DiagnosticsConfig } from './contrib/discord/config';
 import { ChannelLogger, LogLevel } from './contrib/discord/logging';
+import I18n from './contrib/i18n';
 
 // Instances
 const client = new Discord.Client({
 
 });
 
-const locale = new Locale();
+const i18n = new I18n(path.join(process.cwd(), 'locale'));
+const coh2Locale = new Locale();
 const diagnosticsConfig = new DiagnosticsConfig();
 const replaysConfig = new ReplaysConfig();
 const logger = new ChannelLogger(client, diagnosticsConfig);
@@ -31,8 +33,9 @@ client.on('ready', async () => {
     await fs.emptyDir(replaysConfig.replaysTempPath);
 
     await Promise.all([
-        locale.init(replaysConfig.localeFilePath),
+        coh2Locale.init(replaysConfig.localeFilePath),
         logger.init(),
+        i18n.init(),
     ]);
    
     console.log('Ready!');
@@ -61,7 +64,7 @@ client.on('ready', async () => {
 
 client.on('message', async message => {
     try {
-        if (await tryParseCoH2Replay(message, client, logger, replaysConfig))
+        if (await tryParseCoH2Replay(message, client, logger, i18n, replaysConfig))
             return;
         
         if (await tryExecuteAdminCommand(message, client, logger, diagnosticsConfig))

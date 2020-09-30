@@ -23,3 +23,28 @@ export function exec(command: string): Promise<{stdout: string, stderr: string}>
 export function capitalize(str: string) { 
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export interface StringFormatArgs {
+    [key: string]: number | string;
+}
+
+// TODO add unit tests
+export function formatString(str: string, args?: StringFormatArgs) {
+    if (args != null) {
+        return str.replace(/\{(.*?)\}/g, (match, key) => {
+            if (args.hasOwnProperty(key)) {
+                let value = args[key];
+                if (value != null) {
+                    let strValue = value.toString();
+                    return strValue;
+                } else {
+                    return '';
+                }
+            } else {
+                return match;
+            }
+        });
+    } else {
+        return str;
+    }
+}

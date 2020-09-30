@@ -7,8 +7,9 @@ import { exec } from '../../contrib/misc';
 import * as Replay from '../../contrib/coh2/replay';
 import Config from './config';
 import { ChannelLogger } from '../../contrib/discord/logging';
+import I18n from '../../contrib/i18n';
 
-export default async (message: Discord.Message, client: Discord.Client, logger: ChannelLogger, config: Config): Promise<boolean> => {
+export default async (message: Discord.Message, client: Discord.Client, logger: ChannelLogger, i18n: I18n, config: Config): Promise<boolean> => {
     const attachments = message.attachments.array();
     let isHandled = false;
 
@@ -58,8 +59,12 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
                 Replay.getPlayerListEmbed(replay, 0, config),
                 Replay.getPlayerListEmbed(replay, 1, config),
             );
-
-            const loadAllChatTip = `\n${message.author}: React with \xa0 ${config.expandChatPreview.reaction} \xa0 to load all chat messages.`;
+            const loadAllChatTip = i18n.get(
+                'replay.chat.loadAllByReacting', message.guild?.preferredLocale, {
+                    '@user': message.author.toString(),
+                    'emoji': `\xa0 ${config.expandChatPreview.reaction} \xa0`
+                }
+            );
             const chatPreview = getChatPreviewEmbed(replay, {charsPerChunk: 1024 - loadAllChatTip.length});
             if (!chatPreview.complete) {
                 chatPreview.field.value += loadAllChatTip;
