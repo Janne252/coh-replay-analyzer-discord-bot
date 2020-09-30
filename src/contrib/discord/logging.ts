@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js';
-import { truncatedEmbedCodeField } from '../../contrib/discord';
+import { getGuildUrl, truncatedEmbedCodeField } from '../../contrib/discord';
 
 /* istanbul ignore next */
 /**
@@ -27,7 +27,7 @@ export class ChannelLogger {
      * Appends a reference of the guild to the embed.
      */
     private appendGuild(embed: Discord.MessageEmbed, guild: Discord.Guild) {
-        embed.fields.push({ name: 'Server', value: `[${guild}](https://discord.com/channels/${guild.id})`, inline: false });
+        embed.fields.push({ name: 'Server', value: `[${guild}](${getGuildUrl(guild)})`, inline: false });
     }
 
     /**
