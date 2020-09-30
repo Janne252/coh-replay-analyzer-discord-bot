@@ -1,4 +1,4 @@
-import Discord from 'discord.js';
+import Discord, { Guild, TextChannel } from 'discord.js';
 
 /**
  * Truncates a value to the maximum length and wraps it in code markdown tags (```).
@@ -45,4 +45,30 @@ export class MessageHelpers {
     public static withoutMentions(message: {content: string}) {
         return message.content.replace(/<@!\d+>/g, '').trim();
     }
+}
+
+export function getGuildUrl(guild: Guild | string, channel?: Discord.Channel | string) {
+    const guildId = typeof guild === 'string' ? guild : guild.id;
+    const channelId = channel ? (typeof channel === 'string' ? channel : channel.id) : null;
+    return `https://discord.com/channels/${guildId}${channelId ? '/' + channelId : ''}`;
+}
+
+export async function getAllChannelMessages(channel: TextChannel, sort = true) {
+    let before = undefined;
+    const count = 100;
+    const result: Discord.Message[] = [];
+    while (true) {
+        const batch: Discord.Message[] = (await channel.messages.fetch({ limit: count, before })).array();
+        if (batch.length == 0) {
+            break;
+        }
+        result.push(...batch);
+        before = batch[batch.length - 1].id;
+    }
+
+    if (sort) {
+        result.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+    }
+
+    return result;
 }
