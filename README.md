@@ -7,7 +7,7 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
 # Installation
 - Bot authentication link: https://discord.com/api/oauth2/authorize?client_id=753206700655378523&permissions=321600&scope=bot
     - Scopes: `Send Messages`, `Manage Messages`, `Embed Links`, `Attach Files`, `Use External Emojis`, `Add Reactions`
-
+- ❤️ Please consider inviting `Janne252#7736` to the server(s) the bot has been added to ❤️
 # TODO
 - [x] Set activity status message periodically, e.g. every 60 minutes (appears to disappear/clear after some time)
 - [ ] Use the "home" discord server as a CDN For map images?
