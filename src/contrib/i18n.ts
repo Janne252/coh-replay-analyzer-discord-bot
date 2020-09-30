@@ -3,8 +3,8 @@ import fs from 'fs-extra';
 import { formatString, StringFormatArgs } from './misc';
 
 export default class I18n {
-    private catalog: Record<string, string> = {};
-    constructor(private readonly path: string) {
+    public readonly catalog: Record<string, string> = {};
+    constructor(private readonly path: string, public readonly fallback = 'en') {
 
     }
 
@@ -23,7 +23,7 @@ export default class I18n {
         this.append(translations, localeName);
     }
 
-    private append(translations: TranslationDeclaration, prefix = '') {
+    public append(translations: TranslationDeclaration, prefix = '') {
         for (const key in translations) {
             const value = translations[key];
             const id = `${prefix}.${key}`;
@@ -42,8 +42,13 @@ export default class I18n {
     private getTranslationCatalogKey(id: string, locale: string) {
         return `${this.normalizeLocale(locale)}.${id}`;
     }
+
     public get(id: string, locale = 'en', format?: StringFormatArgs) {
-        let message = this.catalog[this.getTranslationCatalogKey(id, locale)] ?? id;
+        let key = this.getTranslationCatalogKey(id, locale);
+        if (!(key in this.catalog)) {
+            key = this.getTranslationCatalogKey(id, this.fallback);
+        }
+        let message = this.catalog[key] ?? id;
         if (format) {
             message = formatString(message, format);
         }
