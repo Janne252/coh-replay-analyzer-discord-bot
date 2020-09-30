@@ -61,10 +61,10 @@ client.on('ready', async () => {
 
 client.on('message', async message => {
     try {
-        if (await tryParseCoH2Replay(message, client, replaysConfig))
+        if (await tryParseCoH2Replay(message, client, logger, replaysConfig))
             return;
         
-        if (await tryExecuteAdminCommand(message, client, diagnosticsConfig))
+        if (await tryExecuteAdminCommand(message, client, logger, diagnosticsConfig))
             return;
     } catch (error) {
         // Catch errors with context

@@ -11,7 +11,7 @@ export class ChannelLogger {
     
     //@ts-expect-error 2564
     private admin: Discord.GuildMember;
-    private destination: Record<string, {guild: Discord.Guild, channel: Discord.TextChannel}> = {};
+    public readonly destination: Record<string, {guild: Discord.Guild, channel: Discord.TextChannel}> = {};
 
     constructor(private readonly client: Discord.Client, private readonly config: DiagnosticsConfig) {
 
@@ -52,12 +52,8 @@ export class ChannelLogger {
      * Initializes the logger by fetching guild, channel, and admin user.
      */
     async init() {
-        for (const logLevelName in LogLevel) {
-            const logLevel = LogLevel[logLevelName as keyof LogLevel] as LogLevelOption;
+        for (const logLevel of LogLevels) {
             const loggerConfig = this.config[logLevel.name as keyof DiagnosticsConfig] as {guild: string, channel: string};
-            if (loggerConfig === undefined) {
-                var b =  1;
-            }
             const guild = await this.client.guilds.fetch(loggerConfig.guild);
             this.destination[logLevel.name] = {
                 guild,
@@ -168,7 +164,7 @@ export type LoggerContext = Discord.Guild | Discord.Channel | Discord.Message;
 export interface LogLevelOption {
     readonly name: string;
     readonly color: number;
-    readonly tagAdmin?: boolean;
+    readonly tagAdmin: boolean;
 }
 
 export class LogLevel {
@@ -176,10 +172,12 @@ export class LogLevel {
     public static readonly Log: LogLevelOption = {
         name: 'log', 
         color: 0x2196f3, // Blue
+        tagAdmin: false,
     };
     public static readonly Warning: LogLevelOption = {
         name: 'warning', 
         color: 0xffc107, // Orange
+        tagAdmin: false,
     };
     public static readonly Error: LogLevelOption = {
         name: 'error', 
@@ -189,5 +187,8 @@ export class LogLevel {
     public static readonly Test: LogLevelOption = {
         name: 'test', 
         color: 0x9c27b0, // Purple
+        tagAdmin: false,
     };
 }
+
+export const LogLevels = Object.keys(LogLevel).map(key => LogLevel[key as keyof LogLevel] as LogLevelOption);

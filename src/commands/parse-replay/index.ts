@@ -6,8 +6,9 @@ import download from 'download';
 import { exec } from '../../contrib/misc';
 import * as Replay from '../../contrib/coh2/replay';
 import Config from './config';
+import { ChannelLogger } from '../../contrib/discord/logging';
 
-export default async (message: Discord.Message, client: Discord.Client, config: Config): Promise<boolean> => {
+export default async (message: Discord.Message, client: Discord.Client, logger: ChannelLogger, config: Config): Promise<boolean> => {
     const attachments = message.attachments.array();
     let isHandled = false;
 

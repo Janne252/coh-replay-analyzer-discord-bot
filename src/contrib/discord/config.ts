@@ -1,5 +1,5 @@
 import { PackageJsonConfig, PackageConfig } from '../config';
-import { LogLevel, LogLevelOption } from './logging';
+import { LogLevel, LogLevelOption, LogLevels } from './logging';
 
 /* istanbul ignore next */
 /**
@@ -31,7 +31,7 @@ export class DiagnosticsConfig extends PackageJsonConfig {
     }
 
     configure(config: PackageConfig<{diagnostics: DiagnosticsConfig}>) {
-        for (const level of Object.keys(LogLevel).map(key => LogLevel[key as keyof LogLevel] as LogLevelOption)) {
+        for (const level of LogLevels) {
             if (!(level.name in config.diagnostics)) {
                 throw new Error(`Missing diagnostics configuration "${level.name}"`); 
             }

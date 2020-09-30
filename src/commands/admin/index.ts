@@ -5,10 +5,11 @@ import { getGuildUrl, MessageHelpers } from '../../contrib/discord';
 import { makeLength } from '../../contrib/testing/generator';
 import { DiagnosticsConfig } from '../../contrib/discord/config';
 import moment from 'moment';
+import { ChannelLogger, LogLevels } from '../../contrib/discord/logging';
 
 const root = process.cwd();
 
-export default async (message: Discord.Message, client: Discord.Client, config: DiagnosticsConfig) => {
+export default async (message: Discord.Message, client: Discord.Client, logger: ChannelLogger, config: DiagnosticsConfig) => {
     const isAdmin = isAdminCommand(message, client, config);
     const command = MessageHelpers.withoutMentions(message);
 
@@ -39,11 +40,25 @@ export default async (message: Discord.Message, client: Discord.Client, config: 
                         footer: guild.description ? {text: guild.description} : undefined,
                     }));
                 }
-                break;
+                return true;
+            }
+            case 'test:logs': {
+                for (const logLevel of LogLevels) {
+                    await message.reply(new Discord.MessageEmbed({description: `Beginning to write "${logLevel.name}" to ${logger.destination[logLevel.name].channel}...`}));
+                    await logger.log({
+                        title: `Test: "${logLevel.name}"`,
+                        fields: [
+                            { name: 'name', value: `\`${logLevel.name}\``, inline: true, },
+                            { name: 'color', value: `\`${logLevel.color}\``, inline: true, },
+                            { name: 'tagAdmin', value: `\`${logLevel.tagAdmin}\``, inline: true, },
+                        ]
+                    }, {level: logLevel});
+                }
+                return true;
             }
             // Used to test replay parsing by posting all the test replays
             case 'test:replays': {
-                await message.reply(new Discord.MessageEmbed({description: `Beginning to upload replays to ${guild.name}: ${channel}...`}));
+                await message.reply(new Discord.MessageEmbed({description: `Beginning to upload replays to ${channel}...`}));
                 for (const file of await fs.readdir(path.join(root, 'tests/replays'))) {
                     const attachment = new Discord.MessageAttachment(path.join(root, 'tests/replays', file));
                     await channel.send(attachment);
