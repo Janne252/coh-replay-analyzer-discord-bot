@@ -17,7 +17,7 @@ const client = new Discord.Client({
 
 });
 
-const i18n = new I18n(path.join(process.cwd(), 'locale'));
+export const i18n = new I18n(path.join(process.cwd(), 'locale'));
 const coh2Locale = new Locale();
 const diagnosticsConfig = new DiagnosticsConfig();
 const replaysConfig = new ReplaysConfig();
@@ -43,7 +43,7 @@ client.on('ready', async () => {
     const updateStatus = async () => {
         try {
             await client.user?.setActivity({
-                name: 'Replays',
+                name: i18n.get('watchingActivity'),
                 type: 'WATCHING'
             });
         } finally {
@@ -63,8 +63,9 @@ client.on('ready', async () => {
 });
 
 client.on('message', async message => {
+    const restoreLocale = i18n.activate(message.guild?.preferredLocale as string);
     try {
-        if (await tryParseCoH2Replay(message, client, logger, i18n, replaysConfig))
+        if (await tryParseCoH2Replay(message, client, logger, replaysConfig))
             return;
         
         if (await tryExecuteAdminCommand(message, client, logger, diagnosticsConfig))
@@ -72,6 +73,8 @@ client.on('message', async message => {
     } catch (error) {
         // Catch errors with context
         await logger.error(error, message);
+    } finally {
+        restoreLocale();
     }
 });
 

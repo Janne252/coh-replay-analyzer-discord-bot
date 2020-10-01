@@ -4,12 +4,20 @@ import { formatString, StringFormatArgs } from './misc';
 
 export default class I18n {
     public readonly catalog: Record<string, string> = {};
-    constructor(private readonly path: string, public readonly fallback = 'en') {
+    public activeLocale: string = 'en';
+
+    constructor(private readonly path: string, public readonly defaultLocale = 'en') {
 
     }
 
+    activate(locale: string) {
+        const previousLocale = this.activeLocale;
+        this.activeLocale = locale;
+
+        return () => this.activate(previousLocale);
+    }
+
     async init() {
-        
         for (const file of await fs.readdir(this.path)) {
             if (file.endsWith('.json')) {
                 this.read(file);
@@ -43,10 +51,10 @@ export default class I18n {
         return `${this.normalizeLocale(locale)}.${id}`;
     }
 
-    public get(id: string, locale = 'en', format?: StringFormatArgs) {
-        let key = this.getTranslationCatalogKey(id, locale);
-        if (!(key in this.catalog)) {
-            key = this.getTranslationCatalogKey(id, this.fallback);
+    public get(id: string, format?: StringFormatArgs, locale?: string) {
+        let key = this.getTranslationCatalogKey(id, locale ?? this.defaultLocale);
+        if (!(key in this.catalog) && locale != this.defaultLocale) {
+            key = this.getTranslationCatalogKey(id, this.defaultLocale);
         }
         let message = this.catalog[key] ?? id;
         if (format) {

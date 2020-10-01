@@ -8,8 +8,9 @@ import * as Replay from '../../contrib/coh2/replay';
 import Config from './config';
 import { ChannelLogger } from '../../contrib/discord/logging';
 import I18n from '../../contrib/i18n';
+import { i18n } from '../..';
 
-export default async (message: Discord.Message, client: Discord.Client, logger: ChannelLogger, i18n: I18n, config: Config): Promise<boolean> => {
+export default async (message: Discord.Message, client: Discord.Client, logger: ChannelLogger, config: Config): Promise<boolean> => {
     const attachments = message.attachments.array();
     let isHandled = false;
 
@@ -60,7 +61,7 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
                 Replay.getPlayerListEmbed(replay, 1, config),
             );
             const loadAllChatTip = i18n.get(
-                'replay.chat.loadAllByReacting', message.guild?.preferredLocale, {
+                'replay.chat.loadAllByReacting', {
                     '@user': message.author.toString(),
                     'emoji': `\xa0 ${config.expandChatPreview.reaction} \xa0`
                 }
@@ -73,8 +74,8 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
             const chatPreviewIndex = embed.fields.length - 1;
 
             embed.addFields(
-                { name: 'Match duration', value: `||${Replay.getReplayDurationDisplay(replay.duration, {verbose: true})}||`, inline: true},
-                { name: 'Game version', value: `4.0.0.${replay.version}`, inline: true},
+                { name: i18n.get('replay.matchDuration'), value: `||${Replay.getReplayDurationDisplay(replay.duration, {verbose: true})}||`, inline: true},
+                { name: i18n.get('replay.gameVersion'), value: `4.0.0.${replay.version}`, inline: true},
             );
             // Attach the scenario preview image to the message if there's one available.
             // TODO: Use a CDN to host these images (see readme.md in the project root)
@@ -83,14 +84,17 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
                 embed.attachFiles([scenarioPreviewImageFilepath]);
                 embed.setImage(`attachment://${scenarioPreviewImageFilename}`);
             } else {
-                embed.addField('\u200b', '_No map preview image available. If this is an official map, please contact an admin on the server._');
+                embed.addField('\u200b', `_${i18n.get('replay.noMapPreviewImageAvailable')}_`);
             }
             embed.setFooter(client.user?.username, client.user?.avatarURL() as string);
             
             const result = await message.channel.send(embed);
+            let expandedChatMessages: Discord.Message[] = [];
             if (!chatPreview.complete) {
-                await awaitPostExpandedChat(replay, result, message.author, embed, config, { chatPreviewIndex });
+                expandedChatMessages = await awaitPostExpandedChat(replay, result, message, embed, config, { chatPreviewIndex });
             }
+            
+            removeOnDeletion(client, message,  {replayEmbedMessage: result, expandedChatMessages});
         } catch (error) {
             // Raise to an outer scope handler
             throw error;
@@ -107,15 +111,15 @@ function getChatPreviewEmbed(replay: Replay.Data, {charsPerChunk}: {charsPerChun
     if (!replay.chat || replay.chat.length == 0) {
         return {
             complete: true,
-            field: {name: 'Chat', value: '_No chat._', inline: false},
+            field: {name: i18n.get('replay.chat.title'), value: `_${i18n.get('replay.chat.noChatAvailable.')}_`, inline: false},
         };
     }
 
     const chunks = Replay.splitChat(replay, {charsPerChunk: charsPerChunk ?? 1024});
     const complete = chunks.length == 1;
-    let title = 'Chat';
+    let title = i18n.get('replay.chat.title');
     if (!complete) {
-        title = `Chat (${chunks[0].count}/${replay.chat.length})`;
+        title = i18n.get('replay.chat.partial', {count: chunks[0].count, total: replay.chat.length});
     }
 
     return {
@@ -128,37 +132,52 @@ function shouldProceedBasedOnFilename(attachment: Discord.MessageAttachment) {
     return attachment && attachment.name && attachment.name.endsWith('.rec');
 }
 
+async function removeOnDeletion(client: Discord.Client, userMessage: Discord.Message, {replayEmbedMessage, expandedChatMessages}: {replayEmbedMessage: Discord.Message, expandedChatMessages: Discord.Message[]}) {
+    const listener = async (deletedMessage: Discord.Message | Discord.PartialMessage) => {
+        if (deletedMessage.id === userMessage.id) {
+            await Promise.all([
+                replayEmbedMessage.delete(),
+                ...(expandedChatMessages.map(m => m.delete()))
+            ]);
+            client.off('messageDelete', listener);
+        }
+    };
+
+    client.on('messageDelete', listener);
+}
+
 async function awaitPostExpandedChat(
     replay: Replay.Data, 
-    message: Discord.Message, 
-    author: Discord.User,
+    botMessage: Discord.Message, 
+    userMessage: Discord.Message,
     embed: Discord.MessageEmbed, 
     config: Config, 
     {chatPreviewIndex}: {chatPreviewIndex: number}
 ) {
     // Placeholder reaction for the user
-    const selfReaction = await message.react(config.expandChatPreview.reaction);
+    const selfReaction = await botMessage.react(config.expandChatPreview.reaction);
     const chatOutputMessages: Discord.Message[] = [];
-    const reactions = await message.awaitReactions(
-        (reaction, user) => user.id == author.id && reaction.emoji.name == config.expandChatPreview.reaction, 
+    const reactions = await botMessage.awaitReactions(
+        (reaction, user) => user.id == userMessage.author.id && reaction.emoji.name == config.expandChatPreview.reaction, 
         {time: config.expandChatPreview.timeoutSeconds * 1000, max: 1}
     );
     if (reactions.array().some(reaction => reaction.emoji.name == config.expandChatPreview.reaction)) {
         await selfReaction.remove();
         // Send replay chat as block quote messages
         // Utilize Discord's automatic splitting functionality when passing message data as an array
-        const result = await message.channel.send(
+        const result = await botMessage.channel.send(
             replay.chat.map(message => `> ${Replay.formatChatMessage(message, {noNewline: true})}`), 
             {split: true}
         );
         chatOutputMessages.push(...(!Array.isArray(result) ? [result] : result));
     }
     if (chatOutputMessages.length > 0) {
-        embed.fields[chatPreviewIndex].name = 'Chat';
-        embed.fields[chatPreviewIndex].value = `[Show](${chatOutputMessages[0].url})`;
+        embed.fields[chatPreviewIndex].name = i18n.get('replay.chat.title');
+        embed.fields[chatPreviewIndex].value = `[${i18n.get('replay.chat.jumpToFullChatLinkText')}](${chatOutputMessages[0].url})`;
     } else {
         embed.fields[chatPreviewIndex] = getChatPreviewEmbed(replay).field;
     }
-    await message.edit(embed);
+    await botMessage.edit(embed);
     await selfReaction.remove();
+    return chatOutputMessages;
 }

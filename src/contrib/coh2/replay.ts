@@ -3,6 +3,7 @@ import { capitalize } from '../misc';
 import { LocaleLike } from '.';
 import { InputData } from '../../types';
 import ReplaysConfig from '../../commands/parse-replay/config';
+import { i18n } from '../..';
 
 export function formatChatMessage(
     message: InputData<ReplayChatMessage, 'message' | 'name' | 'tick'>, 
@@ -145,11 +146,11 @@ export function getPlayerListEmbed(
 ) {
     return { 
         inline: true, 
-        name: `Team ${team + 1}`, 
+        name: i18n.get('replay.player.playerTeam', {teamNumber: team + 1}), 
         value: replay.players
             .filter(p => p.team == team)
             .map(p => formatPlayer(p, config))
-            .join('\n') || '_No players available._'
+            .join('\n') || `_${i18n.get('replay.players.noPlayersAvailable')}_`
     };
 }
 
