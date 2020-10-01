@@ -48,5 +48,7 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
     - Separate config file?
 - [ ] Admin commands written in the mobile version of Discord don't appear to work / register
 - [ ] Localize replay duration with moment (refactor to use moment)
+- [ ] Move locale instance to its own module so that mocking translations while testing is easier
+    - [ ] remove i18n parameter from getPlayerListEmbed
 # License
 [MIT License](./LICENSE.txt)
