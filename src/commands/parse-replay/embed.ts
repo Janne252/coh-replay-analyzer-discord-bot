@@ -68,7 +68,8 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         const scenarioPreviewImageFilepath = this.buildScenarioPreviewFilepath(scenarioPreviewImageFilename);
 
         if (fs.existsSync(scenarioPreviewImageFilepath)) {
-            this.attachFiles([scenarioPreviewImageFilepath]);
+            const attachment = new Discord.MessageAttachment(scenarioPreviewImageFilepath, scenarioPreviewImageFilename);
+            this.attachFiles([attachment]);
             this.setImage(`attachment://${scenarioPreviewImageFilename}`);
         } else {
             this.appendNoScenarioPreviewImageAvailable();
@@ -221,7 +222,8 @@ export class CompactReplayEmbed extends ReplayBaseEmbed {
         const scenarioPreviewImageFilepath = this.buildScenarioPreviewFilepath(scenarioPreviewImageFilename);
 
         if (fs.existsSync(scenarioPreviewImageFilepath)) {
-            this.attachFiles([scenarioPreviewImageFilepath]);
+            const attachment = new Discord.MessageAttachment(scenarioPreviewImageFilepath, scenarioPreviewImageFilename);
+            this.attachFiles([attachment]);
             this.setThumbnail(`attachment://${scenarioPreviewImageFilename}`);
         } else {
             this.appendNoScenarioPreviewImageAvailable();
