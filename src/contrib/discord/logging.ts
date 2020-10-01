@@ -123,7 +123,8 @@ export class ChannelLogger {
             fields,
         }, {
             context, 
-            level: LogLevel.Error
+            level: LogLevel.Error,
+            environmentInfo: true,
         });
 
         if (error.stack) {
