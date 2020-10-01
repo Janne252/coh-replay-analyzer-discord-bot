@@ -4,19 +4,20 @@ import fs from 'fs-extra';
  * Represents a a wrapper class that provides localized strings from a RelicCOH2.<language>.ucs file.
  */
 export class Locale {
-    private readonly messages: Record<string, string> = {};
+    public static readonly Empty = new Locale();
+    
     /**
      * @param idPrefix Prefixed added to each message ID. Defaults to '$'.
      */
-    constructor(private readonly idPrefix = '$') {
+    constructor(private readonly messages: Record<string, string> = {}) {
 
     }
 
-    async init(filepath: string) {
+    async init(filepath: string, idPrefix = '$') {
         const localeStrings = (await fs.readFile(filepath, {encoding: 'utf-8'})).split('\n');
         for (const row of localeStrings) {
             const [id, message] = row.split('\t').map(part => part.trim());
-            this.messages[`${this.idPrefix}${id}`] = message;
+            this.messages[`${idPrefix}${id}`] = message;
         }
     }
 
