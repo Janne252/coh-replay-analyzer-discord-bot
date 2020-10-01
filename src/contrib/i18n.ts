@@ -2,11 +2,12 @@ import path from 'path';
 import fs from 'fs-extra';
 import { formatString, StringFormatArgs } from './misc';
 
-export default class I18n {
-    public readonly catalog: Record<string, string> = {};
+export class I18n {
+    public catalog: Record<string, string> = {};
+    public defaultLocale: string = 'en';
     public activeLocale: string = 'en';
 
-    constructor(private readonly path: string, public readonly defaultLocale = 'en') {
+    constructor() {
 
     }
 
@@ -17,17 +18,17 @@ export default class I18n {
         return () => this.activate(previousLocale);
     }
 
-    async init() {
-        for (const file of await fs.readdir(this.path)) {
-            if (file.endsWith('.json')) {
-                this.read(file);
+    async loadJsonCatalogs(rootPath: string) {
+        for (const filename of await fs.readdir(rootPath)) {
+            if (filename.endsWith('.json')) {
+                this.read(path.join(rootPath, filename));
             }
         }
     }
 
     private async read(filename: string) {
         const localeName = path.basename(filename, '.json');
-        const translations = JSON.parse(await fs.readFile(path.join(this.path, filename), {encoding: 'utf8'}));
+        const translations = JSON.parse(await fs.readFile(filename, {encoding: 'utf8'}));
         this.append(translations, localeName);
     }
 
@@ -63,7 +64,18 @@ export default class I18n {
 
         return message;
     }
+
+    public override(...translations: [string, TranslationDeclaration][]) {
+        const previous = JSON.parse(JSON.stringify(this.catalog));
+        for (const [locale, catalog] of translations) {
+            this.append(catalog, locale);
+        }
+        return () => this.catalog = previous;
+    }
 }
+
+const i18n = new I18n();
+export default i18n;
 
 export interface TranslationDeclaration {
     [key: string]: string | TranslationDeclaration;

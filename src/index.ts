@@ -10,14 +10,13 @@ import tryExecuteAdminCommand from './commands/admin';
 import { ShutdownManager } from './contrib/discord';
 import { DiagnosticsConfig } from './contrib/discord/config';
 import { ChannelLogger, LogLevel } from './contrib/discord/logging';
-import I18n from './contrib/i18n';
+import i18n from './contrib/i18n';
 
 // Instances
 const client = new Discord.Client({
 
 });
 
-export const i18n = new I18n(path.join(process.cwd(), 'locale'));
 const coh2Locale = new Locale();
 const diagnosticsConfig = new DiagnosticsConfig();
 const replaysConfig = new ReplaysConfig();
@@ -35,7 +34,7 @@ client.on('ready', async () => {
     await Promise.all([
         coh2Locale.init(replaysConfig.localeFilePath),
         logger.init(),
-        i18n.init(),
+        i18n.loadJsonCatalogs(path.join(process.cwd(), 'locale')),
     ]);
    
     console.log('Ready!');

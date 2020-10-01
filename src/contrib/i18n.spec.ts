@@ -1,9 +1,9 @@
 import assert from 'assert';
 import {describe, it} from 'mocha';
-import I18n from './i18n';
+import i18n, {I18n} from './i18n';
 
 function makeTranslations(...locales: [ string, any][]) {
-    const i18n = new I18n('');
+    const i18n = new I18n();
     for (const [locale, definition] of locales) {
         i18n.append(definition, locale);
     }
@@ -24,6 +24,17 @@ describe('contrib.i18n', () => {
     });
     it('formatted translations', () => {
         const i18n = makeTranslations(['en', {display: {value: 'value is {value}'}}]);
+        assert.strictEqual(i18n.get('display.value', {locale: 'en', format: {value: 1}}), 'value is 1');
+    });
+    it('override', () => {
+        const i18n = makeTranslations(['en', {display: {value: 'value is {value}', values: 'values are {value}'}}]);
+        const restore = i18n.override(['en', {display: {value: 'value equals {value}'}}]);
+        // Overridden
+        assert.strictEqual(i18n.get('display.value', {locale: 'en', format: {value: 1}}), 'value equals 1');
+        // Not overridden
+        assert.strictEqual(i18n.get('display.values', {locale: 'en', format: {value: 1}}), 'values are 1');
+        restore();
+        // After restore
         assert.strictEqual(i18n.get('display.value', {locale: 'en', format: {value: 1}}), 'value is 1');
     });
 });

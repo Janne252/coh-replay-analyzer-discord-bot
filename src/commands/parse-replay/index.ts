@@ -8,7 +8,7 @@ import * as Replay from '../../contrib/coh2/replay';
 import Config from './config';
 import { ChannelLogger } from '../../contrib/discord/logging';
 import I18n from '../../contrib/i18n';
-import { i18n } from '../..';
+import i18n from '../../contrib/i18n';
 
 export default async (message: Discord.Message, client: Discord.Client, logger: ChannelLogger, config: Config): Promise<boolean> => {
     const attachments = message.attachments.array();
