@@ -6,6 +6,7 @@ import { makeLength } from '../../contrib/testing/generator';
 import { DiagnosticsConfig } from '../../contrib/discord/config';
 import moment from 'moment';
 import { ChannelLogger, LogLevels } from '../../contrib/discord/logging';
+import { Readable } from 'stream';
 
 const root = process.cwd();
 
@@ -17,6 +18,14 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
         const guild = await client.guilds.fetch(config.test.guild as string);
         const channel = guild?.channels.resolve(config.test.channel as string) as Discord.TextChannel;
 
+        if (command.startsWith('dump:message')) {
+            const [guildId, channelId, messageId] = command.substring('dump:message'.length).split('/').map(o => o.trim());
+            const targetGuild = await client.guilds.fetch(guildId);
+            const targetChannel = targetGuild.channels.cache.get(channelId) as Discord.TextChannel;
+            const targetMessage = await targetChannel.messages.fetch(messageId);
+            const attachment = new Discord.MessageAttachment(Readable.from(JSON.stringify(targetMessage.toJSON(), null, 4)), `${messageId}.json`);
+            await message.reply(attachment);
+        }
         switch (command) {
             case 'ping':
                 await message.reply('pong');
