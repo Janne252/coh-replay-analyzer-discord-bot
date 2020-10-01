@@ -108,8 +108,8 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         });
     }
 
-    protected getDurationDisplay({verbose}: {verbose?: boolean} = {verbose: true}) {
-        return Replay.getReplayDurationDisplay(this.replay.duration, {verbose});
+    protected getDurationDisplay({units}: {units?: boolean} = {units: true}) {
+        return Replay.getReplayDurationDisplay(this.replay.duration, {units});
     }
    
     protected async expandChatPreview() {
@@ -214,7 +214,7 @@ export class ReplayEmbed extends ReplayBaseEmbed {
 
 export class CompactReplayEmbed extends ReplayBaseEmbed {
     protected appendTitle() {
-        this.setTitle(`${Replay.resolveScenarioDisplayName(this.replay)} \xa0 ⏱ \xa0||${this.getDurationDisplay({verbose: false})}||`);
+        this.setTitle(`${Replay.resolveScenarioDisplayName(this.replay)} \xa0 ⏱ \xa0||\`${this.getDurationDisplay({units: false})}\`||`);
     }
     protected appendScenarioPreviewImage() {
         const scenarioPreviewImageFilename = this.buildScenarioPreviewImageFilename({suffix: '-x64'});

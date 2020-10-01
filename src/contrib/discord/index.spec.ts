@@ -9,10 +9,12 @@ describe('contrib.discord', () => {
     });
     describe('MessageHelpers', () => {
         it('withoutMentions', () => {
-            assert.strictEqual(MessageHelpers.withoutMentions({content: 'hello'}), 'hello');
-            assert.strictEqual(MessageHelpers.withoutMentions({content: ' hello'}), 'hello');
-            assert.strictEqual(MessageHelpers.withoutMentions({content: '<@!3456787654456> hello'}), 'hello');
-            assert.strictEqual(MessageHelpers.withoutMentions({content: '<@!3456787654456> hello <@!9434930434>'}), 'hello');
+            assert.strictEqual(MessageHelpers.strip({content: 'hello'}), 'hello');
+            assert.strictEqual(MessageHelpers.strip({content: ' hello'}), 'hello');
+            assert.strictEqual(MessageHelpers.strip({content: '<@!3456787654456> hello'}), 'hello');
+            assert.strictEqual(MessageHelpers.strip({content: '<@!3456787654456> hello <@!9434930434>'}), 'hello');
+            // Mobile client does not include the !
+            assert.strictEqual(MessageHelpers.strip({content: '<@3456787654456> hello <@9434930434>'}), 'hello');
         });
     });
 });

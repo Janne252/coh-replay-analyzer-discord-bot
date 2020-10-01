@@ -5,6 +5,7 @@ import { makeLength } from '../testing/generator';
 import { Locale } from '.';
 
 import {Data} from './replay';
+import i18n from '../i18n';
 
 export function mockReplay(options: Partial<Data['map']>) {
     return {
@@ -95,15 +96,32 @@ describe('contrib.coh2.replay', () => {
     });
 
     it('getReplayDurationDisplay', () => {
-        assert.strictEqual(getReplayDurationDisplay(0), '0s');
-        assert.strictEqual(getReplayDurationDisplay(34000), '1h 10m 50s');
-        assert.strictEqual(getReplayDurationDisplay(34000, {verbose: true}), '1 hour 10 minutes 50 seconds');
-        assert.strictEqual(getReplayDurationDisplay(12000, {verbose: true}), '25 minutes');
-        assert.strictEqual(getReplayDurationDisplay(8, {verbose: true}), '1 second');
-        assert.strictEqual(getReplayDurationDisplay(16, {verbose: true}), '2 seconds');
-        assert.strictEqual(getReplayDurationDisplay(8 * 60, {verbose: true}), '1 minute');
-        assert.strictEqual(getReplayDurationDisplay(8 * 3600, {verbose: true}), '1 hour');
-        assert.strictEqual(getReplayDurationDisplay(8 * 3600 * 2, {verbose: true}), '2 hours');
+        const restoreTranslations = i18n.override(['en', {
+            "time": {
+                "hour": "hour",
+                "hours": "hours",
+                "minute": "minute",
+                "minutes": "minutes",
+                "second": "second",
+                "seconds": "seconds"
+            }
+        }]);
+        assert.strictEqual(getReplayDurationDisplay(0), '0 seconds');
+        assert.strictEqual(getReplayDurationDisplay(34000), '1 hour 10 minutes 50 seconds');
+        assert.strictEqual(getReplayDurationDisplay(34000, {units: true}), '1 hour 10 minutes 50 seconds');
+        assert.strictEqual(getReplayDurationDisplay(34000, {units: false}), '01:10:50');
+
+        assert.strictEqual(getReplayDurationDisplay(12000, {units: true}), '25 minutes');
+        assert.strictEqual(getReplayDurationDisplay(8, {units: true}), '1 second');
+        assert.strictEqual(getReplayDurationDisplay(16, {units: true}), '2 seconds');
+        assert.strictEqual(getReplayDurationDisplay(8 * 60, {units: true}), '1 minute');
+
+        assert.strictEqual(getReplayDurationDisplay(8 * 3600, {units: true}), '1 hour');
+        assert.strictEqual(getReplayDurationDisplay(8 * 3600, {units: false}), '01:00:00');
+
+        assert.strictEqual(getReplayDurationDisplay(8 * 3600 * 2, {units: true}), '2 hours');
+        assert.strictEqual(getReplayDurationDisplay(8 * 3600 * 2, {units: false}), '02:00:00');
+        restoreTranslations();
     });
 
     it ('splitChat', () => {

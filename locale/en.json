@@ -15,5 +15,13 @@
             "noPlayersAvailable": "No players available.",
             "playerTeam": "Team {teamNumber}"
         }
+    },
+    "time": {
+        "hour": "hour",
+        "hours": "hours",
+        "minute": "minute",
+        "minutes": "minutes",
+        "second": "second",
+        "seconds": "seconds"
     }
 }

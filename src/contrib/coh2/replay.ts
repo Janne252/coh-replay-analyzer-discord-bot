@@ -60,11 +60,15 @@ export function getReplayTimestamp(ticks: number) {
     return new Date(ticks / 8 * 1000).toISOString().substring(11, 19);
 }
 
-export function getReplayDurationDisplay(ticks: number, {verbose}: {verbose?: boolean} = {}) {
-    let [hh, mm, ss] = getReplayTimestamp(ticks).split(':');
-    hh = (hh != '00') ? `${Number(hh)}${(verbose ? (Number(hh) == 1 ? ' hour' : ' hours') : 'h')}` : '';
-    mm = (mm != '00') ? `${Number(mm)}${(verbose ? (Number(mm) == 1 ? ' minute' : ' minutes') : 'm')}` : '';
-    ss = (ss != '00' || (hh == '' && mm == '')) ? `${Number(ss)}${(verbose ? (Number(ss) == 1 ? ' second' : ' seconds') : 's')}` : '';
+export function getReplayDurationDisplay(ticks: number, {units}: {units?: boolean} = {units: true}) {
+    let timestamp = getReplayTimestamp(ticks);
+    if (!units) {
+        return timestamp;
+    }
+    let [hh, mm, ss] = timestamp.split(':');
+    hh = (hh != '00') ? `${Number(hh)}${(Number(hh) == 1 ? ` ${i18n.get('time.hour')}` : ` ${i18n.get('time.hours')}`)}` : '';
+    mm = (mm != '00') ? `${Number(mm)}${(Number(mm) == 1 ? ` ${i18n.get('time.minute')}` : ` ${i18n.get('time.minutes')}`)}` : '';
+    ss = (ss != '00' || (hh == '' && mm == '')) ? `${Number(ss)}${(Number(ss) == 1 ? ` ${i18n.get('time.second')}` : ` ${i18n.get('time.seconds')}`)}` : '';
     return [hh, mm, ss].filter(o => !!o).join(' ');
 }
 
