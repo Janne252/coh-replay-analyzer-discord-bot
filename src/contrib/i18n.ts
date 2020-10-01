@@ -51,12 +51,12 @@ export default class I18n {
         return `${this.normalizeLocale(locale)}.${id}`;
     }
 
-    public get(id: string, format?: StringFormatArgs, locale?: string) {
-        let key = this.getTranslationCatalogKey(id, locale ?? this.defaultLocale);
+    public get(id: string, {format, locale, fallback}: {format?: StringFormatArgs, locale?: string, fallback?: string} = {}): string  {
+        let key = this.getTranslationCatalogKey(id, locale ?? this.activeLocale ?? this.defaultLocale);
         if (!(key in this.catalog) && locale != this.defaultLocale) {
             key = this.getTranslationCatalogKey(id, this.defaultLocale);
         }
-        let message = this.catalog[key] ?? id;
+        let message = this.catalog[key] ?? fallback ?? id;
         if (format) {
             message = formatString(message, format);
         }

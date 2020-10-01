@@ -4,6 +4,8 @@ import { formatChatMessage, formatPlayer, getPlayerListEmbed, getReplayDurationD
 import * as factory from '../testing/factory';
 import * as mocking from '../testing/mocking';
 import { makeLength } from '../testing/generator';
+import I18n from '../i18n';
+import path from 'path';
 
 describe('contrib.coh2.replay', () => {
     it('resolveScenarioDisplayName: From replay.map.name', () => {
@@ -198,8 +200,17 @@ describe('contrib.coh2.replay', () => {
 
     it('getPlayerListEmbed', () => {
         // No players
+        const i18n = new I18n('', 'test');
+        i18n.append({
+            replay: {
+                player: {
+                    playerTeam: 'Team {teamNumber}',
+                    noPlayersAvailable: 'No players available.',
+                }
+            }
+        }, 'test');
         assert.deepStrictEqual(
-            getPlayerListEmbed({players: []}, 0, {factionEmojis: {}}), {
+            getPlayerListEmbed({players: []}, 0, {factionEmojis: {}}, i18n), {
                 name: 'Team 1',
                 inline: true,
                 value: '_No players available._'
@@ -208,7 +219,7 @@ describe('contrib.coh2.replay', () => {
         
         // With player
         assert.deepStrictEqual(
-            getPlayerListEmbed({players: [{name: 'Player', faction: 'faction', team: 0, steam_id_str: '0'}]}, 0, {factionEmojis: {'faction': '<emoji>'}}), {
+            getPlayerListEmbed({players: [{name: 'Player', faction: 'faction', team: 0, steam_id_str: '0'}]}, 0, {factionEmojis: {'faction': '<emoji>'}}, i18n), {
                 name: 'Team 1',
                 inline: true,
                 value: '<emoji> Player'
@@ -219,7 +230,7 @@ describe('contrib.coh2.replay', () => {
             getPlayerListEmbed({players: [
                 {name: 'P1', faction: 'faction', team: 0, steam_id_str: '0'},
                 {name: 'P2', faction: 'faction', team: 0, steam_id_str: '0'},
-            ]}, 0, {factionEmojis: {'faction': '<emoji>'}}), {
+            ]}, 0, {factionEmojis: {'faction': '<emoji>'}}, i18n), {
                 name: 'Team 1',
                 inline: true,
                 value: '<emoji> P1\n<emoji> P2'

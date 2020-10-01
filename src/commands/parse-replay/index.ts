@@ -61,10 +61,10 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
                 Replay.getPlayerListEmbed(replay, 1, config),
             );
             const loadAllChatTip = i18n.get(
-                'replay.chat.loadAllByReacting', {
+                'replay.chat.loadAllByReacting', {format: {
                     '@user': message.author.toString(),
                     'emoji': `\xa0 ${config.expandChatPreview.reaction} \xa0`
-                }
+                }}
             );
             const chatPreview = getChatPreviewEmbed(replay, {charsPerChunk: 1024 - loadAllChatTip.length});
             if (!chatPreview.complete) {
@@ -111,7 +111,7 @@ function getChatPreviewEmbed(replay: Replay.Data, {charsPerChunk}: {charsPerChun
     if (!replay.chat || replay.chat.length == 0) {
         return {
             complete: true,
-            field: {name: i18n.get('replay.chat.title'), value: `_${i18n.get('replay.chat.noChatAvailable.')}_`, inline: false},
+            field: {name: i18n.get('replay.chat.title'), value: `_${i18n.get('replay.chat.noChatAvailable')}_`, inline: false},
         };
     }
 
@@ -119,7 +119,7 @@ function getChatPreviewEmbed(replay: Replay.Data, {charsPerChunk}: {charsPerChun
     const complete = chunks.length == 1;
     let title = i18n.get('replay.chat.title');
     if (!complete) {
-        title = i18n.get('replay.chat.partial', {count: chunks[0].count, total: replay.chat.length});
+        title = i18n.get('replay.chat.partial', {format: {count: chunks[0].count, total: replay.chat.length}});
     }
 
     return {
