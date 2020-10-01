@@ -60,7 +60,7 @@ export class ChannelLogger {
                 channel: guild.channels.resolve(loggerConfig.channel) as Discord.TextChannel,
             }
         }
-        this.admin = await (await this.client.guilds.fetch(this.config.admin.guild)).members.fetch(this.config.admin.user);
+        this.admin = await (await this.client.guilds.fetch(this.config.admin.guild as string)).members.fetch(this.config.admin.user as string);
     }
     
     async log(content: Discord.MessageEmbedOptions = {}, options?: {context?: LoggerContext, level?: LogLevelOption, environmentInfo?: boolean}) {

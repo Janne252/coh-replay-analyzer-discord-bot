@@ -1,4 +1,5 @@
 import * as child_process from 'child_process';
+import path from 'path';
 
 /* istanbul ignore next */
 /**
@@ -51,4 +52,8 @@ export function formatString(str: string, args?: StringFormatArgs) {
     } else {
         return str;
     }
+}
+
+export function ensureAbsolutePath(input: string, root = process.cwd()) {
+    return path.isAbsolute(input) ? input : path.join(root, input);
 }

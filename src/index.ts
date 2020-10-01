@@ -11,6 +11,7 @@ import { ShutdownManager } from './contrib/discord';
 import { DiagnosticsConfig } from './contrib/discord/config';
 import { ChannelLogger, LogLevel } from './contrib/discord/logging';
 import i18n from './contrib/i18n';
+import { PackageJsonConfig } from './contrib/config';
 
 // Instances
 const client = new Discord.Client({
@@ -24,8 +25,8 @@ const logger = new ChannelLogger(client, diagnosticsConfig);
 const shutdownManager = new ShutdownManager(client, logger);
 
 client.on('ready', async () => {
-    await replaysConfig.init();
-    await diagnosticsConfig.init();
+    await PackageJsonConfig.assign(replaysConfig, 'replays');
+    await PackageJsonConfig.assign(diagnosticsConfig, 'diagnostics');
 
     // Prepare .replays folder
     await fs.ensureDir(replaysConfig.replaysTempPath);

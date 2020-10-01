@@ -68,7 +68,7 @@ export function getReplayDurationDisplay(ticks: number, {verbose}: {verbose?: bo
     return [hh, mm, ss].filter(o => !!o).join(' ');
 }
 
-export function resolveScenarioId(replay: Data) {
+export function resolveScenarioId(replay: {map: {file: string}}) {
     return replay.map.file
         .replace(/data:/gi, '')
         .replace(/\\/g, '/')
@@ -83,7 +83,7 @@ export function resolveScenarioId(replay: Data) {
     ;
 }
 
-export function resolveScenarioDisplayName(replay: InputData<ReplayData, 'map'>, locale?: LocaleLike) {
+export function resolveScenarioDisplayName(replay: {map: {name: string, file: string, players: number}}, locale?: LocaleLike) {
     let result = (locale ? locale.get(replay.map.name) : '') || '';
     // Fallback to provided name if it is not a LocString reference
     if (!result && !/\$[abcdef\d]+(:[abcdef\d]+)?/.test(replay.map.name)) {
@@ -116,43 +116,6 @@ export function resolveScenarioDisplayName(replay: InputData<ReplayData, 'map'>,
     return result;
 }
 
-/**
- * Prefixes player name with the faction emoji.
- * Adds a link to the official leaderboards if the player has a valid Steam ID available.
- * @param player 
- */
-export function formatPlayer(
-    player: InputData<ReplayPlayer, 'name' | 'steam_id_str' | 'faction'>, 
-    config: InputData<ReplaysConfig, 'factionEmojis' | 'leaderboardUrl'>
-) {
-    let playerNameDisplay = player.name;
-    if (player.steam_id_str && player.steam_id_str != '0') {
-        const url = (
-            config.leaderboardUrl ?? 
-            `http://www.companyofheroes.com/leaderboards#profile/steam/{steamId}/standings`
-        )
-            .replace(/\{steamId\}/g, player.steam_id_str)
-        ;
-        playerNameDisplay = `[${player.name}](${url})`;
-    }
-
-    return `${player.faction in config.factionEmojis ? (config.factionEmojis[player.faction]) + ' ' : ''}${playerNameDisplay}`;
-}
-
-export function getPlayerListEmbed(
-    replay: {players: InputData<ReplayPlayer, 'name' | 'faction' | 'team' | 'steam_id_str'>[]}, 
-    team: 0 | 1, 
-    config: InputData<ReplaysConfig, 'factionEmojis' | 'leaderboardUrl'>
-) {
-    return { 
-        inline: true, 
-        name: i18n.get('replay.player.playerTeam', {format: {teamNumber: team + 1}}), 
-        value: replay.players
-            .filter(p => p.team == team)
-            .map(p => formatPlayer(p, config))
-            .join('\n') || `_${i18n.get('replay.player.noPlayersAvailable')}_`
-    };
-}
 
 /**
  * Definition for https://github.com/ryantaylor/vault JSON output.

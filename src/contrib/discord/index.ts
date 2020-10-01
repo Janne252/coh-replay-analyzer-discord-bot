@@ -52,8 +52,12 @@ export class ShutdownManager {
 }
 
 export class MessageHelpers {
-    public static withoutMentions(message: {content: string}) {
-        return message.content.replace(/<@!\d+>/g, '').trim();
+    public static strip(message: {content: string}, {keepMentions}: {keepMentions?: boolean} = {}) {
+        let result = message.content.trim();
+        if (!keepMentions) {
+            result = result.replace(/<@!?\d+>/g, '').trim()
+        }
+        return result;
     }
 }
 

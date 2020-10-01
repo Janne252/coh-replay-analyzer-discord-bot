@@ -9,8 +9,8 @@
       "channel": "753552456574697522"
     },
     "test": {
-      "guild": "753277157027086427",
-      "channel": "754050938066436153"
+      "guild": "745915526869549086",
+      "channel": "753207374419853393"
     },
     "warning": {
       "guild": "753277157027086427",
@@ -51,7 +51,7 @@
     "build": "rimraf ./dist && tsc --project ./tsconfig.json",
     "build:flank": "cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.bin",
     "start": "node ./dist/index.js --enable-source-maps",
-    "test": "ts-mocha -p ./tsconfig.json ./src/**/*.spec.ts",
+    "test": "ts-mocha -p ./tsconfig.json ./src/**/*.spec.ts --exit",
     "test:coverage": "nyc --cache false --reporter=text --reporter=html npm test"
   },
   "author": "Janne Varjo",
