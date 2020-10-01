@@ -1,15 +1,19 @@
 {
-    "activityNameForWatching": "Replays",
+    "watchingActivity": "Replays",
     "replay": {
         "matchDuration": "Match duration",
         "GameVersion": "Game version",
         "noMapPreviewImageAvailable": "No map preview image available. If this is an official map, please contact an admin on the server.",
         "chat": {
             "loadAllByReacting": "{@user} React with {emoji} to load all chat messages.",
-            "sectionHeader": "Chat",
-            "sectionHeaderNoChatAvailable": "No chat.",
-            "sectionHeaderPartial": "Chat ({count}/{total})",
+            "title": "Chat",
+            "noChatAvailable": "No chat.",
+            "partial": "Chat ({count}/{total})",
             "jumpToFullChatLinkText": "Show"
+        },
+        "player": {
+            "noPlayersAvailable": "No players available.",
+            "playerTeam": "Team {teamNumber}"
         }
     }
 }
