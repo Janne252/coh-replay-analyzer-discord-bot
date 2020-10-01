@@ -1,3 +1,19 @@
 {
-    
+    "watchingActivity": "Replays",
+    "replay": {
+        "matchDuration": "Durée de la partie",
+        "gameVersion": "Version du jeu",
+        "noMapPreviewImageAvailable": "L'image de prévisualisation de la carte n'est pas disponible. Si c'est une carte officielle, merci de contacter l'administrateur du serveur.",
+        "chat": {
+            "loadAllByReacting": "{@user} Réagis avec {emoji} pour charger tous les messages du chat.",
+            "title": "Chat",
+            "noChatAvailable": "Aucun chat.",
+            "partial": "Chat ({count}/{total})",
+            "jumpToFullChatLinkText": "Voir"
+        },
+        "player": {
+            "noPlayersAvailable": "Aucun joueurs disponibles.",
+            "playerTeam": "Équipe {teamNumber}"
+        }
+    }
 }

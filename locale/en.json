@@ -2,7 +2,7 @@
     "watchingActivity": "Replays",
     "replay": {
         "matchDuration": "Match duration",
-        "GameVersion": "Game version",
+        "gameVersion": "Game version",
         "noMapPreviewImageAvailable": "No map preview image available. If this is an official map, please contact an admin on the server.",
         "chat": {
             "loadAllByReacting": "{@user} React with {emoji} to load all chat messages.",
