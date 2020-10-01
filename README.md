@@ -6,7 +6,16 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
 
 # Installation
 - Bot authentication link: https://discord.com/api/oauth2/authorize?client_id=753206700655378523&permissions=321600&scope=bot
-    - Scopes: `Send Messages`, `Manage Messages`, `Embed Links`, `Attach Files`, `Use External Emojis`, `Add Reactions`
+    ### Scopes
+    | Scope | Purpose |
+    |-------|---------|
+    |`Send Messages`| Send replay info embeds. |
+    |`Manage Messages`| Manage reactions added to a replay embed (chat expansion). |
+    |`Embed Links`| Embed markdown links (chat expansion link). |
+    |`Attach Files`| Attach map preview images to embeds. |
+    |`Use External Emojis`| Use standalone CoH2 faction emojis from the bot's "home" Discord server. |
+    |`Add Reactions`| Add chat expansion reaction to a replay embed. |
+    
 - ❤️ Please consider inviting `Janne252#7736` to the server(s) the bot has been added to ❤️
 # TODO
 - [x] Set activity status message periodically, e.g. every 60 minutes (appears to disappear/clear after some time)
