@@ -10,9 +10,6 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
 - ❤️ Please consider inviting `Janne252#7736` to the server(s) the bot has been added to ❤️
 # TODO
 - [x] Set activity status message periodically, e.g. every 60 minutes (appears to disappear/clear after some time)
-- [ ] Use the "home" discord server as a CDN For map images?
-    - [ ] Increase image quality to 85% (JPG)
-    - [ ] Increase resolution to 512x512
 - [ ] See if `"{0}_mm_preview_high.tga"` should have a higher priority than `"{0}_mm_preview.tga"` (Higher resolution, still the same artistic render of the tactical map)
 - [x] Use full scenario paths for identifying preview images. Replace path separators with underscores.
 - [x] Preview image generation step should empty the destination directory before outputting any files.
@@ -41,5 +38,6 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
 - [ ] Figure out a better way of signaling handled messages than boolean
 - [ ] "Self-made" configuration system (loads package.json via JSON.parse and takes a section of it) works but probably isn't the best way of doing things
     - Separate config file?
+- [ ] Admin commands written in the mobile version of Discord don't appear to work / register
 # License
 [MIT License](./LICENSE.txt)
