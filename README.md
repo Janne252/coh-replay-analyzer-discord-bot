@@ -47,5 +47,6 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
 - [ ] "Self-made" configuration system (loads package.json via JSON.parse and takes a section of it) works but probably isn't the best way of doing things
     - Separate config file?
 - [ ] Admin commands written in the mobile version of Discord don't appear to work / register
+- [ ] Localize replay duration with moment (refactor to use moment)
 # License
 [MIT License](./LICENSE.txt)
