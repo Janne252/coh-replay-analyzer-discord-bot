@@ -12,7 +12,7 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
     |`Manage Messages`| Manage reactions added to a replay embed (chat expansion). |
     |`Embed Links`| Embed markdown links (chat expansion link). |
     |`Attach Files`| Attach map preview images to embeds. |
-    |`Use External Emojis`| Use standalone CoH2 faction emojis from the bot's "home" Discord server. |
+    |`Use External Emojis`| Use standalone CoH2 faction emojis from the bot's "home" Discord server: <img title=":german:" src="./discord/emoji/german.png" width="24" height="24"> <img title=":soviet:" src="./discord/emoji/soviet.png" width="24" height="24"> <img title=":west_german:" src="./discord/emoji/west_german.png" width="24" height="24"> <img title=":aef:" src="./discord/emoji/aef.png" width="24" height="24"> <img title=":british:" src="./discord/emoji/british.png" width="24" height="24"> |
     |`Add Reactions`| Add chat expansion reaction to a replay embed. |
     
 - ❤️ Please consider inviting `Janne252#7736` to the server(s) the bot has been added to ❤️
