@@ -4,16 +4,12 @@ import { PackageJson } from "type-fest";
 export type PackageConfig<T> = PackageJson & Pick<T, keyof T>;
 
 /* istanbul ignore next */
-export abstract class PackageJsonConfig {
-    constructor(private readonly rootPath = process.cwd()) {
-
+export class PackageJsonConfig {
+    static async load(callback: (config: any) => void) {
+        callback(JSON.parse(await fs.readFile(path.join(process.cwd(), 'package.json'), {encoding: 'utf8'})));
     }
 
-    async init() {
-        this.configure(
-            JSON.parse(await fs.readFile(path.join(this.rootPath, 'package.json'), {encoding: 'utf8'}))
-        );
+    static async assign(config: any, section: string) {
+        return this.load(result => Object.assign(config, result[section]));
     }
-
-    abstract configure(config: any): void;
 }
