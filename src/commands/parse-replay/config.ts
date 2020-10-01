@@ -1,57 +1,29 @@
 import path from 'path';
-import { PackageConfig, PackageJsonConfig } from "../../contrib/config";
+import { ensureAbsolutePath } from '../../contrib/misc';
 
 /* istanbul ignore next */
-export default class ReplaysConfig extends PackageJsonConfig {
-    //@ts-expect-error 2564
-    factionEmojis: Record<string, string>;
+export default class ReplaysConfig {
+    factionEmojis: Record<string, string> = {};
+    leaderboardUrl?: string | undefined;
 
-    leaderboardUrl?: string;
+    private _flankExecutablePath: string = '';
+    get flankExecutablePath() { return this._flankExecutablePath; }
+    set flankExecutablePath(value: string) { this._flankExecutablePath = ensureAbsolutePath(value)};
 
-    //@ts-expect-error 2564
-    flankExecutablePath: string;
+    _localeFilePath: string = '';
+    get localeFilePath() { return this._localeFilePath; }
+    set localeFilePath(value: string) { this._localeFilePath = ensureAbsolutePath(value)};
 
-    //@ts-expect-error 2564
-    localeFilePath: string;
+    _replaysTempPath: string = '';
+    get replaysTempPath() { return this._replaysTempPath; }
+    set replaysTempPath(value: string) { this._replaysTempPath = ensureAbsolutePath(value)};
 
-    //@ts-expect-error 2564
-    replaysTempPath: string;
+    _scenarioPreviewImageRootPath: string = '';
+    get scenarioPreviewImageRootPath() { return this._scenarioPreviewImageRootPath; }
+    set scenarioPreviewImageRootPath(value: string) { this._scenarioPreviewImageRootPath = ensureAbsolutePath(value)};
 
-    //@ts-expect-error 2564
-    scenarioPreviewImageRootPath: string;
-
-    //@ts-expect-error 2564
-    minDataLength: number;
-    
-    //@ts-expect-error 2564
-    magic: string;
-
-    //@ts-expect-error 2564
-    minVersion: number;
-
-    //@ts-expect-error 2564
-    expandChatPreview: {
-        reaction: string;
-        timeoutSeconds: number;
-    }
-
-    constructor(private readonly root: string = process.cwd()) {
-        super();
-    }
-    
-    configure(config: PackageConfig<{replays: ReplaysConfig}>) {
-        this.magic = config.replays.magic;
-        this.minVersion = config.replays.minVersion;
-        this.minDataLength = config.replays.minDataLength;
-
-        this.flankExecutablePath = path.join(this.root, config.replays.flankExecutablePath);
-        this.localeFilePath = path.join(this.root, config.replays.localeFilePath);
-        this.replaysTempPath = path.join(this.root, config.replays.replaysTempPath);
-        this.scenarioPreviewImageRootPath = path.join(this.root, config.replays.scenarioPreviewImageRootPath);
-
-        this.factionEmojis = config.replays.factionEmojis;
-        this.leaderboardUrl = config.replays.leaderboardUrl;
-
-        this.expandChatPreview = config.replays.expandChatPreview;
-    }
+    minDataLength: number = 0;
+    magic: string = '';
+    minVersion: number = 0;
+    expandChatPreview: { reaction: string; timeoutSeconds: number; } = {reaction: '', timeoutSeconds: 0};
 }
