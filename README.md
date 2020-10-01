@@ -8,13 +8,16 @@ The bot provides a summary of the replay's details:
 - Match duration
 - Game version
 
-![](./examples/full-example-01.jpg)
+![](./examples/full-embed.png)
 
 The bot also has a mode for creating compact less verbose embeds, where the summary details are:
 - Map name
 - Map tactical map image (as a small thumbnail image)
 - Players (names, factions, links to their leaderboard profiles,)
 - Match duration
+
+![](./examples/compact-embed.png)
+
 This mode is controlled by the `Manage Messages` permission or by the message content (set the "add a comment" field to `compact`). To enable the compact mode, disable `Manage Messages` permission in the bot role permissions (global) or in the channel bot role permissions (per channel). 
 
 Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault](https://github.com/ryantaylor/vault) and [ryantaylor/flank](https://github.com/ryantaylor/flank).
@@ -45,7 +48,6 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
 - [ ] Figure out a better way of signaling handled messages than boolean
 - [ ] "Self-made" configuration system (loads package.json via JSON.parse and takes a section of it) works but probably isn't the best way of doing things
     - Separate config file?
-- [ ] Localize replay duration with moment (refactor to use moment)
 
 # License
 [MIT License](./LICENSE.txt)
