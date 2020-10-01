@@ -11,13 +11,16 @@ const root = process.cwd();
 
 export default async (message: Discord.Message, client: Discord.Client, logger: ChannelLogger, config: DiagnosticsConfig) => {
     const isAdmin = isAdminCommand(message, client, config);
-    const command = MessageHelpers.withoutMentions(message);
+    const command = MessageHelpers.strip(message);
 
     if (isAdmin) {
-        const guild = await client.guilds.fetch(config.test.guild);
-        const channel = guild?.channels.resolve(config.test.channel) as Discord.TextChannel;
+        const guild = await client.guilds.fetch(config.test.guild as string);
+        const channel = guild?.channels.resolve(config.test.channel as string) as Discord.TextChannel;
 
         switch (command) {
+            case 'ping':
+                await message.reply('pong');
+                return true;
             // Used to get a quick overview of the servers the bot is currently in
             case 'telemetry:servers': {
                 const guilds = client.guilds.cache.array();
@@ -58,15 +61,10 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
             }
             // Used to test replay parsing by posting all the test replays
             case 'test:replays': {
-                await message.reply(new Discord.MessageEmbed({description: `Beginning to upload replays to ${channel}...`}));
-                for (const file of await fs.readdir(path.join(root, 'tests/replays'))) {
-                    const attachment = new Discord.MessageAttachment(path.join(root, 'tests/replays', file));
-                    await channel.send(attachment);
-                    await new Promise((resolve, reject) => {
-                        setTimeout(resolve, 2000);
-                    });
-                }
-                return true;
+                return await testReplays(message, channel);
+            }
+            case 'test:replays-compact': {
+                return await testReplays(message, channel, 'compact');
             }
             // Used to test embed character count limitations
             case 'test:embed': {
@@ -115,4 +113,16 @@ export function isAdminCommand(message: Discord.Message, client: Discord.Client,
         message.mentions.users.has(client.user?.id as string) && 
         message.author.id === config.admin.user
     );
+}
+
+async function testReplays(userMessage: Discord.Message, channel: Discord.TextChannel, messageContent = '') {
+    await userMessage.reply(new Discord.MessageEmbed({description: `Beginning to upload replays to ${channel}...`}));
+    for (const file of await fs.readdir(path.join(root, 'tests/replays'))) {
+        const attachment = new Discord.MessageAttachment(path.join(root, 'tests/replays', file));
+        await channel.send(messageContent, attachment);
+        await new Promise((resolve, reject) => {
+            setTimeout(resolve, 2000);
+        });
+    }
+    return true;
 }
