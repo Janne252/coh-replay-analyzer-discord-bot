@@ -1,42 +1,22 @@
-import { PackageJsonConfig, PackageConfig } from '../config';
-import { LogLevel, LogLevelOption, LogLevels } from './logging';
-
 /* istanbul ignore next */
-/**
- * Helper for writing log messages to a discord channel.
- */
-export class DiagnosticsConfig extends PackageJsonConfig {
-
-    //@ts-expect-error 2564
+export class DiagnosticsConfig {
     log: {
-        readonly guild: string;
-        readonly channel: string;
-    }
+        readonly guild?: string;
+        readonly channel?: string;
+    } = {};
 
-    //@ts-expect-error 2564
     test: {
-        readonly guild: string;
-        readonly channel: string;
-    }
-    //@ts-expect-error 2564
-    error: {
-        readonly guild: string;
-        readonly channel: string;
-    }
-   
-    //@ts-expect-error 2564
-    admin: {
-        readonly guild: string;
-        readonly user: string;
-    }
+        readonly guild?: string;
+        readonly channel?: string;
+    } = {};
 
-    configure(config: PackageConfig<{diagnostics: DiagnosticsConfig}>) {
-        for (const level of LogLevels) {
-            if (!(level.name in config.diagnostics)) {
-                throw new Error(`Missing diagnostics configuration "${level.name}"`); 
-            }
-            this[level.name as keyof DiagnosticsConfig] = config.diagnostics[level.name as keyof DiagnosticsConfig] as any;
-        }
-        this.admin = config.diagnostics.admin;
-    }
+    error: {
+        readonly guild?: string;
+        readonly channel?: string;
+    } = {};
+   
+    admin: {
+        readonly guild?: string;
+        readonly user?: string;
+    } = {};
 }
