@@ -4,6 +4,7 @@ import { LocaleLike } from '.';
 import { InputData } from '../../types';
 import ReplaysConfig from '../../commands/parse-replay/config';
 import { i18n } from '../..';
+import I18n from '../i18n';
 
 export function formatChatMessage(
     message: InputData<ReplayChatMessage, 'message' | 'name' | 'tick'>, 
@@ -142,15 +143,16 @@ export function formatPlayer(
 export function getPlayerListEmbed(
     replay: {players: InputData<ReplayPlayer, 'name' | 'faction' | 'team' | 'steam_id_str'>[]}, 
     team: 0 | 1, 
-    config: InputData<ReplaysConfig, 'factionEmojis' | 'leaderboardUrl'>
+    config: InputData<ReplaysConfig, 'factionEmojis' | 'leaderboardUrl'>,
+    locale?: I18n
 ) {
     return { 
         inline: true, 
-        name: i18n.get('replay.player.playerTeam', {teamNumber: team + 1}), 
+        name: (locale ?? i18n).get('replay.player.playerTeam', {format: {teamNumber: team + 1}}), 
         value: replay.players
             .filter(p => p.team == team)
             .map(p => formatPlayer(p, config))
-            .join('\n') || `_${i18n.get('replay.players.noPlayersAvailable')}_`
+            .join('\n') || `_${(locale ?? i18n).get('replay.player.noPlayersAvailable')}_`
     };
 }
 
