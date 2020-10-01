@@ -28,7 +28,7 @@
             ],
             "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/ts-mocha",
             "args": [
-                "${workspaceFolder}/tests/**/*.spec.ts",
+                "${workspaceFolder}/**/*.spec.ts",
             ],
             "protocol": "inspector"
         }
