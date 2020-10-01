@@ -1,4 +1,4 @@
-import Discord, { Guild, TextChannel } from 'discord.js';
+import Discord, { DiscordAPIError, Guild, TextChannel } from 'discord.js';
 import { ChannelLogger, LogLevel } from './logging';
 
 /**
@@ -85,4 +85,35 @@ export async function getAllChannelMessages(channel: TextChannel, sort = true) {
     }
 
     return result;
+}
+
+export async function deleteMessageById(channel: Discord.TextChannel, ...ids: string[]) {
+    for (const id of ids) {
+        try {
+            const message = await channel.messages.fetch(id);
+            await message.delete();
+        } catch (error) {
+            if (error instanceof DiscordAPIError && error.httpStatus === 404 && error.message === 'Unknown Message') {
+                // Already deleted
+            } else {
+                // Some other failure, propagate
+                throw error;
+            }
+        }
+    }
+}
+
+export async function autoDeleteRelatedMessages({client, timeoutSeconds, triggers, targets}: {client: Discord.Client, timeoutSeconds: number, triggers: string[], targets: string[]}) {
+    const listener = async (deletedMessage: Discord.Message | Discord.PartialMessage) => {
+        // Delete message if it's one of the triggers
+        if (triggers.some(i => i === deletedMessage.id)) {
+            removeListener();
+            await deleteMessageById(deletedMessage.channel as Discord.TextChannel, ...targets);
+        }
+    };
+    const removeListener = () => client.off('messageDelete', listener);
+
+    client.on('messageDelete', listener);
+    // Stop listening eventually
+    setTimeout(removeListener, timeoutSeconds * 1000);
 }

@@ -6,6 +6,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { InputData } from '../../types';
 import { ReplayPlayer } from '../../contrib/coh2/replay';
+import { autoDeleteRelatedMessages, deleteMessageById } from '../../contrib/discord';
 
 export type InputPlayer = InputData<ReplayPlayer, 'name' | 'steam_id_str' | 'faction' | 'team'>;
 export type InputReplay = {map: {name: string, file: string, players: number}, players: InputPlayer[]} & InputData<Replay.Data, 'duration' | 'version' | 'chat'>;
@@ -99,7 +100,12 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         await this.build();
         this.sent = await this.userMessage.channel.send(this);
         await this.expandChatPreview();    
-        this.hookDeletionListener();
+        autoDeleteRelatedMessages({
+            client: this.client,
+            timeoutSeconds: this.config.waitForDeletionTimeoutSeconds,
+            triggers: [this.userMessage.id, this.sent.id],
+            targets: [this.sent.id, ...this.sentChatLog.map(o => o.id)],
+        });
     }
 
     protected getDurationDisplay({verbose}: {verbose?: boolean} = {verbose: true}) {
@@ -135,30 +141,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         await selfReaction.remove();
     }
 
-    protected hookDeletionListener() {
-        const listener = async (deletedMessage: Discord.Message | Discord.PartialMessage) => {
-            // Original message was deleted - delete embed and any chat expansions
-            if (deletedMessage.id === this.userMessage.id) {
-                // Early removal to prevent reacting to message deletion operations performed by the bot
-                removeListener();
-                await Promise.all([
-                    this.sent.delete(),
-                    ...(this.sentChatLog.map(m => m.delete()))
-                ]);
-            // Bot's message was deleted - delete any chat expansions
-            } else if (deletedMessage.id === this.sent.id) {
-                // Early removal to prevent reacting to message deletion operations performed by the bot
-                removeListener();
-                await Promise.all([
-                    ...(this.sentChatLog.map(m => m.delete()))
-                ]);
-            }
 
-        };
-        const removeListener = () => this.client.off('messageDelete', listener);
-    
-        this.client.on('messageDelete', listener);
-    }
 
     protected getPlayerListEmbed(
         replay: {players: InputData<ReplayPlayer, 'name' | 'faction' | 'team' | 'steam_id_str'>[]}, 

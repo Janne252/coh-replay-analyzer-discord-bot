@@ -5,6 +5,7 @@ import { ensureAbsolutePath } from '../../contrib/misc';
 export default class ReplaysConfig {
     factionEmojis: Record<string, string> = {};
     leaderboardUrl?: string | undefined;
+    waitForDeletionTimeoutSeconds: number = 0;
 
     private _flankExecutablePath: string = '';
     get flankExecutablePath() { return this._flankExecutablePath; }

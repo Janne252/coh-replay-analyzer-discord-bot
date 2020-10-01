@@ -25,6 +25,8 @@ const logger = new ChannelLogger(client, diagnosticsConfig);
 const shutdownManager = new ShutdownManager(client, logger);
 
 client.on('ready', async () => {
+    // Replay deletion listers can exceed 10 if both test:replays and test:replays-compact are executed
+    client.setMaxListeners(32);
     await PackageJsonConfig.assign(replaysConfig, 'replays');
     await PackageJsonConfig.assign(diagnosticsConfig, 'diagnostics');
 

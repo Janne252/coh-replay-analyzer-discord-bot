@@ -38,6 +38,7 @@
       "reaction": "💬",
       "timeoutSeconds": 30
     },
+    "waitForDeletionTimeoutSeconds": 30,
     "factionEmojis": {
       "german": "<:german:753277450171056208>",
       "soviet": "<:soviet:753277450489954375>",

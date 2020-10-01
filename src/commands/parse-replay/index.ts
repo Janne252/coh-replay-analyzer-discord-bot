@@ -64,7 +64,7 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
             const embed = new EmbedType(client, message, replay, config);
             await embed.submit();
         } catch (error) {
-            // Raise to an outer scope handler
+            // Propagate
             throw error;
         } finally {
             // Always (try) delete temporarily stored replay file
