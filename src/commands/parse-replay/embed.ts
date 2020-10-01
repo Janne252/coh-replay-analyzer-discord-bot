@@ -61,19 +61,10 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
     }
 
     protected appendScenarioPreviewImage() {
-        // Attach the scenario preview image to the message if there's one available.
-        // TODO: Use a CDN to host these images (see readme.md in the project root)
-        // TODO: use an async operation for checking if the file exists
-        const scenarioPreviewImageFilename = this.buildScenarioPreviewImageFilename();
-        const scenarioPreviewImageFilepath = this.buildScenarioPreviewFilepath(scenarioPreviewImageFilename);
-
-        if (fs.existsSync(scenarioPreviewImageFilepath)) {
-            const attachment = new Discord.MessageAttachment(scenarioPreviewImageFilepath, scenarioPreviewImageFilename);
-            this.attachFiles([attachment]);
-            this.setImage(`attachment://${scenarioPreviewImageFilename}`);
-        } else {
-            this.appendNoScenarioPreviewImageAvailable();
-        }
+        this.tryAttachScenarioPreviewImage({
+            filepath: this.buildScenarioPreviewFilepath(this.buildScenarioPreviewImageFilename()), 
+            type: 'image'
+        });
     }
 
     protected appendNoScenarioPreviewImageAvailable() {
@@ -109,6 +100,29 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         });
     }
 
+    protected tryAttachScenarioPreviewImage({filepath, type}: {filepath: string, type: 'image' | 'thumbnail'}) {
+            // Attach the scenario preview image to the message if there's one available.
+        // TODO: Use a CDN to host these images (see readme.md in the project root)
+        // TODO: use an async operation for checking if the file exists
+        
+        const name = 'preview.png';
+        if (fs.existsSync(filepath)) {
+            this.attachFiles([new Discord.MessageAttachment(filepath, name)]);
+            const url = `attachment://${name}`;
+            switch (type) {
+                case 'image':
+                    this.setImage(url);
+                    break;
+                case 'thumbnail':
+                    this.setThumbnail(url);
+                    break;
+                default:
+                    throw new Error(`Unsupported scenario preview image type "${type}"`);
+            }
+        } else {
+            this.appendNoScenarioPreviewImageAvailable();
+        }
+    }
     protected getDurationDisplay({units}: {units?: boolean} = {units: true}) {
         return Replay.getReplayDurationDisplay(this.replay.duration, {units});
     }
@@ -218,16 +232,10 @@ export class CompactReplayEmbed extends ReplayBaseEmbed {
         this.setTitle(`${Replay.resolveScenarioDisplayName(this.replay)} \xa0 ⏱ \xa0||\`${this.getDurationDisplay({units: false})}\`||`);
     }
     protected appendScenarioPreviewImage() {
-        const scenarioPreviewImageFilename = this.buildScenarioPreviewImageFilename({suffix: '-x64'});
-        const scenarioPreviewImageFilepath = this.buildScenarioPreviewFilepath(scenarioPreviewImageFilename);
-
-        if (fs.existsSync(scenarioPreviewImageFilepath)) {
-            const attachment = new Discord.MessageAttachment(scenarioPreviewImageFilepath, scenarioPreviewImageFilename);
-            this.attachFiles([attachment]);
-            this.setThumbnail(`attachment://${scenarioPreviewImageFilename}`);
-        } else {
-            this.appendNoScenarioPreviewImageAvailable();
-        }
+        this.tryAttachScenarioPreviewImage({
+            filepath: this.buildScenarioPreviewFilepath(this.buildScenarioPreviewImageFilename({suffix: '-x64'})), 
+            type: 'thumbnail'
+        });
     }   
     
     public build() {
