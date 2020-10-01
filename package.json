@@ -57,7 +57,6 @@
   "author": "Janne Varjo",
   "license": "MIT",
   "dependencies": {
-    "@types/assert": "^1.5.2",
     "discord.js": "^12.3.1",
     "download": "^8.0.0",
     "fs-extra": "^9.0.1",
@@ -66,6 +65,7 @@
   },
   "devDependencies": {
     "@tsconfig/node12": "^1.0.7",
+    "@types/assert": "^1.5.2",
     "@types/download": "^6.2.4",
     "@types/fs-extra": "^9.0.1",
     "@types/mocha": "^8.0.3",
