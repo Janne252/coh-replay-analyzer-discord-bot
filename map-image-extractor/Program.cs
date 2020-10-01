@@ -215,6 +215,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                     scenarioId = Regex.Replace(scenarioId, "[\\-]+", "-");
 
                     var imageFilename = Path.Join(ScenarioPreviewImageDestinationRoot, $"{scenarioId}.jpg");
+                    var thumbnailImageFilename = Path.Join(ScenarioPreviewImageDestinationRoot, $"{scenarioId}-x64.jpg");
                     var image = SixLabors.ImageSharp.Image.Load(preview.GetData());
 
                     var icons = scenario.GetIcons();
@@ -280,6 +281,15 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                     }
 
                     image.Save(imageFilename, jpgEncoder);
+                    var thumbnail = image.Clone();
+                    thumbnail.Mutate(_ => _
+                        .Resize(new ResizeOptions()
+                        {
+                            Mode = ResizeMode.Max,
+                            Size = new SixLabors.ImageSharp.Size(64, 64)
+                        })
+                    );
+                    thumbnail.Save(thumbnailImageFilename, jpgEncoder);
                     Console.WriteLine($"{scenario.ScenarioName}: {preview.Name}");
                 }
             }
