@@ -137,26 +137,25 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
 
     protected hookDeletionListener() {
         const listener = async (deletedMessage: Discord.Message | Discord.PartialMessage) => {
-            let removeListener = false;
             // Original message was deleted - delete embed and any chat expansions
             if (deletedMessage.id === this.userMessage.id) {
+                // Early removal to prevent reacting to message deletion operations performed by the bot
+                removeListener();
                 await Promise.all([
                     this.sent.delete(),
                     ...(this.sentChatLog.map(m => m.delete()))
                 ]);
-                removeListener = true;
             // Bot's message was deleted - delete any chat expansions
             } else if (deletedMessage.id === this.sent.id) {
+                // Early removal to prevent reacting to message deletion operations performed by the bot
+                removeListener();
                 await Promise.all([
                     ...(this.sentChatLog.map(m => m.delete()))
                 ]);
-                removeListener = true;
             }
 
-            if (removeListener) {
-                this.client.off('messageDelete', listener);
-            }
         };
+        const removeListener = () => this.client.off('messageDelete', listener);
     
         this.client.on('messageDelete', listener);
     }
