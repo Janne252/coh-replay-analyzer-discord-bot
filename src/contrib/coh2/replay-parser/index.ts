@@ -1,12 +1,10 @@
 import assert from 'assert';
 import { BinaryReader } from '../../io';
-import { RelicChunky } from '../chunk';
+import { ChunkParseMode, RelicChunky } from '../chunk';
 
-/**
- * TypeScript implementation of https://github.com/ryantaylor/vault
- */
-// TODO don't extend BinaryReader, instead use an instance of it
-export class ReplayParser extends BinaryReader {
+// Implementation loosely based on Ryan Taylor's https://github.com/ryantaylor/vault
+export class ReplayParser {
+    public static readonly ExpectedPrefix = 0x00;
     public static readonly MinimumVersion = 19545;
 
 
@@ -20,40 +18,41 @@ export class ReplayParser extends BinaryReader {
     public get timestamp() { return this._timestamp; }
 
     constructor(data: Buffer) {
-        super(data);
-        this.parseHeader();
+        const reader = new BinaryReader(data);
+        this.parseHeader(reader);
     }
 
-    private parseHeader() {
+    private parseHeader(reader: BinaryReader) {
         // Prefix, always seems to be 0x00
-        const prefix = this.readUInt16();
-        if (prefix !== 0x00) {
-            this.unexpectedValue(this.position - 2, prefix, 0);
+        const prefix = reader.readUInt16();
+        if (prefix !== ReplayParser.ExpectedPrefix) {
+            reader.unexpectedValue(reader.position - 2, prefix, 0);
+            throw new Error(`Unexpected replay file prefix at offset ${reader.position - 2}: ${prefix}, expected ${ReplayParser.ExpectedPrefix}`);
         }
 
         // Version
-        this._version = this.readUInt16();
+        this._version = reader.readUInt16();
         if (this.version < ReplayParser.MinimumVersion) {
-            this.unexpectedValue(this.position - 2, this.version, `version >= ${ReplayParser.MinimumVersion}`);
+            throw new Error(`Unsupported replay file version ${this.version}, expected greater than or equal to ${ReplayParser.MinimumVersion}`);
         }
         
         // Magic
-        this._magic = this.readString(8, 'utf8');
+        this._magic = reader.readString(8, 'utf8');
 
-        this._timestamp = this.readNullTerminatedString(2, 'utf16le');
+        this._timestamp = reader.readNullTerminatedString(2, 'utf16le');
 
         // Padding (32 bytes including last 2 bytes of the null-terminated timestamp)
-        const padding = this.read(30).reduce((a, b) => a + b, 0);
+        const padding = reader.read(30).reduce((a, b) => a + b, 0);
         if (padding !== 0x00) {
-            this.unexpectedValue(`${this.position - 30} - ${this.position}`, padding, 0x00);
+            reader.unexpectedValue(`${reader.position - 30} - ${reader.position}`, padding, 0x00);
         }
 
-        // TODO parse Relic Chunky (chunky bois)
-        // For some reason there are 2 Chunkies. Where's the indication that chunk's children end?
-        const chunky01 = new RelicChunky(this, 'replay01');
-        // The next chunky has a child chunk "DATAPLAS" which seems to report its end way before its data appears to end
-        // How do we know DATAPLAS does not have any siblings after it? It's parent is DATAFOLD
-        const chunky02 = new RelicChunky(this, 'replay02');
+        // Parse chunky bois
+        // Replay is a special file where 2 Relic Chunky "files" are stored in series
+        // There is no indication of how many chunks they should contain, meaning that
+        // We have to parse their contents gracefully (stop when an invalid chunk is found)
+        const chunky01 = new RelicChunky(reader, ChunkParseMode.Graceful);
+        const chunky02 = new RelicChunky(reader, ChunkParseMode.Graceful);
         var b = 1;
     }
 }
