@@ -33,8 +33,20 @@ export class BinaryReader {
         return result;
     }
 
-    public ReadUInt32() {
+    public readUInt32() {
         const result = this.data.readUInt32LE(this.position);
+        this.offset(4);
+        return result;
+    }
+
+    public readUInt64() {
+        const result = this.data.readBigUInt64LE(this.position);
+        this.offset(8);
+        return result;
+    }
+
+    public readFloat() {
+        const result = this.data.readFloatLE(this.position);
         this.offset(4);
         return result;
     }
