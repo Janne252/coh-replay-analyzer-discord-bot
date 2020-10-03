@@ -169,6 +169,12 @@ class Scenario extends ReplaySection {
         this.minimapHeight = reader.readUInt32();
         // 00000000000000000000000000000000:XXXXXXXX
         const wincondition = reader.readString(reader.readUInt32());
+        // Replay file stores info about the minimap icons because
+        // certain game modes replace entities at runtime, e.g.
+        // annihilation mode replaces all victory points with standard territory points
+
+        // Does not explain though why annihilation mode replays have info about
+        // victory point icons
         this.minimapLayers = MinimalLayer.collection(reader, 4);
         // sometimes there's 0x00, sometimes 0x01 0x00
         // Do we just assume 0x01 means there's one additional byte?
