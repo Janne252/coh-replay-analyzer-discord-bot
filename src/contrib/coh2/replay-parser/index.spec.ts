@@ -4,7 +4,10 @@ import { ReplayParser } from '.';
 import fs from 'fs-extra';
 import path from 'path';
 
-function massTest(root: string) {
+function massTestDir(root: string) {
+    massTest(fs.readdirSync(root).map(file => path.join(root, file)));
+}
+function massTest(files: string[]) {
     let count = 0;
         let skippedInvalidVersion = 0;
         let skippedEmptyFile = 0;
@@ -12,8 +15,7 @@ function massTest(root: string) {
         let skippedOtherwiseInvalid = 0;
         let success = 0;
         let failed = 0;
-        for (const file of fs.readdirSync(root)) {
-            const filename = path.join(root, file);
+        for (const filename of files) {
             try {
                 const replay = new ReplayParser(filename, {strict: false});
                 if (!replay.isValid) {
@@ -106,14 +108,31 @@ describe('contrib.coh2.replay-parser', () => {
         }
     });
     */
-    /*
-    it('mass-test 01', () => {
-        massTest(`C:\\Users\\Janne\\Downloads\\sample-replays`);
-    });
-    */
-    
-    it('mass-test 02', () => {
-        massTest(`C:\\Users\\Janne\\Downloads\\sample-replays-02`);
-    });
-    
+    if (true) 
+        it('mass-test 01', () => {
+            massTestDir(`C:\\Users\\Janne\\Downloads\\sample-replays`);
+        });
+    if (false) 
+        it('mass-test 02', () => {
+            massTestDir(`C:\\Users\\Janne\\Downloads\\sample-replays-02`);
+        });
+    if (false) 
+        it('battlefront', () => {
+            massTestDir(path.join(process.cwd(), 'tests/battlefront-replays'));
+        });
+
+    if (false) 
+        it('starting-resources', () => {
+            massTestDir(path.join(process.cwd(), 'tests/starting-resources-replays'));
+        });
+
+    if (false) 
+        it('starting-positions', () => {
+            massTestDir(path.join(process.cwd(), 'tests/starting-positions-replays'));
+        });
+
+    if (false) 
+        it('cold-tech', () => {
+            massTestDir(path.join(process.cwd(), 'tests/cold-tech-replays'));
+        });
 });

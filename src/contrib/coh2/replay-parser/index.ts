@@ -151,14 +151,23 @@ class Scenario extends DataSection {
             Not yet parsed, but could potentially be present in replay data:
             - .info version (2007, 2008)
             - .info savedname ""
-            - .info scenario_battlefront 2
+            - .info scenario_battlefront
                 Test:
                 - scenario_battlefront: 0 2p_don_river
                 - scenario_battlefront: 1 2p_la_gleize_breakout
                 - scenario_battlefront: 2 (2-4)_langres
-                - scenario_battlefront: 3 2p_halbe
-                - scenario_battlefront: 4 2p_cherneux
+                - scenario_battlefront: 3 alliance of defiance
+                - scenario_battlefront: 4 noville encirclement
                 - scenario_battlefront: 5 2p_arnherm_checkpoint
+            - .options
+                scenario_type = skirmish|multiplayer|battle_solo|battle_coop|challenge|0|1|persistent|persistent_battle (enum) (set to 1 for normal user-created maps)
+                scenario_year = 1941
+                start_location = fixed (enum)
+                win_condition = victory_point (enum)
+                visible_in_lobby = true (boolean)
+                slots = {} // Custom player slots config. Variable data, if it's present it should break existing parsers
+                uses_ice = true (boolean)
+
         */
         const unknown_01 = reader.readUInt32(); // 0x0
         const unknown_02 = reader.readUInt32(); // 0x0
@@ -171,7 +180,16 @@ class Scenario extends DataSection {
             var b = 1;
         }
         this.filepath = reader.readString(reader.readUInt32(), 'utf8');
-        const unknown_08 = reader.read(16);
+        // Almost certainly scenario (map) dependent
+        const unknown_08_a = reader.readUInt32();
+        const unknown_08_b = reader.readUInt32();
+        const unknown_08_c = reader.readUInt32();
+        const unknown_08_d = reader.readUInt32();
+
+        if (unknown_08_c != 0 || unknown_08_d != 0) {
+            var b = 1;
+        }
+
         this.name = reader.readString(reader.readUInt32() * 2, 'utf16le');
         this.descriptionLong = reader.readString(reader.readUInt32() * 2, 'utf16le');
         this.description = reader.readString(reader.readUInt32() * 2, 'utf16le');
@@ -211,8 +229,12 @@ class Scenario extends DataSection {
         this.minimapHeight = reader.readUInt32();
         // 00000000000000000000000000000000:XXXXXXXX
         this.wincondition = reader.readString(reader.readUInt32());
-        const u14 = reader.readUInt32();
+        const unknown_14 = reader.readUInt32();
 
+        if (unknown_14 != 0 || this.filepath.indexOf('tow') !== -1) {
+            console.log(this.filepath, unknown_14);
+            var b = 1;
+        }
         // Replay file stores info about the minimap icons because
         // certain game modes replace entities at runtime, e.g.
         // annihilation mode replaces all victory points with standard territory points
