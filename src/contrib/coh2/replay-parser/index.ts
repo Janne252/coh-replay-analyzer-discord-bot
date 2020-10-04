@@ -134,6 +134,7 @@ class Scenario extends DataSection {
     public readonly height: number;
 
     public readonly music: string;
+    public readonly abbrNameMaybe: string;
     public readonly scenarioReferenceFilepath: string;
     public readonly scenarioReferenceName: string;
     public readonly scenarioReferenceDirectory: string;
@@ -146,7 +147,19 @@ class Scenario extends DataSection {
 
     constructor(reader: BinaryReader) {
         super();
-        
+        /*
+            Not yet parsed, but could potentially be present in replay data:
+            - .info version (2007, 2008)
+            - .info savedname ""
+            - .info scenario_battlefront 2
+                Test:
+                - scenario_battlefront: 0 2p_don_river
+                - scenario_battlefront: 1 2p_la_gleize_breakout
+                - scenario_battlefront: 2 (2-4)_langres
+                - scenario_battlefront: 3 2p_halbe
+                - scenario_battlefront: 4 2p_cherneux
+                - scenario_battlefront: 5 2p_arnherm_checkpoint
+        */
         const unknown_01 = reader.readUInt32(); // 0x0
         const unknown_02 = reader.readUInt32(); // 0x0
         const unknown_03 = reader.read(4);
@@ -169,10 +182,8 @@ class Scenario extends DataSection {
         this.music = reader.readString(reader.readUInt32(), 'utf8');
         // Not savedname nor any other known text field (that we know of)
         // Will be tested again against a larger replay set
-        const unknown_09 = reader.readString(reader.readUInt32() * 2, 'utf16le');
-        if (unknown_09 !== '') {
-            var b = 1;
-        }
+        this.abbrNameMaybe = reader.readString(reader.readUInt32() * 2, 'utf16le');
+
         // 16 bytes of strange data present only in a very small percentage of replays
         const unknown_10 = reader.read(16);
         
