@@ -12,3 +12,4 @@ node_modules
 # Visual Studio 2015/2017 cache/options directory
 /map-image-extractor/.vs/
 /map-image-extractor/[Oo]bj/
+/large-replay-sample-sets

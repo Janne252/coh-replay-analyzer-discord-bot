@@ -177,18 +177,15 @@ class Scenario extends DataSection {
         const unknown_06 = reader.readUInt32(); // 0x0
         const unknown_07 = reader.readUInt32(); // 0x0
         if (unknown_01 != 0 || unknown_02 != 0 || unknown_04 != 3 || unknown_05 != 0 || unknown_06 != 0 || unknown_07 != 0) {
-            var b = 1;
+            throw new Error('Unexpected unknown 01 - 07');
         }
+
         this.filepath = reader.readString(reader.readUInt32(), 'utf8');
-        // Almost certainly scenario (map) dependent
+        // Almost certainly scenario (map) dependent data
         const unknown_08_a = reader.readUInt32();
         const unknown_08_b = reader.readUInt32();
         const unknown_08_c = reader.readUInt32();
         const unknown_08_d = reader.readUInt32();
-
-        if (unknown_08_c != 0 || unknown_08_d != 0) {
-            var b = 1;
-        }
 
         this.name = reader.readString(reader.readUInt32() * 2, 'utf16le');
         this.descriptionLong = reader.readString(reader.readUInt32() * 2, 'utf16le');
@@ -203,37 +200,40 @@ class Scenario extends DataSection {
         this.abbrNameMaybe = reader.readString(reader.readUInt32() * 2, 'utf16le');
 
         // 16 bytes of strange data present only in a very small percentage of replays
+        // could be related to custom / modded maps?
         const unknown_10 = reader.read(16);
+        if (unknown_10.reduce((a, b) => a + b, 0) !== 0) {
+            console.log('unknown_10', this.filepath, unknown_10);
+        }
         
         this.scenarioReferenceFilepath = reader.readString(reader.readUInt32());
         this.scenarioReferenceName = reader.readString(reader.readUInt32());
         this.scenarioReferenceDirectory = reader.readString(reader.readUInt32());
 
         this.atmosphereOptions = AtmosphereOption.collection({reader, count: reader.readUInt32()});
-        const unknown_12 = UnknownDataSection.collection({reader, count: reader.readUInt16(), args: [8]});
-        if (unknown_12[0].data.reduce((a, b) => a + b, 0) !== 0 || unknown_12[1].data.reduce((a, b) => a + b, 0) !== 0) {
-            var b = 1;
+        const unknown_11 = UnknownDataSection.collection({reader, count: reader.readUInt16(), args: [8]});
+        if (unknown_11[0].data.reduce((a, b) => a + b, 0) !== 0 || unknown_11[1].data.reduce((a, b) => a + b, 0) !== 0) {
+            console.log('unknown_12', this.filepath, unknown_11);
         }
-        const [b1, b2, b3, b4] = reader.read(4);
-        if (b1 != 0 || b2 != 0 || b3 != 0 || b4 != 0) {
-            var b = 1;
-            // console.log(b1, b2, b3, b4);
-        }
+
+        // Could be 4 booleans
+        const [unknown_12_a, unknown_12_b, unknown_12_c, unknown_12_d] = reader.read(4);
+
         const unknown_13 = reader.readUInt32(); // 0x4 = layer count?
         if (unknown_13 !== 4) {
-            var b = 1;
+            console.log('unknown_13', this.filepath, unknown_13);
         }
         // .options scenario_description_ext field
         this.descriptionExt = reader.readString(reader.readUInt32() * 2, 'utf16le');
         this.minimapWidth = reader.readUInt32();
         this.minimapHeight = reader.readUInt32();
+
         // 00000000000000000000000000000000:XXXXXXXX
         this.wincondition = reader.readString(reader.readUInt32());
         const unknown_14 = reader.readUInt32();
 
         if (unknown_14 != 0 || this.filepath.indexOf('tow') !== -1) {
-            console.log(this.filepath, unknown_14);
-            var b = 1;
+            console.log('unknown_14', this.filepath, unknown_14);
         }
         // Replay file stores info about the minimap icons because
         // certain game modes replace entities at runtime, e.g.
@@ -244,9 +244,6 @@ class Scenario extends DataSection {
         this.minimapLayers = MinimapLayer.collection({reader, count: 3});
 
         this.defaultSkins = DefaultSkin.collection({reader, count: reader.readUInt32()});
-        // sometimes there's 0x00, sometimes 0x01 0x00
-        // Do we just assume 0x01 means there's one additional byte?
-        var b = 1;
     }
 }
 

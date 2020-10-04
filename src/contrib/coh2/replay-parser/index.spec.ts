@@ -5,52 +5,54 @@ import fs from 'fs-extra';
 import path from 'path';
 
 function massTestDir(root: string) {
+    console.log(`Beginning to check replays in ${root}...`);
     massTest(fs.readdirSync(root).map(file => path.join(root, file)));
 }
 function massTest(files: string[]) {
+    console.log(`Beginning to check ${files.length} replays...`);
     let count = 0;
-        let skippedInvalidVersion = 0;
-        let skippedEmptyFile = 0;
-        let skippedInvalidMagic = 0;
-        let skippedOtherwiseInvalid = 0;
-        let success = 0;
-        let failed = 0;
-        for (const filename of files) {
-            try {
-                const replay = new ReplayParser(filename, {strict: false});
-                if (!replay.isValid) {
-                    if (replay.version < ReplayParser.MinimumVersion) {
-                        skippedInvalidVersion++;
-                    } else if (replay.magic !== ReplayParser.Magic) {
-                        skippedInvalidMagic++;
-                    } else if (replay.dataLength === 0) {
-                        skippedEmptyFile++;
-                    } else {
-                        var b = 1;
-                        skippedOtherwiseInvalid++;
-                    }
+    let skippedInvalidVersion = 0;
+    let skippedEmptyFile = 0;
+    let skippedInvalidMagic = 0;
+    let skippedOtherwiseInvalid = 0;
+    let success = 0;
+    let failed = 0;
+    for (const filename of files) {
+        try {
+            const replay = new ReplayParser(filename, {strict: false});
+            if (!replay.isValid) {
+                if (replay.version < ReplayParser.MinimumVersion) {
+                    skippedInvalidVersion++;
+                } else if (replay.magic !== ReplayParser.Magic) {
+                    skippedInvalidMagic++;
+                } else if (replay.dataLength === 0) {
+                    skippedEmptyFile++;
                 } else {
-                    success++;
+                    var b = 1;
+                    skippedOtherwiseInvalid++;
                 }
-                
-            } catch (error) {
-                console.error(error);
-                console.log(filename);
-                failed++;
-                var b = 1;
-            } finally {
-                count++;
+            } else {
+                success++;
             }
+            
+        } catch (error) {
+            console.error(error);
+            console.log(filename);
+            failed++;
+            var b = 1;
+        } finally {
+            count++;
         }
-        console.info(
-            `Parsed ${count} replays of which ${success} succeeded.` +
-            `\n\tSkipped:` +
-            `\n\t\t${skippedInvalidVersion} (invalid version)` +
-            `\n\t\t${skippedEmptyFile} (empty file)` +
-            `\n\t\t${skippedInvalidMagic} (invalid magic)` +
-            `\n\t\t${skippedOtherwiseInvalid} (other)` +
-            `\n\t\t${failed} (FAILED)`
-        );
+    }
+    console.info(
+        `Parsed ${count} replays of which ${success} succeeded.` +
+        `\n\tSkipped:` +
+        `\n\t\t${skippedInvalidVersion} (invalid version)` +
+        `\n\t\t${skippedEmptyFile} (empty file)` +
+        `\n\t\t${skippedInvalidMagic} (invalid magic)` +
+        `\n\t\t${skippedOtherwiseInvalid} (other)` +
+        `\n\t\t${failed} (FAILED)`
+    );
 }
 describe('contrib.coh2.replay-parser', () => {
     /*
@@ -108,7 +110,19 @@ describe('contrib.coh2.replay-parser', () => {
         }
     });
     */
+    if (false) 
+    it('coh2-org-2020-10-04-reduced', () => {
+        massTestDir(path.join(process.cwd(), 'large-replay-sample-sets/coh2-org-2020-10-04-reduced'));
+    });
     if (true) 
+    it('coh2-org-2020-10-04-full', () => {
+        massTestDir(path.join(process.cwd(), 'large-replay-sample-sets/coh2-org-2020-10-04-full'));
+    });
+    if (false) 
+        it('coh2-org-2020-10-04', () => {
+            massTestDir(path.join(process.cwd(), 'large-replay-sample-sets/coh2-org-2020-10-04'));
+        });
+    if (false) 
         it('mass-test 01', () => {
             massTestDir(`C:\\Users\\Janne\\Downloads\\sample-replays`);
         });
