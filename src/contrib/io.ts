@@ -1,12 +1,25 @@
+import fs from 'fs-extra';
+
 export class BinaryReader {
     public position = 0;
-
+    public data: Buffer;
+    public filepath?: string;
+   
     get length() {
         return this.data.byteLength;
     }
 
-    constructor(protected readonly data: Buffer) {
-
+    constructor(filepath: string)
+    constructor(data: Buffer)
+    // The actual implementation constructor is hidden; We have to publish it
+    constructor(filepathOrBuffer: string | Buffer)
+    constructor(filepathOrBuffer: string | Buffer) {
+        if (filepathOrBuffer instanceof Buffer) {
+            this.data = filepathOrBuffer;
+        } else {
+            this.filepath = filepathOrBuffer;
+            this.data = fs.readFileSync(this.filepath);
+        }
     }
 
     public offset(offset: number) {
@@ -80,5 +93,59 @@ export class BinaryReader {
 
     public unexpectedValue(offset: number | string, value: any, expected: any) {
         throw new Error(`Unexpected value at offset ${offset}: ${value}, expected ${expected}`);
+    }
+}
+
+/**
+ * Represents a section of data in a file that may or may not repeat multiple times.
+ */
+export abstract class DataSection {
+    static get alias(): string {
+        throw new Error(`All sub-classes of DataSection must implement static alias: string`);
+    }
+
+    public static collection<T>(this: {new(reader: BinaryReader, ...args: any[]): T}, {reader, count, args}: {reader: BinaryReader, count?: number, args?: any[]}) {
+        const result: T[] = [];
+        while (reader.position < reader.length && result.length != count) {
+            const offset = reader.position;
+            const index = result.length;
+            try {
+                result.push(new this(reader, ...args ?? []));
+            } catch (error) {
+                let message = `Failed to initialize a data section of type "${(this as any).alias}" at index ${index} at byte offset ${offset}`;
+
+                // Append original error to the message if it's not a DataSectionError
+                if (!(error instanceof DataSectionError)) {
+                    message += `: ${error}`;
+                } 
+                const dataSectionError = new DataSectionError(message, {index , offset});
+
+                // Re-throw inner-most error if it's a DataSectionError
+                if (error instanceof DataSectionError) {
+                    error.parent = dataSectionError;
+                    throw error;
+                }
+
+                throw dataSectionError;
+            }
+        }
+
+        return result;
+    }
+}
+
+export class DataSectionError extends Error {
+    public readonly index: number;
+    public readonly offset: number;
+    public parent?: DataSectionError;
+    
+    constructor(message: string, {index, offset}: {index: number, offset: number}) {
+        super(message);
+        this.index = index;
+        this.offset = offset;
+    }
+
+    toString() {
+        return `${this.message}${this.parent ? `\n\t${this.parent}` : ''}`;
     }
 }

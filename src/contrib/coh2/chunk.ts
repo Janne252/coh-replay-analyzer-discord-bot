@@ -1,4 +1,4 @@
-import { BinaryReader } from "../io";
+import { BinaryReader, DataSection } from "../io";
 
 export enum ChunkType {
     Folder = 'FOLD',
@@ -10,7 +10,7 @@ export enum ChunkParseMode {
     Graceful,
 }
 
-export abstract class ChunkLike {
+export abstract class ChunkLike extends DataSection {
     public version: number;
     public children: Chunk[] = [];
     
@@ -30,6 +30,8 @@ export abstract class ChunkLike {
 // Implementation based on Corsix' https://github.com/corsix/coh2-formats and
 // Copernicus' CoH2_RGDTools (source unavailable as of 2020/10/2)
 export class Chunk extends ChunkLike {
+    static get alias() { return 'Chunk' }
+
     public readonly type: ChunkType;
     public readonly kind: string;
     public readonly alias: string;
@@ -97,8 +99,10 @@ export class Chunk extends ChunkLike {
 }
 
 export type ChunkDataParsers = Record<string, (chunk: Chunk, reader: BinaryReader) => void>;
+
 export class RelicChunky extends ChunkLike {
-    public readonly name: string;
+    static get alias() { return 'RelicChunky' }
+
     public readonly magic: string;
     // In Corsix' implementation "magi"c is "Relic Chunky" and the signature is processed separately as below
     // For comparison Copernicus reads the signature as part of the "magic": "Relic Chunky\r\n\u001a\0"

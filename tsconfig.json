@@ -3,7 +3,8 @@
     "compilerOptions": {
         "module": "commonjs",
         "sourceMap": true,
-        "outDir": "dist"
+        "outDir": "dist",
+        "experimentalDecorators": true
     },
     "files": ["src/index.ts"],
     "exclude": [
