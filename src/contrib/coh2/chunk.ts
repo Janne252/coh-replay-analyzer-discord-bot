@@ -13,18 +13,6 @@ export enum ChunkParseMode {
 export abstract class ChunkLike extends DataSection {
     public version: number;
     public children: Chunk[] = [];
-    
-    public flatten() {
-        const result: Chunk[] = [];
-        if (this instanceof Chunk) {
-            result.push(this);
-        }
-        for (const child of this.children) {
-            result.push(...child.flatten());
-        }
-
-        return result;
-    }
 }
 
 // Implementation based on Corsix' https://github.com/corsix/coh2-formats and
@@ -32,6 +20,7 @@ export abstract class ChunkLike extends DataSection {
 export class Chunk extends ChunkLike {
     static get alias() { return 'Chunk' }
 
+    public readonly dataOffset: number;
     public readonly type: ChunkType;
     public readonly kind: string;
     public readonly alias: string;
@@ -44,7 +33,7 @@ export class Chunk extends ChunkLike {
 
     public readonly isValid: boolean;
     constructor(public readonly Chunky: RelicChunky, reader: BinaryReader, {mode, dataParsers}: {mode: ChunkParseMode, dataParsers?: ChunkDataParsers}) {
-        super();
+        super(reader);
         this.type = reader.readString(4, 'ascii') as ChunkType;
         this.kind = reader.readString(4, 'ascii');
         this.alias = `${this.type}${this.kind}`;
@@ -70,10 +59,15 @@ export class Chunk extends ChunkLike {
 
         this.name = reader.readString(this.nameLength, 'ascii');
         
+        const endOffset = reader.position + this.dataLength;
+        this.dataOffset = reader.position;
         if (this.type === ChunkType.Folder) {
-            this.children.push(...Chunk.readChunks(this.Chunky, reader, {endOffset: reader.position + this.dataLength, mode, dataParsers}));
+            this.children.push(...Chunk.readChunks(this.Chunky, reader, {endOffset, mode, dataParsers}));
         } else if (dataParsers && this.alias in dataParsers) {
             dataParsers[this.alias](this, reader);
+            if (reader.position < endOffset) {
+                throw new Error(`dataParser "${this.alias}" did not parse all data`);
+            }
         } else {
             this.readData(reader);
         }
@@ -111,9 +105,11 @@ export class RelicChunky extends ChunkLike {
     public readonly fileHeaderSize: number = 36;
     public readonly chunkHeaderSize: number;
     public readonly minVersion: number;
+    /** Number of bytes excluding header bytes. */
+    public readonly dataLength: number;
 
-    constructor(reader: BinaryReader, {mode, dataParsers}: {mode: ChunkParseMode, dataParsers?: ChunkDataParsers}) {
-        super();
+    constructor(reader: BinaryReader, {mode, dataParsers, expectedDataLength}: {mode: ChunkParseMode, dataParsers?: ChunkDataParsers, expectedDataLength?: number}) {
+        super(reader);
         this.magic = reader.readString(12, 'ascii');
         this.signature = reader.readUInt32();
         this.version = reader.readUInt32();
@@ -124,6 +120,12 @@ export class RelicChunky extends ChunkLike {
             this.minVersion = reader.readUInt32();
         }
 
+        const offsetForDataLength = reader.position;
         this.children.push(...Chunk.readChunks(this, reader, {mode, dataParsers}));
+        this.dataLength = reader.position - offsetForDataLength;
+
+        if (expectedDataLength != null && this.dataLength != expectedDataLength) {
+            throw new Error(`Unexpected chunky data length ${this.dataLength}, expected ${expectedDataLength}`);
+        }
     }
 }

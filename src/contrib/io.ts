@@ -100,6 +100,8 @@ export class BinaryReader {
  * Represents a section of data in a file that may or may not repeat multiple times.
  */
 export abstract class DataSection {
+    public readonly startOffset: number;
+
     static get alias(): string {
         throw new Error(`All sub-classes of DataSection must implement static alias: string`);
     }
@@ -131,6 +133,10 @@ export abstract class DataSection {
         }
 
         return result;
+    }
+
+    constructor(reader: BinaryReader) {
+        this.startOffset = reader.position;
     }
 }
 

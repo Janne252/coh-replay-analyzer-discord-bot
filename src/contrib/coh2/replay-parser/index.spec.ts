@@ -111,14 +111,6 @@ describe('contrib.coh2.replay-parser', () => {
     });
     */
     if (false) 
-        it('coh2-org-2020-10-04-reduced', () => {
-            massTestDir(path.join(process.cwd(), 'large-replay-sample-sets/coh2-org-2020-10-04-reduced'));
-        });
-    if (false) 
-        it('coh2-org-2020-10-04-full', () => {
-            massTestDir(path.join(process.cwd(), 'large-replay-sample-sets/coh2-org-2020-10-04-full'));
-        });
-    if (false) 
         it('coh2-org-2020-10-04', () => {
             massTestDir(path.join(process.cwd(), 'large-replay-sample-sets/coh2-org-2020-10-04'));
         });
@@ -137,18 +129,52 @@ describe('contrib.coh2.replay-parser', () => {
 
 
     if (true) {
-        it('starting-positions', () => {
-            massTestDir(path.join(process.cwd(), 'tests/starting-position-replays'));
+        it('coh2-org-2020-10-04-full', () => {
+            massTestDir(path.join(process.cwd(), '../large-replay-sample-sets/coh2-org-2020-10-04-full'));
         });
     }
-    if (true) {
-        it('starting-resources', () => {
-            massTestDir(path.join(process.cwd(), 'tests/starting-resources-replays'));
+    if (false) {
+        it('coh2-org-2020-10-04-reduced', () => {
+            massTestDir(path.join(process.cwd(), '../large-replay-sample-sets/coh2-org-2020-10-04-reduced'));
         });
     }
-    if (true) {
-        it('cold-tech', () => {
-            massTestDir(path.join(process.cwd(), 'tests/cold-tech-replays'));
+    if (false) {
+        it('special-replays', () => {
+            massTest([
+                'tests/special-replays/player-inventory-item-kind-514.rec',
+                // 'tests/special-replays/scenario-with-0-default-skins.rec',
+                // 'tests/special-replays/scenario-with-atmosphere-options.rec',
+                // 'tests/special-replays/scenario-with-default-skin-0-length.rec',
+                // 'tests/special-replays/scenario-with-music.rec',
+                // 'tests/special-replays/scenario-with-scenario-description-ext.rec',
+                // 'tests/special-replays/scenario-with-sceneref.rec',
+            ].map(filename => path.join(process.cwd(), filename)));
         });
     }
+
+    if (false) {
+        it('game-configurations', () => {
+            massTest([
+                'tests/game-configuration-replays/starting_positions_random.rec',
+                //'tests/game-configuration-replays/starting_positions_fixed.rec',
+                // 'tests/game-configuration-replays/starting_positions_fixed_try_2.rec',
+                // 'tests/game-configuration-replays/starting_positions_fixed_reversed.rec',
+
+                // 'tests/game-configuration-replays/starting_resources_standard.rec',
+                // 'tests/game-configuration-replays/starting_resources_high.rec',
+                // 
+                // 'tests/game-configuration-replays/victory_point_500.rec',
+                // 
+                // 'tests/game-configuration-replays/cold_tech_scenario_default.rec',
+                // 'tests/game-configuration-replays/cold_tech_disabled.rec',
+                // 'tests/game-configuration-replays/victory_point_250.rec',
+                // 'tests/game-configuration-replays/victory_point_1000.rec',
+                // 'tests/game-configuration-replays/default_annihilation.rec',
+                // 'tests/game-configuration-replays/default_tuning_pack_all_units.rec',
+                // 'tests/game-configuration-replays/default_win_condition_ccm2_annihilation.rec',
+
+            ].map(filename => path.join(process.cwd(), filename)));
+        });
+    }
+
 });

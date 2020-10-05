@@ -2,7 +2,7 @@ import assert from 'assert';
 import fs from 'fs-extra';
 import path from 'path';
 import { BinaryReader, DataSection } from '../../io';
-import { Chunk, ChunkParseMode, RelicChunky, ChunkType } from '../chunk';
+import { Chunk, ChunkParseMode, RelicChunky } from '../chunk';
 
 export type ReplayParserOptions = {strict: boolean};
 
@@ -64,20 +64,23 @@ export class ReplayParser {
             return;
         }
         
-        this.timestamp = reader.readNullTerminatedString(2, 'utf16le');
+        this.timestamp = reader.readString(64, 'utf16le');
         
-        reader.position = 76;
+        //reader.position = 76;
 
         const dataParsers = {
-            DATADATA: this.parse_DATADATA,
-            DATASDSC: this.parse_DATASDSC,
-            DATAPLAS: this.parse_DATAPLAS,
+            DATADATA: (chunk, reader) => this.parse_DATADATA(chunk, reader),
+            DATASDSC: (chunk, reader) => this.parse_DATASDSC(chunk, reader),
+            DATAPLAS: (chunk, reader) => this.parse_DATAPLAS(chunk, reader),
         };
         // Parse chunky bois
         // Replay is a special file where 2 Relic Chunky "files" are stored in series
         // There is no indication of how many chunks they should contain, meaning that
         // We have to parse their contents gracefully (stop when an invalid chunk is found)
-        this.sections = RelicChunky.collection({reader, count: 2, args: [{mode: ChunkParseMode.Graceful, dataParsers}]});
+        this.sections = [
+            new RelicChunky(reader, {mode: ChunkParseMode.Graceful, dataParsers, expectedDataLength: 60}),
+            new RelicChunky(reader, {mode: ChunkParseMode.Graceful, dataParsers}),
+        ];
         // If no parsing operation marked the the replay as invalid, default to valid
         this.isValid = this.isValid ?? true;
     }
@@ -92,25 +95,35 @@ export class ReplayParser {
         throw new Error(message);
     }
 
-
     private parse_DATADATA(chunk: Chunk, reader: BinaryReader) {
         if (chunk.version == 0x1) {
             // 4 bytes, first byte seems to encode values for starting resources, starting positions, cold tech
 
             const settings = reader.readUInt8();
+            const bits = [
+                settings >> 7 & 0x01,
+                settings >> 6 & 0x01,
+                settings >> 5 & 0x01,
+                settings >> 4 & 0x01,
+                settings >> 3 & 0x01,
+                settings >> 2 & 0x01,
+                settings >> 1 & 0x01,
+                settings >> 0 & 0x01,
+            ]
             const u1 = reader.read(3);
-            console.log(...[...settings.toString(2).split('').reverse(), path.basename(reader.filepath)])
-            //console.log(...[...Array.from(u1).map(o => {if (o < 10) return `00${o}`; else if (o < 100) return `0${o}`; else return 0}), path.basename(reader.filepath)]);
+            // console.log(...[...bits, settings, path.basename(reader.filepath)])
+            // console.log(...[...Array.from(u1).map(o => {if (o < 10) return `00${o}`; else if (o < 100) return `0${o}`; else return 0}), path.basename(reader.filepath)]);
             var b = 1;
             // 4 bytes of data, what is it?
         } else if (chunk.version >= 27 && chunk.version <= 28) {
             this.opponentType = reader.readUInt32();
             const padding = reader.read(4);
-            const u1 = reader.readUInt32();
-            const u2 = reader.readUInt16();
+            const u1 = reader.readUInt32(); // 0x0
+            const u2 = reader.readUInt16(); // 0x0
             this.seed = reader.readUInt32();
             this.players = Player.collection({reader, count: reader.readUInt32()});
-            var b = 1;
+            // Around 150 bytes are yet to be parsed
+            const rest = reader.read((chunk.dataOffset + chunk.dataLength) - reader.position);
         }
     }
 
@@ -124,9 +137,9 @@ export class ReplayParser {
     }
 
     private parse_DATAPLAS(chunk: Chunk, reader: BinaryReader) {
-
+        const data = reader.read(chunk.dataLength);
+        var b = 1;
     }
-
 }
 
 class Scenario extends DataSection {
@@ -154,7 +167,7 @@ class Scenario extends DataSection {
     public readonly defaultSkins: DefaultSkin[];
 
     constructor(reader: BinaryReader) {
-        super();
+        super(reader);
         /*
             Not yet parsed, but could potentially be present in replay data:
             - .info version (2007, 2008)
@@ -184,13 +197,11 @@ class Scenario extends DataSection {
         const unknown_05 = reader.readUInt32(); // 0x0
         const unknown_06 = reader.readUInt32(); // 0x0
         const unknown_07 = reader.readUInt32(); // 0x0
-        if (unknown_01 != 0 || unknown_02 != 0 || unknown_04 != 3 || unknown_05 != 0 || unknown_06 != 0 || unknown_07 != 0) {
-            throw new Error('Unexpected unknown 01 - 07');
-        }
 
         this.filepath = reader.readString(reader.readUInt32(), 'utf8');
         // Almost certainly scenario (map) dependent data
         const unknown_08_a = reader.readUInt32();
+        // Rest 3 appear to be 0x00
         const unknown_08_b = reader.readUInt32();
         const unknown_08_c = reader.readUInt32();
         const unknown_08_d = reader.readUInt32();
@@ -210,27 +221,22 @@ class Scenario extends DataSection {
         // 16 bytes of strange data present only in a very small percentage of replays
         // could be related to custom / modded maps?
         const unknown_10 = reader.read(16);
-        if (unknown_10.reduce((a, b) => a + b, 0) !== 0) {
-            console.log('unknown_10', this.filepath, unknown_10);
-        }
-        
+
         this.scenarioReferenceFilepath = reader.readString(reader.readUInt32());
         this.scenarioReferenceName = reader.readString(reader.readUInt32());
         this.scenarioReferenceDirectory = reader.readString(reader.readUInt32());
 
         this.atmosphereOptions = AtmosphereOption.collection({reader, count: reader.readUInt32()});
+        // Appears to be a collection of 8 byte values
         const unknown_11 = UnknownDataSection.collection({reader, count: reader.readUInt16(), args: [8]});
         if (unknown_11[0].data.reduce((a, b) => a + b, 0) !== 0 || unknown_11[1].data.reduce((a, b) => a + b, 0) !== 0) {
-            console.log('unknown_12', this.filepath, unknown_11);
+            throw new Error(`Unknown data section has data`);
         }
 
         // Could be 4 booleans
         const [unknown_12_a, unknown_12_b, unknown_12_c, unknown_12_d] = reader.read(4);
 
         const unknown_13 = reader.readUInt32(); // 0x4 = layer count?
-        if (unknown_13 !== 4) {
-            console.log('unknown_13', this.filepath, unknown_13);
-        }
         // .options scenario_description_ext field
         this.descriptionExt = reader.readString(reader.readUInt32() * 2, 'utf16le');
         this.minimapWidth = reader.readUInt32();
@@ -238,11 +244,9 @@ class Scenario extends DataSection {
 
         // 00000000000000000000000000000000:XXXXXXXX
         this.wincondition = reader.readString(reader.readUInt32());
+        // Seems to be set to 0x1 for singleplayer and Theatre of War replays
         const unknown_14 = reader.readUInt32();
 
-        if (unknown_14 != 0 || this.filepath.indexOf('tow') !== -1) {
-            console.log('unknown_14', this.filepath, unknown_14);
-        }
         // Replay file stores info about the minimap icons because
         // certain game modes replace entities at runtime, e.g.
         // annihilation mode replaces all victory points with standard territory points
@@ -260,7 +264,7 @@ class UnknownDataSection extends DataSection {
 
     public readonly data: Buffer;
     constructor(reader: BinaryReader, public readonly byteLength: number) {
-        super();
+        super(reader);
         this.data = reader.read(byteLength);
     }
 }
@@ -268,7 +272,7 @@ class DefaultSkin extends DataSection {
     static get alias() { return 'DefaultSkin' };
     public readonly name: string;
     constructor(reader: BinaryReader) {
-        super();
+        super(reader);
         this.name = reader.readString(reader.readUInt32());
     }
 }
@@ -278,7 +282,7 @@ class AtmosphereOption extends DataSection {
     private readonly titleLocStringId: number;
     private readonly filepath: string;
     constructor(reader: BinaryReader) {
-        super();
+        super(reader);
         this.titleLocStringId = reader.readUInt32();
         this.filepath = reader.readString(reader.readUInt32());
     }
@@ -290,7 +294,7 @@ class MinimapLayer extends DataSection {
     public readonly icons: MinimapIcon[];
 
     constructor(reader: BinaryReader) {
-        super();
+        super(reader);
         this.icons = MinimapIcon.collection({reader, count: reader.readUInt32()});
     }
 }
@@ -303,7 +307,7 @@ class MinimapIcon extends DataSection {
     public readonly name: string;
 
     constructor(reader: BinaryReader) {
-        super();
+        super(reader);
         this.x = reader.readFloat();
         this.y = reader.readFloat();
         this.name = reader.readString(reader.readUInt32(), 'utf8');
@@ -327,7 +331,7 @@ class Player extends DataSection {
     public readonly intelBulletins: IntelBulletin[];
 
     constructor(reader: BinaryReader) {
-        super();
+        super(reader);
         this.type = reader.readUInt8();
         this.name = reader.readString(reader.readUInt32() * 2, 'utf16le');
         this.team = reader.readUInt32();
@@ -356,6 +360,8 @@ class Player extends DataSection {
         
         const u11 = reader.readUInt32(); // 0x0
         const u12 = reader.read(8);
+        // There seems to be data related to the player's world index / starting position
+        // console.log(...[...[u01, ...u02, ...u04, ...u05, u06, u07, u08, u09, ...u10, u11, ...u12].map(o => `${o}`.padStart(3, '0')), this.name, path.basename(reader.filepath)])
         var b = 1;
     }
 }
@@ -366,24 +372,29 @@ abstract class PlayerInventoryItem extends DataSection {
     public serverId: number;
    
     constructor(reader: BinaryReader) {
-        super();
+        super(reader);
         this.kind = reader.readUInt16();
         switch (this.kind) {
-            case 0x1: {
+            case 1: {
                 break;
             }
 
-            case 0x109: {
+            case 265: {
                 this.parsePlayerItem(reader);
                 break;
             }
 
-            case 0x206: {
+            case 514: {
+                this.parseItem_514(reader);
+                break;
+            }
+
+            case 518: {
                 this.parseAIPlayerItem(reader);
                 break;
             }
 
-            case 0x216: {
+            case 534: {
                 this.parsePlayerItemSpecial(reader);
                 break;
             }
@@ -401,6 +412,10 @@ abstract class PlayerInventoryItem extends DataSection {
         const u02 = reader.readUInt32(); // 0x0
         const u03 = reader.read(reader.readUInt16());
         var b = 1;
+    }
+
+    protected parseItem_514(reader: BinaryReader) {
+        const u01 = reader.readUInt8();
     }
 
     protected parseAIPlayerItem(reader: BinaryReader) {
