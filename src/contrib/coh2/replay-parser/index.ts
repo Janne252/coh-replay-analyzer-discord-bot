@@ -1,5 +1,6 @@
 import assert from 'assert';
 import fs from 'fs-extra';
+import path from 'path';
 import { BinaryReader, DataSection } from '../../io';
 import { Chunk, ChunkParseMode, RelicChunky, ChunkType } from '../chunk';
 
@@ -68,7 +69,7 @@ export class ReplayParser {
         reader.position = 76;
 
         const dataParsers = {
-            DATATATA: this.parse_DATADATA,
+            DATADATA: this.parse_DATADATA,
             DATASDSC: this.parse_DATASDSC,
             DATAPLAS: this.parse_DATAPLAS,
         };
@@ -94,6 +95,13 @@ export class ReplayParser {
 
     private parse_DATADATA(chunk: Chunk, reader: BinaryReader) {
         if (chunk.version == 0x1) {
+            // 4 bytes, first byte seems to encode values for starting resources, starting positions, cold tech
+
+            const settings = reader.readUInt8();
+            const u1 = reader.read(3);
+            console.log(...[...settings.toString(2).split('').reverse(), path.basename(reader.filepath)])
+            //console.log(...[...Array.from(u1).map(o => {if (o < 10) return `00${o}`; else if (o < 100) return `0${o}`; else return 0}), path.basename(reader.filepath)]);
+            var b = 1;
             // 4 bytes of data, what is it?
         } else if (chunk.version >= 27 && chunk.version <= 28) {
             this.opponentType = reader.readUInt32();

@@ -111,13 +111,13 @@ describe('contrib.coh2.replay-parser', () => {
     });
     */
     if (false) 
-    it('coh2-org-2020-10-04-reduced', () => {
-        massTestDir(path.join(process.cwd(), 'large-replay-sample-sets/coh2-org-2020-10-04-reduced'));
-    });
-    if (true) 
-    it('coh2-org-2020-10-04-full', () => {
-        massTestDir(path.join(process.cwd(), 'large-replay-sample-sets/coh2-org-2020-10-04-full'));
-    });
+        it('coh2-org-2020-10-04-reduced', () => {
+            massTestDir(path.join(process.cwd(), 'large-replay-sample-sets/coh2-org-2020-10-04-reduced'));
+        });
+    if (false) 
+        it('coh2-org-2020-10-04-full', () => {
+            massTestDir(path.join(process.cwd(), 'large-replay-sample-sets/coh2-org-2020-10-04-full'));
+        });
     if (false) 
         it('coh2-org-2020-10-04', () => {
             massTestDir(path.join(process.cwd(), 'large-replay-sample-sets/coh2-org-2020-10-04'));
@@ -135,18 +135,20 @@ describe('contrib.coh2.replay-parser', () => {
             massTestDir(path.join(process.cwd(), 'tests/battlefront-replays'));
         });
 
-    if (false) 
+
+    if (true) {
+        it('starting-positions', () => {
+            massTestDir(path.join(process.cwd(), 'tests/starting-position-replays'));
+        });
+    }
+    if (true) {
         it('starting-resources', () => {
             massTestDir(path.join(process.cwd(), 'tests/starting-resources-replays'));
         });
-
-    if (false) 
-        it('starting-positions', () => {
-            massTestDir(path.join(process.cwd(), 'tests/starting-positions-replays'));
-        });
-
-    if (false) 
+    }
+    if (true) {
         it('cold-tech', () => {
             massTestDir(path.join(process.cwd(), 'tests/cold-tech-replays'));
         });
+    }
 });
