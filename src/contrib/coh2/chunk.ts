@@ -62,7 +62,7 @@ export class Chunk extends ChunkLike {
         const endOffset = reader.position + this.dataLength;
         this.dataOffset = reader.position;
         if (this.type === ChunkType.Folder) {
-            this.children.push(...Chunk.readChunks(this.Chunky, reader, {endOffset, mode, dataParsers}));
+            this.children.push(...Chunk.readChunks(this.Chunky, reader, {endOffset, mode: ChunkParseMode.Strict, dataParsers}));
         } else if (dataParsers && this.alias in dataParsers) {
             dataParsers[this.alias](this, reader);
             if (reader.position < endOffset) {

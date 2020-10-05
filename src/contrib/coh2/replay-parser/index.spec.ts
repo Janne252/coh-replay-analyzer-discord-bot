@@ -128,12 +128,12 @@ describe('contrib.coh2.replay-parser', () => {
         });
 
 
-    if (true) {
+    if (false) {
         it('coh2-org-2020-10-04-full', () => {
             massTestDir(path.join(process.cwd(), '../large-replay-sample-sets/coh2-org-2020-10-04-full'));
         });
     }
-    if (false) {
+    if (true) {
         it('coh2-org-2020-10-04-reduced', () => {
             massTestDir(path.join(process.cwd(), '../large-replay-sample-sets/coh2-org-2020-10-04-reduced'));
         });
