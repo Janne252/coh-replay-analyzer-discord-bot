@@ -129,7 +129,7 @@ export function getGuildEmbedInfoFields(guild: Discord.Guild, {user}: {user?: Di
     const result = [
         { name: 'Owner', value: `${guild.owner}`, inline: true },
         { name: 'Members', value: guild.memberCount, inline: true },
-        { name: 'Created', value: `${moment(guild.createdAt).from(moment.utc())}\n_${guild.createdAt.toDateString()}_`, inline: true },
+        { name: 'Created at', value: `${guild.createdAt.toDateString()} (_${moment(guild.createdAt).from(moment.utc())}_)`, inline: true },
         { name: 'Locale', value: `\`${guild.preferredLocale}\``, inline: true, },
         { name: 'Region', value: `\`${guild.region}\``, inline: true, },
     ];
@@ -137,9 +137,9 @@ export function getGuildEmbedInfoFields(guild: Discord.Guild, {user}: {user?: Di
     if (user) {                    
         const guildMember = guild.member(user?.id as string) as Discord.GuildMember;
         result.push({ 
-            name: `Member: ${user.username}`, 
+            name: `Member since`, 
             value: (guildMember ? 
-                `${moment(guildMember.joinedAt).from(moment.utc())}\n_${guildMember.joinedAt?.toDateString()}_`
+                `${guildMember.joinedAt?.toDateString()} (_${moment(guildMember.joinedAt).from(moment.utc())}_)`
                 :  '_Not a member._'
             ), 
             inline: true 
