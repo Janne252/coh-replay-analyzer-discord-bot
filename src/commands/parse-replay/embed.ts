@@ -242,7 +242,6 @@ export class CompactReplayEmbed extends ReplayBaseEmbed {
         this.appendTitle();
         this.appendPlayers();
         this.appendScenarioPreviewImage();
-        this.appendFooter();
     }
 }
 
