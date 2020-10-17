@@ -63,12 +63,13 @@ export class ChannelLogger {
         this.admin = await (await this.client.guilds.fetch(this.config.admin.guild as string)).members.fetch(this.config.admin.user as string);
     }
     
-    async log(content: Discord.MessageEmbedOptions = {}, options?: {context?: LoggerContext, level?: LogLevelOption, environmentInfo?: boolean}) {
+    async log(content: Discord.MessageEmbedOptions = {}, options?: {context?: LoggerContext, level?: LogLevelOption, environmentInfo?: boolean, tagAdmin?: boolean}) {
         const timestamp = new Date();
         const level = options?.level ?? LogLevel.Log;
         const context = options?.context;
         const environmentInfo = options?.environmentInfo ?? false;
-        const tagAdmin = level.tagAdmin ?? false;
+        // Options has the highest priority when setting tagAdmin (first non-null value)
+        const tagAdmin = options?.tagAdmin ?? level.tagAdmin ?? false;
 
         content = {
             // defaults

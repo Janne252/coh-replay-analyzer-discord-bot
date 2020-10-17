@@ -7,7 +7,7 @@ import tryParseCoH2Replay from './commands/parse-replay';
 
 import tryExecuteAdminCommand from './commands/admin';
 
-import { ShutdownManager } from './contrib/discord';
+import { getGuildEmbedInfoFields, ShutdownManager } from './contrib/discord';
 import { DiagnosticsConfig } from './contrib/discord/config';
 import { ChannelLogger, LogLevel } from './contrib/discord/logging';
 import i18n from './contrib/i18n';
@@ -78,6 +78,20 @@ client.on('message', async message => {
     } finally {
         restoreLocale();
     }
+});
+
+client.on('guildCreate', async enteredGuild => {
+    logger.log({title: 'Joined a server', fields: getGuildEmbedInfoFields(enteredGuild, {user: client.user})}, {
+        tagAdmin: true,
+        level: LogLevel.Log,
+    });
+});
+
+client.on('guildDelete', async exitedGuild => {
+    logger.log({title: 'Removed from a server', fields: getGuildEmbedInfoFields(exitedGuild, {user: client.user})}, {
+        tagAdmin: true,
+        level: LogLevel.Warning,
+    });
 });
 
 // Login with a locally stored utf8 encoded text file.

@@ -1,5 +1,6 @@
 import Discord, { DiscordAPIError, Guild, TextChannel } from 'discord.js';
 import { ChannelLogger, LogLevel } from './logging';
+import moment from 'moment';
 
 /**
  * Truncates a value to the maximum length and wraps it in code markdown tags (```).
@@ -122,4 +123,27 @@ export async function autoDeleteRelatedMessages({client, timeoutSeconds, trigger
     client.on('messageDelete', listener);
     // Stop listening eventually
     setTimeout(removeListener, timeoutSeconds * 1000);
+}
+
+export function getGuildEmbedInfoFields(guild: Discord.Guild, {user}: {user?: Discord.User | null} = {}): Discord.EmbedFieldData[] {
+    const result = [
+        { name: 'Owner', value: `${guild.owner}`, inline: true },
+        { name: 'Members', value: guild.memberCount, inline: true },
+        { name: 'Created', value: `${moment(guild.createdAt).from(moment.utc())}\n_${guild.createdAt.toDateString()}_`, inline: true },
+        { name: 'Locale', value: `\`${guild.preferredLocale}\``, inline: true, },
+        { name: 'Region', value: `\`${guild.region}\``, inline: true, },
+    ];
+
+    if (user) {                    
+        const guildMember = guild.member(user?.id as string) as Discord.GuildMember;
+        result.push({ 
+            name: `Member: ${user.username}`, 
+            value: (guildMember ? 
+                `${moment(guildMember.joinedAt).from(moment.utc())}\n_${guildMember.joinedAt?.toDateString()}_`
+                :  '_Not a member._'
+            ), 
+            inline: true 
+        });
+    }
+    return result;
 }

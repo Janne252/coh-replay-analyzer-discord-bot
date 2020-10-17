@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs-extra';
 import * as Discord from "discord.js";
-import { getGuildUrl, MessageHelpers } from '../../contrib/discord';
+import { getGuildEmbedInfoFields, getGuildUrl, MessageHelpers } from '../../contrib/discord';
 import { makeLength } from '../../contrib/testing/generator';
 import { DiagnosticsConfig } from '../../contrib/discord/config';
 import moment from 'moment';
@@ -36,18 +36,12 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
                 await message.reply(`${client.user} is currently active on ${guilds.length} server${guilds.length == 1 ? '' : 's'}.`);
                 for (const guild of guilds) {
                     const iconUrl = guild.iconURL();
-                    const guildMember = guild.member(client.user?.id as string) as Discord.GuildMember;
                     await message.reply(new Discord.MessageEmbed({
                         title: guild.name,
                         thumbnail: iconUrl ? {url: iconUrl } : undefined,
                         description: `[View in browser](${getGuildUrl(guild)})`,
                         fields: [
-                            { name: 'Owner', value: `${guild.owner}`, inline: true },
-                            { name: 'Members', value: guild.memberCount, inline: true },
-                            { name: 'Created', value: `${moment(guild.createdAt).from(moment.utc())}\n_${guild.createdAt.toDateString()}_`, inline: true },
-                            { name: 'Added', value: `${moment(guildMember.joinedAt).from(moment.utc())}\n_${guildMember.joinedAt?.toDateString()}_`, inline: true },
-                            { name: 'Locale', value: `\`${guild.preferredLocale}\``, inline: true, },
-                            { name: 'Region', value: `\`${guild.region}\``, inline: true, },
+                            ...getGuildEmbedInfoFields(guild, {user: client.user}),
                         ],
                         footer: guild.description ? {text: guild.description} : undefined,
                     }));
