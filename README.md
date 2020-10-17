@@ -48,6 +48,5 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
 - [ ] Figure out a better way of signaling handled messages than boolean
 - [ ] "Self-made" configuration system (loads package.json via JSON.parse and takes a section of it) works but probably isn't the best way of doing things
     - Separate config file?
-- [ ] Log `guildCreate` and `guildDelete`
 # License
 [MIT License](./LICENSE.txt)
