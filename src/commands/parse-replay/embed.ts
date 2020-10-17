@@ -237,6 +237,10 @@ export class CompactReplayEmbed extends ReplayBaseEmbed {
             type: 'thumbnail'
         });
     }   
+
+    protected appendNoScenarioPreviewImageAvailable() {
+        // noop
+    }
     
     public build() {
         this.appendTitle();
