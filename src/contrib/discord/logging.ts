@@ -63,7 +63,7 @@ export class ChannelLogger {
         this.admin = await (await this.client.guilds.fetch(this.config.admin.guild as string)).members.fetch(this.config.admin.user as string);
     }
     
-    async log(content: Discord.MessageEmbedOptions = {}, options?: {context?: LoggerContext, level?: LogLevelOption, environmentInfo?: boolean, tagAdmin?: boolean}) {
+    async log(content: Discord.MessageEmbedOptions = {}, options?: {context?: LoggerContext, level?: LogLevelOption, environmentInfo?: boolean, tagAdmin?: boolean, color?: number}) {
         const timestamp = new Date();
         const level = options?.level ?? LogLevel.Log;
         const context = options?.context;
@@ -75,7 +75,7 @@ export class ChannelLogger {
             // defaults
             title:  `ℹ️ ${timestamp.toLocaleString('en-US')}`,
             footer: {text: this.client.user?.username as string, iconURL: this.client.user?.avatarURL() ?? undefined},
-            color: level.color,
+            color: options?.color ?? level.color,
             // Overrides
             ...content,
         }
@@ -169,26 +169,35 @@ export interface LogLevelOption {
     readonly tagAdmin: boolean;
 }
 
+
+export enum Color {
+    Green = 0x4caf50,
+    Purple = 0x9c27b0,
+    Red = 0xf44336,
+    Orange = 0xffc107,
+    Blue = 0x2196f3,
+}
+
 export class LogLevel {
     // Value should match the name of LogColor value
     public static readonly Log: LogLevelOption = {
         name: 'log', 
-        color: 0x2196f3, // Blue
+        color: Color.Blue, // Blue
         tagAdmin: false,
     };
     public static readonly Warning: LogLevelOption = {
         name: 'warning', 
-        color: 0xffc107, // Orange
+        color: Color.Orange, // Orange
         tagAdmin: false,
     };
     public static readonly Error: LogLevelOption = {
         name: 'error', 
-        color: 0xf44336, // Red
+        color: Color.Red, // Red
         tagAdmin: true,
     };
     public static readonly Test: LogLevelOption = {
         name: 'test', 
-        color: 0x9c27b0, // Purple
+        color: Color.Purple, // Purple
         tagAdmin: false,
     };
 }
