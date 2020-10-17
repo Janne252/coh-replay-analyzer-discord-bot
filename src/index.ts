@@ -9,7 +9,7 @@ import tryExecuteAdminCommand from './commands/admin';
 
 import { getGuildEmbedInfoFields, ShutdownManager } from './contrib/discord';
 import { DiagnosticsConfig } from './contrib/discord/config';
-import { ChannelLogger, LogLevel } from './contrib/discord/logging';
+import { ChannelLogger, Color, LogLevel } from './contrib/discord/logging';
 import i18n from './contrib/i18n';
 import { PackageJsonConfig } from './contrib/config';
 
@@ -83,12 +83,14 @@ client.on('message', async message => {
 client.on('guildCreate', async enteredGuild => {
     logger.log({title: 'Joined a server', fields: getGuildEmbedInfoFields(enteredGuild, {user: client.user})}, {
         tagAdmin: true,
+        color: Color.Green,
     });
 });
 
 client.on('guildDelete', async exitedGuild => {
     logger.log({title: 'Removed from a server', fields: getGuildEmbedInfoFields(exitedGuild, {user: client.user})}, {
         tagAdmin: true,
+        color: Color.Orange,
     });
 });
 
