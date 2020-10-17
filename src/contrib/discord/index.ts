@@ -23,10 +23,16 @@ export function truncatedEmbedCodeField(
  * Uniform exit handing (logout from discord & safely exit)
  */
 export class ShutdownManager {
+    private hasExited = false;
     constructor(private readonly client: Discord.Client, private readonly logger: ChannelLogger) {
     }
 
     async exit(params?: {code?: number, signal?: NodeJS.Signals}) {
+        if (this.hasExited) {
+            return;
+        }
+
+        this.hasExited = true;
         try {
             try {
                 await this.logger.log({
@@ -45,9 +51,9 @@ export class ShutdownManager {
     }
 
     addGlobalSignalListeners() {
-        process.on('SIGINT', (e) => this.exit({signal: e}));
-        process.on('SIGABRT', (e) => this.exit({signal: e}));
-        process.on('SIGTERM', (e) => this.exit({signal: e}));
+        process.once('SIGINT', (e) => this.exit({signal: e}));
+        process.once('SIGABRT', (e) => this.exit({signal: e}));
+        process.once('SIGTERM', (e) => this.exit({signal: e}));
     }
 }
 
