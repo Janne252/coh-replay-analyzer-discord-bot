@@ -125,14 +125,29 @@ export async function autoDeleteRelatedMessages({client, timeoutSeconds, trigger
     setTimeout(removeListener, timeoutSeconds * 1000);
 }
 
-export function getGuildEmbedInfoFields(guild: Discord.Guild, {user}: {user?: Discord.User | null} = {}): Discord.EmbedFieldData[] {
-    const result = [
-        { name: 'Owner', value: `${guild.owner}`, inline: true },
+export function getUserReferenceEmbedField(user?: Discord.User): string {
+
+    if (!user) {
+        return `_N/A_`;
+    }
+
+    return `${user} (${user.username}#${user.discriminator})`;
+}
+
+export function getGuildEmbedInfoFields(guild: Discord.Guild, {user, excludeName}: {user?: Discord.User | null, excludeName?: boolean} = {}): Discord.EmbedFieldData[] {
+    const result: Discord.EmbedFieldData[] = [];
+    if (!excludeName) {
+        result.push({
+            name: 'Name', value: guild.name,
+        });
+    }
+    result.push(
+        { name: 'Owner', value: getUserReferenceEmbedField(guild.owner?.user), inline: true },
         { name: 'Members', value: guild.memberCount, inline: true },
         { name: 'Created at', value: `${guild.createdAt.toDateString()} (_${moment(guild.createdAt).from(moment.utc())}_)`, inline: true },
         { name: 'Locale', value: `\`${guild.preferredLocale}\``, inline: true, },
         { name: 'Region', value: `\`${guild.region}\``, inline: true, },
-    ];
+    );
 
     if (user) {                    
         const guildMember = guild.member(user?.id as string) as Discord.GuildMember;

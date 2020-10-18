@@ -41,7 +41,7 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
                         thumbnail: iconUrl ? {url: iconUrl } : undefined,
                         description: `[View in browser](${getGuildUrl(guild)})`,
                         fields: [
-                            ...getGuildEmbedInfoFields(guild, {user: client.user}),
+                            ...getGuildEmbedInfoFields(guild, {user: client.user, excludeName: true}),
                         ],
                         footer: guild.description ? {text: guild.description} : undefined,
                     }));

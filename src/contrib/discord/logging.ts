@@ -169,7 +169,6 @@ export interface LogLevelOption {
     readonly tagAdmin: boolean;
 }
 
-
 export enum Color {
     Green = 0x4caf50,
     Purple = 0x9c27b0,
