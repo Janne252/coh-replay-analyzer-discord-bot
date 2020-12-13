@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "dgSpecHash": "0E6xGhoHmcIRSfozvcLhNM3L5I+Et7myjo7cL2/fFybd3t0YSip9kikPUcn3v9CBclQ4gVHLLCyCXvJrR/SdhQ==",
+  "success": true,
+  "projectFilePath": "E:\\dev\\coh2-replay-discord-bot\\data-generator\\COH2ReplayDiscordBotDataGenerator.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Janne\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
+    "C:\\Users\\Janne\\.nuget\\packages\\sixlabors.imagesharp\\1.0.1\\sixlabors.imagesharp.1.0.1.nupkg.sha512",
+    "C:\\Users\\Janne\\.nuget\\packages\\vikingerik.luainterface\\1.0.4213.34901\\vikingerik.luainterface.1.0.4213.34901.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'VikingErik.LuaInterface 1.0.4213.34901' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework '.NETCoreApp,Version=v3.1'. This package may not be fully compatible with your project.",
+      "libraryId": "VikingErik.LuaInterface",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v3.1"
+      ]
+    }
+  ]
+}

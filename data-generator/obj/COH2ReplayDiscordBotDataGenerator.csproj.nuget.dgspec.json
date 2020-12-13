@@ -1,0 +1,79 @@
+{
+  "format": 1,
+  "restore": {
+    "E:\\dev\\coh2-replay-discord-bot\\data-generator\\COH2ReplayDiscordBotDataGenerator.csproj": {}
+  },
+  "projects": {
+    "E:\\dev\\coh2-replay-discord-bot\\data-generator\\COH2ReplayDiscordBotDataGenerator.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "E:\\dev\\coh2-replay-discord-bot\\data-generator\\COH2ReplayDiscordBotDataGenerator.csproj",
+        "projectName": "COH2ReplayDiscordBotDataGenerator",
+        "projectPath": "E:\\dev\\coh2-replay-discord-bot\\data-generator\\COH2ReplayDiscordBotDataGenerator.csproj",
+        "packagesPath": "C:\\Users\\Janne\\.nuget\\packages\\",
+        "outputPath": "E:\\dev\\coh2-replay-discord-bot\\data-generator\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "c:\\program files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Janne\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.3, )"
+            },
+            "SixLabors.ImageSharp": {
+              "target": "Package",
+              "version": "[1.0.1, )"
+            },
+            "VikingErik.LuaInterface": {
+              "target": "Package",
+              "version": "[1.0.4213.34901, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "c:\\program files\\dotnet\\sdk\\5.0.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

@@ -1,7 +1,12 @@
-﻿using LuaInterface;
+﻿using COH2ReplayDiscordBotDataGenerator.Attributes;
+using LuaInterface;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RelicCore.Archive;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
@@ -9,11 +14,14 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace COH2ReplayDiscordBotMapImageExtractor
 {
@@ -134,29 +142,79 @@ namespace COH2ReplayDiscordBotMapImageExtractor
 
         static Dictionary<string, Image> ScenarioIconCache = new Dictionary<string, Image>();
 
-        static string Coh2RootPath;
-        static string ScenarioPreviewImageDestinationRoot;
-        static string ScenarioIconsRoot;
-
         static double scale(double value, double fromMin, double fromMax, double toMin, double toMax)
         {
             return (value - fromMin) * (toMax - toMin) / (fromMax - fromMin) + toMin;
         }
 
+        public static string StartupRootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        public static string CoH2GameRootPath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".coh2.game.rootpath.local")).Trim();
+        public static string CoH2ModdingToolDataRootPath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".coh2.modding-tool-data.rootpath.local")).Trim();
+        public static string ScenarioPreviewImageDestinationRoot = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".scenario-images.output.rootpath.local")).Trim();
+        public static string CommanderIconDestinationRoot = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".commander-icons.output.rootpath.local")).Trim();
+        public static string CommanderDatabaseDestinationFilepath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".commander-database.output.rootpath.local")).Trim();
+        public static string ScenarioIconsRoot = Path.Join(StartupRootPath, @"assets\icons\minimap");
+        public static string CommanderIconsRoot = Path.Join(StartupRootPath, @"assets\icons\commander");
+
         static void Main(string[] args)
         {
-            if (args.Length < 3)
+            CompileCommanderInfoDatabase();
+            ExportScenarioPreviewImages();
+        }
+
+        static void CompileCommanderInfoDatabase()
+        {
+            var result = new List<JObject>();
+
+            foreach (var commanderFilepath in Directory.GetFiles(Path.Join(CoH2ModdingToolDataRootPath, @"attributes\instances\commander"), "*.xml", SearchOption.AllDirectories))
             {
-                Console.WriteLine("Please provide Company of Heroes 2 installation path as the first argument.");
-                Console.WriteLine("Please provide map preview image destination directory path as the second argument.");
-                Console.WriteLine("Please provide map icons data root as the thrird argument.");
-                return;
+                var commanderName = Path.GetFileNameWithoutExtension(commanderFilepath);
+                using var stream = System.IO.File.Open(commanderFilepath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var commanderData = new XmlSerializer(typeof(Commander)).Deserialize(XmlReader.Create(stream)) as Commander;
+                var commanderId = commanderData.Data.Templates.First(t => t.Name == "server_item" && t.Value == "server_item").UniqueId;
+                if (commanderId.Name != "server_id")
+                {
+                    throw new Exception($"Could not find server_id for commander {commanderFilepath}");
+                }
+
+                dynamic commander = new JObject();
+                commander.name = commanderName;
+                commander.server_id = commanderId.Value;
+                commander.locstring = new JObject();
+                commander.icon = new JObject();
+                foreach (var locstring in commanderData.Data.LocStrings)
+                {
+                    commander.locstring[locstring.Name] = locstring.Value;
+                }
+                foreach (var icon in commanderData.Data.Icons)
+                {
+                    commander.icon[icon.Name] = icon.Value;
+                }
+                
+                var smallIconName = commanderData.Data.Icons.First(i => i.Name == "icon").Value;
+                var commanderIconFilepath = Path.Join(CommanderIconsRoot, $"{smallIconName}.png");
+                if (smallIconName == "")
+                {
+                    Console.WriteLine($"Commander {commanderName} icon is not set.");
+                }
+                else if (!System.IO.File.Exists(commanderIconFilepath))
+                {
+                    throw new Exception($"Commander {commanderName} icon is not available.");
+                }
+                else
+                {
+                    System.IO.File.Copy(commanderIconFilepath, Path.Join(CommanderIconDestinationRoot, $"cmdr-{commanderId.Value}.png"));
+                }
+                result.Add(commander);
             }
 
-            Coh2RootPath = args[0];
-            ScenarioPreviewImageDestinationRoot = Path.GetFullPath(args[1]);
-            ScenarioIconsRoot = Path.GetFullPath(args[2]);
-            var archives = Directory.GetFiles(Path.Join(Coh2RootPath, "CoH2", "Archives"), "*.sga", SearchOption.AllDirectories);
+            System.IO.File.WriteAllText(CommanderDatabaseDestinationFilepath, JsonConvert.SerializeObject(result, Newtonsoft.Json.Formatting.Indented));
+        }
+
+        static void ExportScenarioPreviewImages()
+        {
+            var archives = Directory.GetFiles(Path.Join(CoH2GameRootPath, "CoH2", "Archives"), "*.sga", SearchOption.AllDirectories);
 
             var noScenarioRootArchives = new List<Archive>();
             var noPreviewImageFoundScenarios = new List<ScenarioFolder>();
@@ -164,6 +222,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             {
                 Quality = 75,
             };
+            var pngEncoder = new PngEncoder();
 
             if (Directory.Exists(ScenarioPreviewImageDestinationRoot))
                 Directory.Delete(ScenarioPreviewImageDestinationRoot, true);
@@ -216,17 +275,21 @@ namespace COH2ReplayDiscordBotMapImageExtractor
 
                     var imageFilename = Path.Join(ScenarioPreviewImageDestinationRoot, $"{scenarioId}.jpg");
                     var thumbnailImageFilename = Path.Join(ScenarioPreviewImageDestinationRoot, $"{scenarioId}-x64.jpg");
+                    var horizontallyPaddedFilename = Path.Join(ScenarioPreviewImageDestinationRoot, $"{scenarioId}-padded.png");
                     var image = SixLabors.ImageSharp.Image.Load(preview.GetData());
 
                     var icons = scenario.GetIcons();
+                    // Maximum width of Discord embed image
+                    var targetWidth = 300;
+                    var targetHeight = 300;
 
-                    if (image.Width > 300 && image.Height > 300)
+                    if (image.Width > targetWidth && image.Height > targetHeight)
                     {
                         image.Mutate(_ => _
                             .Resize(new ResizeOptions()
                             {
                                 Mode = ResizeMode.Max,
-                                Size = new SixLabors.ImageSharp.Size(300, 300)
+                                Size = new SixLabors.ImageSharp.Size(targetWidth, targetHeight)
                             })
                         );
                     }
@@ -279,7 +342,15 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                             var b = 1;
                         }
                     }
-
+                    /*
+                    var padding = 64;
+                    var horizontallyPadded = new Image<Rgba32>(image.Width + padding * 2, image.Height);
+                    horizontallyPadded.Mutate(_ =>
+                    {
+                        _.DrawImage(image, new SixLabors.ImageSharp.Point(padding, 0), 1);
+                    });
+                    horizontallyPadded.Save(horizontallyPaddedFilename, pngEncoder);
+                    */
                     image.Save(imageFilename, jpgEncoder);
                     var thumbnail = image.Clone();
                     thumbnail.Mutate(_ => _
