@@ -13,9 +13,9 @@
         },
         "player": {
             "noPlayersAvailable": "Aucun joueurs disponibles.",
-            "noCommandersAvailable": "No commanders available.",
+            "noCommandersAvailable": "Pas de commandants disponibles.",
             "team": "Équipe {teamNumber}",
-            "commander": "Commander"
+            "commander": "Commandant"
         }
     },
     "time": {
@@ -26,5 +26,5 @@
         "second": "seconde",
         "seconds": "secondes"
     },
-    "notAvailable": "N/A"
+    "notAvailable": "ND"
 }
