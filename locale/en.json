@@ -13,7 +13,9 @@
         },
         "player": {
             "noPlayersAvailable": "No players available.",
-            "playerTeam": "Team {teamNumber}"
+            "noCommandersAvailable": "No commanders available.",
+            "team": "Team {teamNumber}",
+            "commander": "Commander"
         }
     },
     "time": {
@@ -23,5 +25,6 @@
         "minutes": "minutes",
         "second": "second",
         "seconds": "seconds"
-    }
+    },
+    "notAvailable": "N/A"
 }
