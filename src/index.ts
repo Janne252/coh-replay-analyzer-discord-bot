@@ -18,7 +18,7 @@ const client = new Discord.Client({
 
 });
 
-const coh2Locale = new Locale();
+export const coh2Locale = new Locale();
 const diagnosticsConfig = new DiagnosticsConfig();
 const replaysConfig = new ReplaysConfig();
 const logger = new ChannelLogger(client, diagnosticsConfig);
@@ -29,11 +29,12 @@ client.on('ready', async () => {
     client.setMaxListeners(32);
     await PackageJsonConfig.assign(replaysConfig, 'replays');
     await PackageJsonConfig.assign(diagnosticsConfig, 'diagnostics');
+    await replaysConfig.init();
 
     // Prepare .replays folder
     await fs.ensureDir(replaysConfig.replaysTempPath);
     await fs.emptyDir(replaysConfig.replaysTempPath);
-
+    
     await Promise.all([
         coh2Locale.init(replaysConfig.localeFilePath),
         logger.init(),

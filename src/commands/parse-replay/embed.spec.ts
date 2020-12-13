@@ -23,8 +23,8 @@ function mockEmbed(type: typeof ReplayEmbed | typeof CompactReplayEmbed, {config
         version: '',
         chat: [],
         players: players ?? [
-            {name: 'Player 1', steam_id: 0, steam_id_str: '', faction: '', team: 0},
-            {name: 'Player 2', steam_id: 0, steam_id_str: '', faction: 'test', team: 1},
+            {name: 'Player 1', steam_id: 0, steam_id_str: '', faction: '', team: 0, commander: 0},
+            {name: 'Player 2', steam_id: 0, steam_id_str: '', faction: 'test', team: 1, commander: 0},
         ]
     }
     const result = new type(client, message, replay, config);
@@ -37,7 +37,7 @@ describe('commands.parse-replay', () => {
         assert.strictEqual(mockEmbed(ReplayEmbed).title, '(2) Test map');
         assert.deepStrictEqual(
             mockEmbed(ReplayEmbed).fields[0], {
-                name: 'replay.player.playerTeam',
+                name: 'replay.player.team',
                 value: 'Player 1',
                 inline: true,
             }
@@ -45,7 +45,7 @@ describe('commands.parse-replay', () => {
         // Emoji found
         assert.deepStrictEqual(
             mockEmbed(ReplayEmbed, {configOverrides: {factionEmojis: {'test': '<test>'}}}).fields[1], {
-                name: 'replay.player.playerTeam',
+                name: 'replay.player.team',
                 value: '<test> Player 2',
                 inline: true,
             }
@@ -54,13 +54,13 @@ describe('commands.parse-replay', () => {
         assert.deepStrictEqual(
             mockEmbed(ReplayEmbed, {
                 players: [
-                    {name: 'Player 1', steam_id_str: '123', faction: 'foo', team: 0}
+                    {name: 'Player 1', steam_id_str: '123', faction: 'foo', team: 0, commander: 0}
                 ],
                 configOverrides: {
                     leaderboardUrl: 'http://example.com/{steamId}',
                 }
             }).fields[0], {
-                name: 'replay.player.playerTeam',
+                name: 'replay.player.team',
                 value: '[Player 1](http://example.com/123)',
                 inline: true,
             }
@@ -69,13 +69,13 @@ describe('commands.parse-replay', () => {
         assert.deepStrictEqual(
             mockEmbed(ReplayEmbed, {
                 players: [
-                    {name: 'Player 1', steam_id_str: '123', faction: 'foo', team: 0}
+                    {name: 'Player 1', steam_id_str: '123', faction: 'foo', team: 0, commander: 0}
                 ],
                 configOverrides: {
                     leaderboardUrl: 'http://example.com/{steamId}/{steamId}',
                 }
             }).fields[0], {
-                name: 'replay.player.playerTeam',
+                name: 'replay.player.team',
                 value: '[Player 1](http://example.com/123/123)',
                 inline: true,
             }
@@ -84,7 +84,7 @@ describe('commands.parse-replay', () => {
             new RegExp(`\\<emoji\\> \\[Player\\]\\(.*?123.*?\\)`).test(
                 mockEmbed(ReplayEmbed, {
                     players: [
-                        {name: 'Player', steam_id_str: '123', faction: 'foo', team: 0}
+                        {name: 'Player', steam_id_str: '123', faction: 'foo', team: 0, commander: 0}
                     ],
                     configOverrides: {
                         factionEmojis: {'foo': '<emoji>'},
@@ -99,7 +99,7 @@ describe('commands.parse-replay', () => {
         const restoreTranslations = i18n.override(['en', {
             replay: {
                 player: {
-                    playerTeam: 'Team {teamNumber}',
+                    team: 'Team {teamNumber}',
                     noPlayersAvailable: 'No players available.',
                 }
             }
@@ -115,7 +115,7 @@ describe('commands.parse-replay', () => {
         
         // With player
         assert.deepStrictEqual(mockEmbed(ReplayEmbed, {
-            players: [{name: 'Player', faction: 'faction', team: 0, steam_id_str: '0'}],
+            players: [{name: 'Player', faction: 'faction', team: 0, steam_id_str: '0', commander: 0}],
             configOverrides: {factionEmojis: {'faction': '<emoji>'}},
         }).fields[0], {
                 name: 'Team 1',
@@ -126,8 +126,8 @@ describe('commands.parse-replay', () => {
         // With multiple players
         assert.deepStrictEqual(mockEmbed(ReplayEmbed, {
             players: [
-                {name: 'P1', faction: 'faction', team: 0, steam_id_str: '0'},
-                {name: 'P2', faction: 'faction', team: 0, steam_id_str: '0'},
+                {name: 'P1', faction: 'faction', team: 0, steam_id_str: '0', commander: 0},
+                {name: 'P2', faction: 'faction', team: 0, steam_id_str: '0', commander: 0},
             ],
             configOverrides: {factionEmojis: {'faction': '<emoji>'}},
         }).fields[0], {

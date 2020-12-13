@@ -7,8 +7,7 @@ import { exec } from '../../contrib/misc';
 import * as Replay from '../../contrib/coh2/replay';
 import Config from './config';
 import { ChannelLogger } from '../../contrib/discord/logging';
-import i18n from '../../contrib/i18n';
-import { ReplayEmbed, CompactReplayEmbed, ReplayBaseEmbed } from './embed';
+import { ReplayEmbed, CompactReplayEmbed } from './embed';
 import { MessageHelpers } from '../../contrib/discord';
 
 export default async (message: Discord.Message, client: Discord.Client, logger: ChannelLogger, config: Config): Promise<boolean> => {

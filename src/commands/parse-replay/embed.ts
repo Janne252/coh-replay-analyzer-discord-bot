@@ -1,15 +1,22 @@
-import Discord, { EmbedField, EmbedFieldData, MessageEmbed } from 'discord.js';
+import Discord, { EmbedField } from 'discord.js';
 import * as Replay from '../../contrib/coh2/replay';
 import i18n from '../../contrib/i18n';
-import ReplaysConfig from './config';
+import ReplaysConfig, { CommanderDatabaseEntry } from './config';
 import fs from 'fs-extra';
 import path from 'path';
 import { InputData } from '../../types';
 import { ReplayPlayer } from '../../contrib/coh2/replay';
-import { autoDeleteRelatedMessages, deleteMessageById } from '../../contrib/discord';
+import { autoDeleteRelatedMessages } from '../../contrib/discord';
+import { coh2Locale } from '../..';
+import { Char } from '../../contrib/misc';
 
-export type InputPlayer = InputData<ReplayPlayer, 'name' | 'steam_id_str' | 'faction' | 'team'>;
+export type InputPlayer = InputData<ReplayPlayer, 'commander' | 'name' | 'steam_id_str' | 'faction' | 'team'>;
 export type InputReplay = {map: {name: string, file: string, players: number}, players: InputPlayer[]} & InputData<Replay.Data, 'duration' | 'version' | 'chat'>;
+
+enum PlayerAppendType {
+    PlayerAndCommanderInSeparateColumns,
+    PlayerAndCommanderInline,
+}
 
 export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
     protected loadAllChatTip: string = '';
@@ -22,8 +29,9 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
     constructor(
         protected readonly client: Discord.Client, 
         protected readonly userMessage: Discord.Message, 
-        protected readonly replay: InputReplay, private readonly config: ReplaysConfig) 
-    {
+        protected readonly replay: InputReplay, 
+        private readonly config: ReplaysConfig
+    ) {
         super();
     }
 
@@ -34,22 +42,45 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
     protected buildScenarioPreviewFilepath(filename: string) {
        return path.join(this.config.scenarioPreviewImageRootPath, filename);
     }
+
     protected appendTitle() {
         this.setTitle(`${Replay.resolveScenarioDisplayName(this.replay)}`);
     }
 
-    protected appendPlayers() {
-        this.addFields(
-            this.getPlayerListEmbed(this.replay, 0),
-            this.getPlayerListEmbed(this.replay, 1),
-        );
+    protected appendPlayers(type: PlayerAppendType) {
+        for (let team = 0; team <= 1; team++) {
+            const players = this.replay.players.filter(p => p.team == team);
+            if (type == PlayerAppendType.PlayerAndCommanderInSeparateColumns) {
+                this.addFields([{
+                        name: i18n.get('replay.player.team', {format: {teamNumber: team + 1}}), 
+                        value: players.map(p => `${this.formatPlayer(p)}`).join('\n'), 
+                        inline: true,
+                    }, {
+                        name: i18n.get('replay.player.commander'), 
+                        value: players.map(p => `||${this.formatPlayerCommander(p)}||`).join('\n'), 
+                        inline: true,
+                    }
+                ]);
+                if (team == 0) {
+                    this.addField(Char.ZeroWidthSpace, Char.ZeroWidthSpace);
+                }
+            } else if (type == PlayerAppendType.PlayerAndCommanderInline) {
+                const spacing = `${Char.NoBreakSpace} ${Char.NoBreakSpace} `;
+                this.addFields([{
+                        name: i18n.get('replay.player.team', {format: {teamNumber: team + 1}}), 
+                        value: players.map(p => `${this.formatPlayer(p)}${spacing}||${this.formatPlayerCommander(p)}||`).join('\n'), 
+                        inline: false,
+                    }
+                ]);
+            }
+        }
     }
 
     protected appendChat() {
         this.loadAllChatTip = i18n.get(
             'replay.chat.loadAllByReacting', {format: {
                 '@user': this.userMessage.author.toString(),
-                'emoji': `\xa0 ${this.config.expandChatPreview.reaction} \xa0`
+                'emoji': `${Char.NoBreakSpace} ${this.config.expandChatPreview.reaction} ${Char.NoBreakSpace}`
             }}
         );
         this.chatPreview = this.getChatPreviewEmbed({charsPerChunk: 1024 - this.loadAllChatTip.length});
@@ -156,15 +187,27 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         await selfReaction.remove();
     }
 
-
-
-    protected getPlayerListEmbed(
-        replay: {players: InputData<ReplayPlayer, 'name' | 'faction' | 'team' | 'steam_id_str'>[]}, 
+    protected getPlayerTeamCommanderListEmbed(
+        replay: {players: InputPlayer[]}, 
         team: 0 | 1, 
     ) {
         return { 
             inline: true, 
-            name: i18n.get('replay.player.playerTeam', {format: {teamNumber: team + 1}}), 
+            name: i18n.get('replay.player.commander'), 
+            value: replay.players
+                .filter(player => player.team == team)
+                .map(player => this.formatPlayerCommander(player))
+                .join('\n') || `_${i18n.get('replay.player.noCommandersAvailable')}_`
+        };
+    }
+
+    protected getPlayerTeamListEmbed(
+        replay: {players: InputPlayer[]}, 
+        team: 0 | 1, 
+    ) {
+        return { 
+            inline: true, 
+            name: i18n.get('replay.player.team', {format: {teamNumber: team + 1}}), 
             value: replay.players
                 .filter(player => player.team == team)
                 .map(player => this.formatPlayer(player))
@@ -192,6 +235,19 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         return `${player.faction in this.config.factionEmojis ? (this.config.factionEmojis[player.faction]) + ' ' : ''}${playerNameDisplay}`;
     }
 
+    protected formatPlayerCommander(player: InputPlayer) {
+        let commander: CommanderDatabaseEntry | null = null;
+
+        for (const availableCommander of this.config.commanderDatabase) {
+            if (availableCommander.server_id == player.commander) {
+                commander = availableCommander;
+                break;
+            }
+        }
+
+        return (coh2Locale.get(commander?.locstring.name as any) || i18n.get('notAvailable')).replace(/ /g, Char.NoBreakSpace);
+    }
+
     protected getChatPreviewEmbed({charsPerChunk}: {charsPerChunk?: number} = {}): ChatPreview {
         if (!this.replay.chat || this.replay.chat.length == 0) {
             return {
@@ -215,7 +271,20 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
 
     public build() {
         this.appendTitle();
-        this.appendPlayers();
+        // Embeds with image are limited to width of ~ 300px. Having
+        // players and commanders split into separate columns leads to wrapped text; 300px is not enough to
+        // display both player name and the commander name on the same line.
+        // If player name and commander name were  in different columns, the wrapping of text
+        // would only appear in the commander column, e.g.
+
+        // player01     some long commander name
+        // player02     that overflows a bit
+        //              player02 commander starts here
+
+        // ^ Not exactly pretty. Inline it is!
+        // Technically we could have a line per player but Discord adds a lot of empty space between
+        // embed lines.
+        this.appendPlayers(PlayerAppendType.PlayerAndCommanderInline);
         this.appendChat();
         this.appendMetadata();
         this.appendScenarioPreviewImage();
@@ -244,7 +313,7 @@ export class CompactReplayEmbed extends ReplayBaseEmbed {
     
     public build() {
         this.appendTitle();
-        this.appendPlayers();
+        this.appendPlayers(PlayerAppendType.PlayerAndCommanderInSeparateColumns);
         this.appendScenarioPreviewImage();
     }
 }

@@ -2,6 +2,7 @@ node_modules
 /.replays
 /.flank.bin
 /.map-image-extractor.bin
+/.data-generator.bin
 /.discord.token
 /dist
 /.debug
@@ -10,5 +11,7 @@ node_modules
 /.nyc.coverage
 
 # Visual Studio 2015/2017 cache/options directory
-/map-image-extractor/.vs/
-/map-image-extractor/[Oo]bj/
+/data-generator/.vs/
+/data-generator/[Oo]bj/
+
+*.rootpath.local

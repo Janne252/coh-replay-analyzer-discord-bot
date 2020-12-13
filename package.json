@@ -31,7 +31,7 @@
     "minDataLength": 12,
     "flankExecutablePath": "./.flank.bin/release/flank",
     "replaysTempPath": "./.replays",
-    "scenarioPreviewImageRootPath": "./data/map-preview-images",
+    "scenarioPreviewImageRootPath": "./data/scenario-preview-images",
     "localeFilePath": "./data/coh2/RelicCoH2.English.ucs",
     "leaderboardUrl": "http://www.companyofheroes.com/leaderboards#profile/steam/{steamId}/standings",
     "expandChatPreview": {
@@ -45,7 +45,8 @@
       "west_german": "<:west_german:753277450217062411>",
       "aef": "<:aef:753277449944432830>",
       "british": "<:british:753277449957277867>"
-    }
+    },
+    "commanderDatabaseFilepath": "./data/coh2/commanders.json"
   },
   "scripts": {
     "dev": "tsc --project ./tsconfig.json --watch",

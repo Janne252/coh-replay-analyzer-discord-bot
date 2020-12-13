@@ -13,19 +13,26 @@ export class Locale {
 
     }
 
-    async init(filepath: string, idPrefix = '$') {
+    async init(filepath: string) {
         const localeStrings = (await fs.readFile(filepath, {encoding: 'utf-8'})).split('\n');
         for (const row of localeStrings) {
             const [id, message] = row.split('\t').map(part => part.trim());
-            this.messages[`${idPrefix}${id}`] = message;
+            this.messages[Number(id)] = message;
         }
     }
 
-    get(id: string) {
+    get(id: number | string) {
+        if (typeof id === 'string') {
+            if (id.startsWith('$')) {
+                id = id.substring(1);
+            }
+
+            id = Number(id);
+        }
         return this.messages[id];
     }
 }
 
 export interface LocaleLike {
-    get(id: string): string;
+    get(id: number | string): number;
 }
