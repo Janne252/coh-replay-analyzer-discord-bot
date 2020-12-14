@@ -64,10 +64,10 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
             }
             // Used to test replay parsing by posting all the test replays
             case 'test:replays': {
-                return await testReplays(message, channel);
+                return await testReplays(message, message.channel as Discord.TextChannel);
             }
             case 'test:replays-compact': {
-                return await testReplays(message, channel, 'compact');
+                return await testReplays(message, message.channel as Discord.TextChannel, 'compact');
             }
             // Used to test embed character count limitations
             case 'test:embed': {
