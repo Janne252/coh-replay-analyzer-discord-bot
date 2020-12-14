@@ -204,7 +204,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                 }
                 else
                 {
-                    System.IO.File.Copy(commanderIconFilepath, Path.Join(CommanderIconDestinationRoot, $"cmdr-{commanderId.Value}.png"));
+                    System.IO.File.Copy(commanderIconFilepath, Path.Join(CommanderIconDestinationRoot, $"cmdr-{commanderId.Value}.png"), true);
                 }
                 result.Add(commander);
             }
@@ -274,7 +274,8 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                     scenarioId = Regex.Replace(scenarioId, "[\\-]+", "-");
 
                     var imageFilename = Path.Join(ScenarioPreviewImageDestinationRoot, $"{scenarioId}.jpg");
-                    var thumbnailImageFilename = Path.Join(ScenarioPreviewImageDestinationRoot, $"{scenarioId}-x64.jpg");
+                    var thumbnailImageFilenamex64 = Path.Join(ScenarioPreviewImageDestinationRoot, $"{scenarioId}-x64.jpg");
+                    var thumbnailImageFilenamex80 = Path.Join(ScenarioPreviewImageDestinationRoot, $"{scenarioId}-x80.jpg");
                     var horizontallyPaddedFilename = Path.Join(ScenarioPreviewImageDestinationRoot, $"{scenarioId}-padded.png");
                     var image = SixLabors.ImageSharp.Image.Load(preview.GetData());
 
@@ -352,15 +353,25 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                     horizontallyPadded.Save(horizontallyPaddedFilename, pngEncoder);
                     */
                     image.Save(imageFilename, jpgEncoder);
-                    var thumbnail = image.Clone();
-                    thumbnail.Mutate(_ => _
+                    var thumbnailx64 = image.Clone();
+                    thumbnailx64.Mutate(_ => _
                         .Resize(new ResizeOptions()
                         {
                             Mode = ResizeMode.Max,
                             Size = new SixLabors.ImageSharp.Size(64, 64)
                         })
                     );
-                    thumbnail.Save(thumbnailImageFilename, jpgEncoder);
+                    thumbnailx64.Save(thumbnailImageFilenamex64, jpgEncoder);
+                    // 3rd repeat and this becomes its own method
+                    var thumbnailx80 = image.Clone();
+                    thumbnailx80.Mutate(_ => _
+                        .Resize(new ResizeOptions()
+                        {
+                            Mode = ResizeMode.Max,
+                            Size = new SixLabors.ImageSharp.Size(80, 80)
+                        })
+                    );
+                    thumbnailx80.Save(thumbnailImageFilenamex80, jpgEncoder);
                     Console.WriteLine($"{scenario.ScenarioName}: {preview.Name}");
                 }
             }
