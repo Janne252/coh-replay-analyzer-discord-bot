@@ -47,31 +47,51 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         this.setTitle(`${Replay.resolveScenarioDisplayName(this.replay)}`);
     }
 
+    protected disguiseCommanderName(name: string) {
+        // ||<text|| makes it a spoiler
+        // `<text>` makes it an inline code snippet; a monospace font to ensure uniform width
+       return `||\`${name.padEnd(32, Char.NoBreakSpace)}\`||`;
+    }
+
     protected appendPlayers(type: PlayerAppendType) {
-        for (let team = 0; team <= 1; team++) {
-            const players = this.replay.players.filter(p => p.team == team);
-            if (type == PlayerAppendType.PlayerAndCommanderInSeparateColumns) {
-                this.addFields([{
-                        name: i18n.get('replay.player.team', {format: {teamNumber: team + 1}}), 
-                        value: players.map(p => `${this.formatPlayer(p)}`).join('\n'), 
-                        inline: true,
-                    }, {
-                        name: i18n.get('replay.player.commander'), 
-                        value: players.map(p => `||${this.formatPlayerCommander(p)}||`).join('\n'), 
-                        inline: true,
-                    }
+        const longestPlayerName = Math.max(...this.replay.players.map(p => p.name.length));
+        const longestCommanderName = Math.max(16, ...this.replay.players.map(p => this.formatPlayerCommander(p, {fixedWidth: false, disguise: false}).length));
+        // Technically this could be rendered by having 2 embed rows separated by
+        // {name: Char.ZeroWidthSpace, value: Char.ZeroWidthSpace}
+        // but it leads to a lot of empty space. Faking headers with bolded text
+        // and using line breaks leads to a more compact result.
+        if (type == PlayerAppendType.PlayerAndCommanderInSeparateColumns) {
+            for (let team = 0; team <= 1; team++) {
+                let playerList = '';
+                let commanderList = '';
+                for (const player of this.replay.players.filter(p => p.team == team)) {
+                    playerList += (
+                        this.formatPlayer(player) +
+                        '\n'
+                    );
+                    commanderList += (
+                        this.formatPlayerCommander(player, {fixedWidth: longestCommanderName, disguise: true, noWrap: true}) +
+                        '\n'
+                    );
+                }
+                this.addFields([
+                    {name: i18n.get('replay.player.team', { format: { teamNumber: team + 1 } }), value: playerList, inline: true},
+                    {name: i18n.get('replay.player.commander'), value: commanderList, inline: true},
                 ]);
                 if (team == 0) {
                     this.addField(Char.ZeroWidthSpace, Char.ZeroWidthSpace);
                 }
-            } else if (type == PlayerAppendType.PlayerAndCommanderInline) {
-                const spacing = `${Char.NoBreakSpace} ${Char.NoBreakSpace} `;
+            }
+        } else if (type == PlayerAppendType.PlayerAndCommanderInline) {
+
+            for (let team = 0; team <= 1; team++) {
+                const players = this.replay.players.filter(p => p.team == team);
+                const spacing = Char.NoBreakSpace.repeat(4);
                 this.addFields([{
-                        name: i18n.get('replay.player.team', {format: {teamNumber: team + 1}}), 
-                        value: players.map(p => `${this.formatPlayer(p)}${spacing}||${this.formatPlayerCommander(p)}||`).join('\n'), 
-                        inline: false,
-                    }
-                ]);
+                    name: i18n.get('replay.player.team', { format: { teamNumber: team + 1 } }),
+                    value: players.map(p => `${this.formatPlayer(p)}${spacing}${this.formatPlayerCommander(p, {fixedWidth: false, disguise: true})}`).join('\n'),
+                    inline: false,
+                }]);
             }
         }
     }
@@ -89,13 +109,6 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         }
         this.addFields(this.chatPreview.field);
         this.chatPreviewIndex = this.fields.length - 1;
-    }
-
-    protected appendScenarioPreviewImage() {
-        this.tryAttachScenarioPreviewImage({
-            filepath: this.buildScenarioPreviewFilepath(this.buildScenarioPreviewImageFilename()), 
-            type: 'image'
-        });
     }
 
     protected appendNoScenarioPreviewImageAvailable() {
@@ -131,24 +144,35 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         });
     }
 
-    protected tryAttachScenarioPreviewImage({filepath, type}: {filepath: string, type: 'image' | 'thumbnail'}) {
+    protected tryAppendScenarioPreviewImage(type: ScenarioPreviewDisplay) {
             // Attach the scenario preview image to the message if there's one available.
         // TODO: Use a CDN to host these images (see readme.md in the project root)
         // TODO: use an async operation for checking if the file exists
         
+        let suffix = '';
+        switch (type) {
+            case ScenarioPreviewDisplay.Image:
+                suffix = '';
+                break;
+            case ScenarioPreviewDisplay.Thumbnail:
+                suffix = '-x80';
+                break;
+            default:
+                throw new Error(`Unsupported preview type "${type}"`);
+        }
+
+        const filepath = this.buildScenarioPreviewFilepath(this.buildScenarioPreviewImageFilename({suffix}));
         const name = 'preview.png';
         if (fs.existsSync(filepath)) {
             this.attachFiles([new Discord.MessageAttachment(filepath, name)]);
             const url = `attachment://${name}`;
             switch (type) {
-                case 'image':
+                case ScenarioPreviewDisplay.Image:
                     this.setImage(url);
                     break;
-                case 'thumbnail':
+                case ScenarioPreviewDisplay.Thumbnail:
                     this.setThumbnail(url);
                     break;
-                default:
-                    throw new Error(`Unsupported scenario preview image type "${type}"`);
             }
         } else {
             this.appendNoScenarioPreviewImageAvailable();
@@ -196,7 +220,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
             name: i18n.get('replay.player.commander'), 
             value: replay.players
                 .filter(player => player.team == team)
-                .map(player => this.formatPlayerCommander(player))
+                .map(player => this.formatPlayerCommander(player, {fixedWidth: true, disguise: true}))
                 .join('\n') || `_${i18n.get('replay.player.noCommandersAvailable')}_`
         };
     }
@@ -220,8 +244,9 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
      * Adds a link to the official leaderboards if the player has a valid Steam ID available.
      * @param player 
      */
-    protected formatPlayer(player: InputPlayer) {
-        let playerNameDisplay = player.name;
+    protected formatPlayer(player: InputPlayer, {fixedWidth}: {fixedWidth?: boolean | number} = {}) {
+        let playerName = player.name.replace(/ /g, Char.NoBreakSpace);
+        let playerNameDisplay = playerName;
         if (player.steam_id_str && player.steam_id_str != '0') {
             const url = (
                 this.config.leaderboardUrl ?? 
@@ -229,13 +254,18 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
             )
                 .replace(/\{steamId\}/g, player.steam_id_str)
             ;
-            playerNameDisplay = `[${player.name}](${url})`;
+            if (fixedWidth) {
+                // Maximum length of Steam display name is 32
+                playerNameDisplay = `[\`${playerName.padEnd(Number(fixedWidth) || 32, Char.NoBreakSpace)}\`](${url})`;
+            } else {
+                playerNameDisplay = `[${playerName}](${url})`;
+            }
         }
 
-        return `${player.faction in this.config.factionEmojis ? (this.config.factionEmojis[player.faction]) + ' ' : ''}${playerNameDisplay}`;
+        return `${player.faction in this.config.factionEmojis ? (this.config.factionEmojis[player.faction]) : ''}${playerNameDisplay}`;
     }
 
-    protected formatPlayerCommander(player: InputPlayer) {
+    protected formatPlayerCommander(player: InputPlayer, {fixedWidth, disguise, noWrap}: {fixedWidth: boolean | number, disguise: boolean, noWrap?: boolean}) {
         let commander: CommanderDatabaseEntry | null = null;
 
         for (const availableCommander of this.config.commanderDatabase) {
@@ -245,7 +275,17 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
             }
         }
 
-        return (coh2Locale.get(commander?.locstring.name as any) || i18n.get('notAvailable')).replace(/ /g, Char.NoBreakSpace);
+        let result = (coh2Locale.get(commander?.locstring.name as any) || i18n.get('notAvailable'));
+        if (noWrap) {
+            result = result.replace(/ /g, Char.NoBreakSpace);
+        }
+        if (fixedWidth) {
+            result = `\`${result.padEnd(Number(fixedWidth) || 32, Char.NoBreakSpace)}\``;
+        }
+        if (disguise) {
+            result = `||${result}||`;
+        }
+        return result;
     }
 
     protected getChatPreviewEmbed({charsPerChunk}: {charsPerChunk?: number} = {}): ChatPreview {
@@ -269,6 +309,10 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         };
     }
 
+    public abstract build(): void;
+}
+
+export class ReplayEmbed extends ReplayBaseEmbed {
     public build() {
         this.appendTitle();
         // Embeds with image are limited to width of ~ 300px. Having
@@ -284,28 +328,18 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         // ^ Not exactly pretty. Inline it is!
         // Technically we could have a line per player but Discord adds a lot of empty space between
         // embed lines.
-        this.appendPlayers(PlayerAppendType.PlayerAndCommanderInline);
+        this.appendPlayers(PlayerAppendType.PlayerAndCommanderInSeparateColumns);
         this.appendChat();
         this.appendMetadata();
-        this.appendScenarioPreviewImage();
+        this.tryAppendScenarioPreviewImage(ScenarioPreviewDisplay.Thumbnail);
         this.appendFooter();
     }
-}
-
-export class ReplayEmbed extends ReplayBaseEmbed {
-
 }
 
 export class CompactReplayEmbed extends ReplayBaseEmbed {
     protected appendTitle() {
         this.setTitle(`${Replay.resolveScenarioDisplayName(this.replay)} \xa0 ⏱ \xa0||\`${this.getDurationDisplay({units: false})}\`||`);
     }
-    protected appendScenarioPreviewImage() {
-        this.tryAttachScenarioPreviewImage({
-            filepath: this.buildScenarioPreviewFilepath(this.buildScenarioPreviewImageFilename({suffix: '-x64'})), 
-            type: 'thumbnail'
-        });
-    }   
 
     protected appendNoScenarioPreviewImageAvailable() {
         // noop
@@ -314,11 +348,16 @@ export class CompactReplayEmbed extends ReplayBaseEmbed {
     public build() {
         this.appendTitle();
         this.appendPlayers(PlayerAppendType.PlayerAndCommanderInSeparateColumns);
-        this.appendScenarioPreviewImage();
+        this.tryAppendScenarioPreviewImage(ScenarioPreviewDisplay.Thumbnail);
     }
 }
 
 export interface ChatPreview {
     readonly complete: boolean;
     field: EmbedField;
+}
+
+export enum ScenarioPreviewDisplay {
+    Image = 'image',
+    Thumbnail = 'thumbnail'
 }
