@@ -14,14 +14,14 @@ import i18n from './contrib/i18n';
 import { PackageJsonConfig } from './contrib/config';
 
 // Instances
-const client = new Discord.Client({
+export const client = new Discord.Client({
 
 });
 
 export const coh2Locale = new Locale();
-const diagnosticsConfig = new DiagnosticsConfig();
-const replaysConfig = new ReplaysConfig();
-const logger = new ChannelLogger(client, diagnosticsConfig);
+export const diagnosticsConfig = new DiagnosticsConfig();
+export const replaysConfig = new ReplaysConfig();
+export const logger = new ChannelLogger(client, diagnosticsConfig);
 const shutdownManager = new ShutdownManager(client, logger);
 
 client.on('ready', async () => {
