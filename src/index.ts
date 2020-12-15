@@ -66,16 +66,22 @@ client.on('ready', async () => {
 });
 
 client.on('message', async message => {
-    const restoreLocale = i18n.activate(message.guild?.preferredLocale as string);
+    // Filter out non-text channel message
+    if (!(message.channel instanceof Discord.TextChannel)) {
+        return;
+    }
+
+    const textMessage = message as Discord.Message & {channel: Discord.TextChannel};
+    const restoreLocale = i18n.activate(textMessage.guild?.preferredLocale as string);
     try {
-        if (await tryParseCoH2Replay(message, client, logger, replaysConfig))
+        if (await tryParseCoH2Replay(textMessage))
             return;
         
-        if (await tryExecuteAdminCommand(message, client, logger, diagnosticsConfig))
+        if (await tryExecuteAdminCommand(textMessage, client, logger, diagnosticsConfig))
             return;
     } catch (error) {
         // Catch errors with context
-        await logger.error(error, message);
+        await logger.error(error, textMessage);
     } finally {
         restoreLocale();
     }
