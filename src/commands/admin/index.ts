@@ -2,13 +2,40 @@ import path from 'path';
 import fs from 'fs-extra';
 import * as Discord from "discord.js";
 import { getGuildEmbedInfoFields, getGuildUrl, MessageHelpers } from '../../contrib/discord';
-import { makeLength } from '../../contrib/testing/generator';
 import { DiagnosticsConfig } from '../../contrib/discord/config';
-import moment from 'moment';
 import { ChannelLogger, LogLevels } from '../../contrib/discord/logging';
 import { Readable } from 'stream';
+import tryParseCoH2Replay from '../../commands/parse-replay';
+import { v4 as uuidv4 } from 'uuid';
 
 const root = process.cwd();
+
+async function sendLocalReplayEmbed(context: Discord.Message, replayFilepath: string, {forceCompact}: {forceCompact?: boolean} = {}) {
+    if(!(await fs.pathExists(replayFilepath))) {
+        await context.reply(`\`${replayFilepath}\` does not exist.`);
+        return;
+    }
+
+    const replayId = uuidv4();
+    const stream = fs.createReadStream(replayFilepath);
+    const attachment = new Discord.MessageAttachment(stream, `${replayId}.rec`);
+    attachment.id = replayId;
+    try {
+        await tryParseCoH2Replay({
+            author: context.author,
+            channel: context.channel as Discord.TextChannel,
+            content: context.content,
+            id: context.id,
+            url: context.url,
+            attachments: new Discord.Collection([[
+                replayId, 
+                attachment
+            ]])
+        }, {forceCompact});
+    } finally {
+        stream.close();
+    }
+}
 
 export default async (message: Discord.Message, client: Discord.Client, logger: ChannelLogger, config: DiagnosticsConfig) => {
     const isAdmin = isAdminCommand(message, client, config);
@@ -25,6 +52,12 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
             const targetMessage = await targetChannel.messages.fetch(messageId);
             const attachment = new Discord.MessageAttachment(Readable.from(JSON.stringify(targetMessage.toJSON(), null, 4)), `${messageId}.json`);
             await message.reply(attachment);
+        } else if (command.startsWith('test:replay ')) {
+            const testReplayFilepath = path.join(root, 'tests/replays', command.substring('test:replay'.length).trim());
+            await sendLocalReplayEmbed(message, testReplayFilepath);
+        } else if (command.startsWith('test:replay-compact ')) {
+            const testReplayFilepath = path.join(root, 'tests/replays', command.substring('test:replay-compact'.length).trim());
+            await sendLocalReplayEmbed(message, testReplayFilepath, {forceCompact: true});
         }
         switch (command) {
             case 'ping':
@@ -67,42 +100,7 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
                 return await testReplays(message, message.channel as Discord.TextChannel);
             }
             case 'test:replays-compact': {
-                return await testReplays(message, message.channel as Discord.TextChannel, 'compact');
-            }
-            // Used to test embed character count limitations
-            case 'test:embed': {
-                const embed = new Discord.MessageEmbed();
-                const url = client.user?.avatarURL() as string;
-
-                embed.author = {
-                    name: makeLength('author name', 256),
-                    url: url,
-                    iconURL: url,
-                    proxyIconURL: url,
-                };
-                embed.title = makeLength('title', 256);
-                embed.description = makeLength('description', 2048);
-                embed.footer = {
-                    text: makeLength('footer', 2048),
-                    iconURL: url,
-                    proxyIconURL: url,
-                };
-                const usedSofar = embed.length;
-                const available = 6000 - usedSofar;
-                const embedTitles = 25 * 10;
-                const embedValues = available - embedTitles;
-                const perEmbedValue = Math.floor(embedValues / 25);
-                const plusLastEmbedValue = embedValues % 25;
-                // Max number of embed fields
-                for (let i = 0; i < 25; i++) {
-                    embed.addFields({
-                        name: makeLength('embed name', 10),
-                        value: makeLength('embed value', perEmbedValue + (i == 24 ? plusLastEmbedValue : 0)),
-                    })
-                }
-                const totalEmbedCharacters = embed.length;
-                await channel.send(embed);
-                return true;
+                return await testReplays(message, message.channel as Discord.TextChannel, {forceCompact: true});
             }
         }
     }
@@ -118,13 +116,13 @@ export function isAdminCommand(message: Discord.Message, client: Discord.Client,
     );
 }
 
-async function testReplays(userMessage: Discord.Message, channel: Discord.TextChannel, messageContent = '') {
+async function testReplays(userMessage: Discord.Message, channel: Discord.TextChannel, {forceCompact}: {forceCompact?: boolean} = {}) {
     await userMessage.reply(new Discord.MessageEmbed({description: `Beginning to upload replays to ${channel}...`}));
-    for (const file of await fs.readdir(path.join(root, 'tests/replays'))) {
-        const attachment = new Discord.MessageAttachment(path.join(root, 'tests/replays', file));
-        await channel.send(messageContent, attachment);
+    const replaysRootPath = path.join(root, 'tests/replays');
+    for (const file of await fs.readdir(replaysRootPath)) {
+        await sendLocalReplayEmbed(userMessage, path.join(replaysRootPath, file), {forceCompact});
         await new Promise((resolve, reject) => {
-            setTimeout(resolve, 2000);
+            setTimeout(resolve, 1000);
         });
     }
     return true;
