@@ -135,8 +135,8 @@ export class ChannelLogger {
                     .map(line => `> ${line}`), 
                 { split: true }
             );
-            
-            const url = Array.isArray(stacktraceMessages) ? (stacktraceMessages as Discord.Message[])[0].url : stacktraceMessages.url;
+            // When split is set to true, discord.js typings declare the return type as an array
+            const url = stacktraceMessages[0].url;
             embed.fields[2].value = `[Show](${url})`;
             await result.edit(embed);
         }
