@@ -59,11 +59,11 @@
   "author": "Janne Varjo",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^12.3.1",
+    "discord.js": "^12.5.1",
     "download": "^8.0.0",
     "fs-extra": "^9.0.1",
-    "moment": "^2.29.0",
-    "uuid": "^8.3.0"
+    "moment": "^2.29.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@tsconfig/node12": "^1.0.7",
