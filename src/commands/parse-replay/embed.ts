@@ -9,6 +9,7 @@ import { ReplayPlayer } from '../../contrib/coh2/replay';
 import { autoDeleteRelatedMessages } from '../../contrib/discord';
 import { coh2Locale } from '../..';
 import { Char } from '../../contrib/misc';
+import { InputMessage } from '.';
 
 export type InputPlayer = InputData<ReplayPlayer, 'commander' | 'name' | 'steam_id_str' | 'faction' | 'team'>;
 export type InputReplay = {map: {name: string, file: string, players: number}, players: InputPlayer[]} & InputData<Replay.Data, 'duration' | 'version' | 'chat'>;
@@ -28,7 +29,8 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
 
     constructor(
         protected readonly client: Discord.Client, 
-        protected readonly userMessage: Discord.Message, 
+        protected readonly userMessage: InputMessage, 
+        protected readonly sourceAttachment: Discord.MessageAttachment,
         protected readonly replay: InputReplay, 
         private readonly config: ReplaysConfig
     ) {
@@ -53,7 +55,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
        return `||\`${name.padEnd(32, Char.NoBreakSpace)}\`||`;
     }
 
-    protected appendPlayers(type: PlayerAppendType) {
+    protected appendPlayers(type: PlayerAppendType, {excludeCommanders}: {excludeCommanders?: boolean} = {}) {
         const longestPlayerName = Math.max(...this.replay.players.map(p => p.name.length));
         const longestCommanderName = Math.max(16, ...this.replay.players.map(p => this.formatPlayerCommander(p, {fixedWidth: false, disguise: false}).length));
         // Technically this could be rendered by having 2 embed rows separated by
@@ -75,11 +77,16 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
                     );
                 }
                 this.addFields([
-                    {name: i18n.get('replay.player.team', { format: { teamNumber: team + 1 } }), value: playerList, inline: true},
-                    {name: i18n.get('replay.player.commander'), value: commanderList, inline: true},
+                    {name: i18n.get('replay.player.team', { format: { teamNumber: team + 1 } }), value: playerList, inline: !excludeCommanders},
                 ]);
-                if (team == 0) {
-                    this.addField(Char.ZeroWidthSpace, Char.ZeroWidthSpace);
+                if (!excludeCommanders) {
+                    this.addFields([
+                        {name: i18n.get('replay.player.commander'), value: commanderList, inline: true},
+                        // Additional column to make the "row" 3 fields.
+                        // This works wonderfully on the desktop version of Discord, but not so well on mobile,
+                        // where the embed fields appear to be forced to a single column (one per line)
+                        {name: Char.ZeroWidthSpace, value: Char.ZeroWidthSpace, inline: true},
+                    ]);
                 }
             }
         } else if (type == PlayerAppendType.PlayerAndCommanderInline) {
@@ -87,10 +94,18 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
             for (let team = 0; team <= 1; team++) {
                 const players = this.replay.players.filter(p => p.team == team);
                 const spacing = Char.NoBreakSpace.repeat(4);
+                let content = '';
+                for (const player of players) {
+                    content += this.formatPlayer(player);
+                    if (!excludeCommanders) {
+                        content += `${spacing}${this.formatPlayerCommander(player, {fixedWidth: false, disguise: true, monospace: true})}`;
+                    }
+                    content += '\n';
+                }
                 this.addFields([{
                     name: i18n.get('replay.player.team', { format: { teamNumber: team + 1 } }),
-                    value: players.map(p => `${this.formatPlayer(p)}${spacing}${this.formatPlayerCommander(p, {fixedWidth: false, disguise: true})}`).join('\n'),
-                    inline: false,
+                    value: content.trim(),
+                    inline: excludeCommanders,
                 }]);
             }
         }
@@ -129,7 +144,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
     }
 
     protected appendFooter() {
-        this.setFooter(this.client.user?.username, this.client.user?.avatarURL() as string);
+        this.setFooter(`${this.client.user?.username}`, this.client.user?.avatarURL() as string);
     }
        
     public async submit() {
@@ -265,7 +280,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         return `${player.faction in this.config.factionEmojis ? (this.config.factionEmojis[player.faction]) : ''}${playerNameDisplay}`;
     }
 
-    protected formatPlayerCommander(player: InputPlayer, {fixedWidth, disguise, noWrap}: {fixedWidth: boolean | number, disguise: boolean, noWrap?: boolean}) {
+    protected formatPlayerCommander(player: InputPlayer, {fixedWidth, disguise, noWrap, monospace}: {fixedWidth: boolean | number, disguise: boolean, noWrap?: boolean, monospace?: boolean}) {
         let commander: CommanderDatabaseEntry | null = null;
 
         for (const availableCommander of this.config.commanderDatabase) {
@@ -279,8 +294,11 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         if (noWrap) {
             result = result.replace(/ /g, Char.NoBreakSpace);
         }
-        if (fixedWidth) {
-            result = `\`${result.padEnd(Number(fixedWidth) || 32, Char.NoBreakSpace)}\``;
+        if (fixedWidth || monospace) {
+            if (fixedWidth) {
+                result = result.padEnd(Number(fixedWidth) || 32, Char.NoBreakSpace);
+            }
+            result = `\`${result}\``;
         }
         if (disguise) {
             result = `||${result}||`;
@@ -328,10 +346,10 @@ export class ReplayEmbed extends ReplayBaseEmbed {
         // ^ Not exactly pretty. Inline it is!
         // Technically we could have a line per player but Discord adds a lot of empty space between
         // embed lines.
-        this.appendPlayers(PlayerAppendType.PlayerAndCommanderInSeparateColumns);
+        this.appendPlayers(PlayerAppendType.PlayerAndCommanderInline, {excludeCommanders: true});
         this.appendChat();
         this.appendMetadata();
-        this.tryAppendScenarioPreviewImage(ScenarioPreviewDisplay.Thumbnail);
+        this.tryAppendScenarioPreviewImage(ScenarioPreviewDisplay.Image);
         this.appendFooter();
     }
 }
