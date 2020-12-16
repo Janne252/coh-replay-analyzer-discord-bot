@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 /**
  * Represents a a wrapper class that provides localized strings from a RelicCOH2.<language>.ucs file.
  */
-export class Locale {
+export class Locale implements LocaleLike {
     public static readonly Empty = new Locale();
     
     /**
@@ -34,5 +34,5 @@ export class Locale {
 }
 
 export interface LocaleLike {
-    get(id: number | string): number;
+    get(id: number | string): string;
 }

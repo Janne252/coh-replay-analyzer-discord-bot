@@ -104,7 +104,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
                 }
                 this.addFields([{
                     name: i18n.get('replay.player.team', { format: { teamNumber: team + 1 } }),
-                    value: content.trim(),
+                    value: content.trim() || `_${i18n.get('replay.player.noPlayersAvailable')}_`,
                     inline: excludeCommanders,
                 }]);
             }
