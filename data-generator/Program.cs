@@ -6,17 +6,16 @@ using RelicCore.Archive;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using SteamWebAPI2.Interfaces;
+using SteamWebAPI2.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -40,6 +39,9 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             "{0}_mm.tga",
         };
 
+        /// <summary>
+        /// List of runtime-resolved icon names and their matching icon file.
+        /// </summary>
         static readonly Dictionary<string, string> ScenarioIconsFilenameMap = new Dictionary<string, string>
         {
             {"territory_point",  "Icons_symbols_flag_null_symbol" },
@@ -98,8 +100,9 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             { "tow_kalach_watchtower", "Icons_symbols_building_common_guard_tower_symbol" },
         };
 
-        static ScenarioFolder.ScenarioIcon Neutral = new ScenarioFolder.ScenarioIcon() { OwnerId = 0 };
-
+        /// <summary>
+        /// Conditional mapping of entities to ingore. Consists of entity name and ownership.
+        /// </summary>
         static readonly Dictionary<string, ScenarioFolder.ScenarioIcon> ScenarioIconsFilenameMapExcludes = new Dictionary<string, ScenarioFolder.ScenarioIcon>
         {
             // Some maps have neutral starting positions
@@ -110,7 +113,13 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             { "territory_point_invisible", null },
             { "territory_point_invisible_command", null },
         };
+        static ScenarioFolder.ScenarioIcon Neutral = new ScenarioFolder.ScenarioIcon() { OwnerId = 0 };
 
+        /// <summary>
+        /// Entities that should never be suffixed with its owner id.
+        /// For example "starting_position" will be suffixed with its owner, 
+        /// and e.g. with ownership of player 1 it becomes "starting_position__1000". This is mapped to the starting position icon with number 1.
+        /// </summary>
         static readonly string[] ScenarioIconNoOwnerVariant = new string[]
         {
             "territory_point", "territory_point_command", "territory_point_mp",
@@ -130,6 +139,10 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             "watchtower", "tow_kalach_watchtower",
         };
 
+        /// <summary>
+        /// List of archives from which scenarios should never be loaded from. 
+        /// Mostly Theathre of War or Single Player maps.
+        /// </summary>
         static readonly string[] ExcludeArchives = new string[]
         {
             "DLC1Scenarios.sga",
@@ -140,27 +153,30 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             "TOWScenarios.sga",
         };
 
+        /// <summary>
+        /// Runtime cache of scenario icon Image instances.
+        /// </summary>
         static Dictionary<string, Image> ScenarioIconCache = new Dictionary<string, Image>();
 
-        static double scale(double value, double fromMin, double fromMax, double toMin, double toMax)
-        {
-            return (value - fromMin) * (toMax - toMin) / (fromMax - fromMin) + toMin;
-        }
-
+        /// <summary>
+        /// Absolute path to the directory from which the program entrypoint is located.
+        /// </summary>
         public static string StartupRootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         public static string CoH2GameRootPath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".coh2.game.rootpath.local")).Trim();
+        public static string CoH2ArchivesRootPath = Path.Join(CoH2GameRootPath, "CoH2", "Archives");
         public static string CoH2ModdingToolDataRootPath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".coh2.modding-tool-data.rootpath.local")).Trim();
         public static string ScenarioPreviewImageDestinationRoot = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".scenario-images.output.rootpath.local")).Trim();
         public static string CommanderIconDestinationRoot = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".commander-icons.output.rootpath.local")).Trim();
         public static string CommanderDatabaseDestinationFilepath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".commander-database.output.rootpath.local")).Trim();
         public static string ScenarioIconsRoot = Path.Join(StartupRootPath, @"assets\icons\minimap");
         public static string CommanderIconsRoot = Path.Join(StartupRootPath, @"assets\icons\commander");
+        public static string CachedCustomScenariosRootPath = Path.Join(StartupRootPath, ".workshop-downloads-cache");
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             CompileCommanderInfoDatabase();
-            ExportScenarioPreviewImages();
+            await ExportScenarioPreviewImages();
         }
 
         static void CompileCommanderInfoDatabase()
@@ -212,10 +228,73 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             System.IO.File.WriteAllText(CommanderDatabaseDestinationFilepath, JsonConvert.SerializeObject(result, Newtonsoft.Json.Formatting.Indented));
         }
 
-        static void ExportScenarioPreviewImages()
+        class CustomScenarioDefinition
         {
-            var archives = Directory.GetFiles(Path.Join(CoH2GameRootPath, "CoH2", "Archives"), "*.sga", SearchOption.AllDirectories);
+            [JsonProperty("id")]
+            public ulong WorkshopId { get; set; }
+            [JsonProperty("name")]
+            public string Name { get; set; }
+        }
 
+        static async Task UpdateCustomScenarios()
+        {
+            var apiFactory = new SteamWebInterfaceFactory(System.IO.File.ReadAllText(".steam-web-api.key").Trim());
+            var webClient = new WebClient();
+            var api = apiFactory.CreateSteamWebInterface<SteamRemoteStorage>(new HttpClient());
+
+            var scenarioCacheRootPath = CachedCustomScenariosRootPath;
+            if (!Directory.Exists(scenarioCacheRootPath))
+            {
+                Directory.CreateDirectory(scenarioCacheRootPath);
+            }
+
+            foreach (var scenario in JsonConvert.DeserializeObject<List<CustomScenarioDefinition>>(System.IO.File.ReadAllText(Path.Join(StartupRootPath, "custom-scenarios.json"))))
+            {
+                Console.WriteLine($"Beginning to update scenario {scenario.WorkshopId} ({scenario.Name})");
+                var itemInfo = await api.GetPublishedFileDetailsAsync(scenario.WorkshopId);
+                if (itemInfo == null)
+                {
+                    throw new Exception($"Failed to fetch Steam Workshop item info of {scenario.WorkshopId}");
+                }
+
+                var lastModified = itemInfo.Data.TimeUpdated;
+                var epocTimestamp = new DateTimeOffset(lastModified, TimeSpan.Zero).ToUnixTimeSeconds();
+                var cachedFilepath = Path.Join(StartupRootPath, ".workshop-downloads-cache", $"{epocTimestamp}.{scenario.WorkshopId}.sga");
+                if (System.IO.File.Exists(cachedFilepath))
+                {
+                    Console.WriteLine($"\tLastest version {epocTimestamp} already cached locally.");
+                    continue;
+                }
+
+                Console.WriteLine($"\tLatest version {epocTimestamp} not found from the local cache. Clearing previous versions and fetching the latest version...");
+                foreach (var outdatedScenarioFile in Directory.GetFiles(scenarioCacheRootPath, $"*{scenario.WorkshopId}.sga", SearchOption.AllDirectories))
+                {
+                    System.IO.File.Delete(outdatedScenarioFile);
+                    Console.WriteLine($"\t{Path.GetFileName(outdatedScenarioFile)} deleted.");
+                }
+
+                await webClient.DownloadFileTaskAsync(itemInfo.Data.FileUrl, cachedFilepath);
+            }
+        }
+
+        static double scale(double value, double fromMin, double fromMax, double toMin, double toMax)
+        {
+            return (value - fromMin) * (toMax - toMin) / (fromMax - fromMin) + toMin;
+        }
+
+        static double Flip(double number) => number < 0 ? Math.Abs(number) : 0 - number;
+
+        static async Task ExportScenarioPreviewImages()
+        {
+            await UpdateCustomScenarios();
+            var archives = new List<string>();
+
+            archives.AddRange(
+                Directory.GetFiles(CoH2ArchivesRootPath, "*.sga", SearchOption.AllDirectories)
+            );
+            archives.AddRange(
+                Directory.GetFiles(CachedCustomScenariosRootPath, "*.sga", SearchOption.AllDirectories)
+            );
             var noScenarioRootArchives = new List<Archive>();
             var noPreviewImageFoundScenarios = new List<ScenarioFolder>();
             var jpgEncoder = new JpegEncoder()
@@ -397,6 +476,11 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             Console.ReadLine();
         }
         
+        /// <summary>
+        /// Resolves an icon to an Image instance.
+        /// </summary>
+        /// <param name="icon"></param>
+        /// <returns></returns>
         private static Image getScenarioIconImage(ScenarioFolder.ScenarioIcon icon)
         {
             var iconKey = icon.EbpName;
@@ -421,32 +505,9 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             return ScenarioIconCache[iconKey];
         }
 
-        private static RelicCore.Archive.File getScenarioPreviewImage(ScenarioFolder scenario)
-        {
-            foreach (var candidateTemplate in ScenarioPreviewImageCandidates)
-            {
-                var file = scenario.Folder.Children.FirstOrDefault(node => node.Name == String.Format(candidateTemplate, scenario.ScenarioName));
-                if (file != null)
-                {
-                    return file as RelicCore.Archive.File;
-                }
-            }
-            return null;
-        }
-
-        private static INode getScenariosRoot(Archive archive)
-        {
-            var root = archive.Children.FirstOrDefault(node => node.Name == "data");
-            if (root == null)
-                return null;
-
-            var scenarios = root.Children.FirstOrDefault(node => node.Name == "scenarios");
-            if (scenarios == null)
-                return null;
-
-            return scenarios;
-        }
-
+        /// <summary>
+        /// Representation of a scenario folder and deserialization mapping of a scenario *.info file.
+        /// </summary>
         public class ScenarioFolder
         {
             public class ScenarioIcon
@@ -477,11 +538,6 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                             OwnerId = int.Parse(value);
                         else if (name == "ebp_name")
                             EbpName = value;
-                    }
-
-                    if (EbpName == null)
-                    {
-                        var b = 1;
                     }
                 }
             }
@@ -537,6 +593,12 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             }
         }
 
+
+        /// <summary>
+        /// Finds all parent nodes (scenario folder) in which an .sgb file is stored.
+        /// </summary>
+        /// <param name="root"></param>
+        /// <returns></returns>
         private static IEnumerable<ScenarioFolder> getScenarioFolders(INode root)
         {
             var result = new List<ScenarioFolder>();
@@ -566,6 +628,39 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             return result;
         }
 
-        static double Flip(double number) => number< 0 ? Math.Abs(number) : 0 - number;
+        /// <summary>
+        /// Finds the most suitable preview image of a scenario.
+        /// </summary>
+        /// <param name="scenario"></param>
+        /// <returns></returns>
+        private static RelicCore.Archive.File getScenarioPreviewImage(ScenarioFolder scenario)
+        {
+            foreach (var candidateTemplate in ScenarioPreviewImageCandidates)
+            {
+                var file = scenario.Folder.Children.FirstOrDefault(node => node.Name == String.Format(candidateTemplate, scenario.ScenarioName));
+                if (file != null)
+                {
+                    return file as RelicCore.Archive.File;
+                }
+            }
+            return null;
+        }
+        /// <summary>
+        /// Finds the root folder of all scenarios in an archive.
+        /// </summary>
+        /// <param name="archive"></param>
+        /// <returns></returns>
+        private static INode getScenariosRoot(Archive archive)
+        {
+            var root = archive.Children.FirstOrDefault(node => node.Name == "data");
+            if (root == null)
+                return null;
+
+            var scenarios = root.Children.FirstOrDefault(node => node.Name == "scenarios");
+            if (scenarios == null)
+                return null;
+
+            return scenarios;
+        }
     }
 }
