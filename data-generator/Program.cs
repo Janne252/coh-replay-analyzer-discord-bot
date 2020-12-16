@@ -100,20 +100,24 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             { "tow_kalach_watchtower", "Icons_symbols_building_common_guard_tower_symbol" },
         };
 
+        enum ScenarioIconExclusionRule
+        {
+            All,
+            Neutral,
+        }
         /// <summary>
         /// Conditional mapping of entities to ingore. Consists of entity name and ownership.
         /// </summary>
-        static readonly Dictionary<string, ScenarioFolder.ScenarioIcon> ScenarioIconsFilenameMapExcludes = new Dictionary<string, ScenarioFolder.ScenarioIcon>
+        static readonly Dictionary<string, ScenarioIconExclusionRule> ScenarioIconsFilenameMapExcludes = new Dictionary<string, ScenarioIconExclusionRule>
         {
             // Some maps have neutral starting positions
-            { "starting_position", Neutral },
-            { "starting_position_sp", Neutral },
-            { "starting_position_shared_territory", Neutral },
+            { "starting_position", ScenarioIconExclusionRule.Neutral },
+            { "starting_position_sp", ScenarioIconExclusionRule.Neutral },
+            { "starting_position_shared_territory", ScenarioIconExclusionRule.Neutral },
             // Ignore invisible territory points
-            { "territory_point_invisible", null },
-            { "territory_point_invisible_command", null },
+            { "territory_point_invisible", ScenarioIconExclusionRule.All },
+            { "territory_point_invisible_command", ScenarioIconExclusionRule.All },
         };
-        static ScenarioFolder.ScenarioIcon Neutral = new ScenarioFolder.ScenarioIcon() { OwnerId = 0 };
 
         /// <summary>
         /// Entities that should never be suffixed with its owner id.
@@ -399,9 +403,9 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                         if (
                             ScenarioIconsFilenameMapExcludes.ContainsKey(icon.EbpName) && (
                                 // global ignore; No comparison
-                                ScenarioIconsFilenameMapExcludes[icon.EbpName] == null ||
-                                // Ignore specific owner
-                                ScenarioIconsFilenameMapExcludes[icon.EbpName].OwnerId == icon.OwnerId
+                                ScenarioIconsFilenameMapExcludes[icon.EbpName] == ScenarioIconExclusionRule.All ||
+                                // Ignore neutral
+                                (ScenarioIconsFilenameMapExcludes[icon.EbpName] == ScenarioIconExclusionRule.Neutral && icon.OwnerId == 0)
                             )
                         )
                         {
