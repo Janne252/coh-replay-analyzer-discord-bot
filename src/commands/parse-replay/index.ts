@@ -1,5 +1,5 @@
 import path from 'path';
-import fs from 'fs-extra';
+import fs, { WriteStream } from 'fs-extra';
 import * as Discord from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
 import download from 'download';
@@ -7,11 +7,21 @@ import { exec } from '../../contrib/misc';
 import * as Replay from '../../contrib/coh2/replay';
 import Config from './config';
 import { ChannelLogger } from '../../contrib/discord/logging';
-import i18n from '../../contrib/i18n';
-import { ReplayEmbed, CompactReplayEmbed, ReplayBaseEmbed } from './embed';
+import { ReplayEmbed, CompactReplayEmbed } from './embed';
 import { MessageHelpers } from '../../contrib/discord';
+import { client, replaysConfig as config } from '../..';
+import { readToEnd } from '../../contrib/io';
 
-export default async (message: Discord.Message, client: Discord.Client, logger: ChannelLogger, config: Config): Promise<boolean> => {
+export interface InputMessage {
+    id: Discord.Snowflake;
+    content: string;
+    attachments: Discord.Collection<Discord.Snowflake, Discord.MessageAttachment>;
+    channel: Discord.TextChannel;
+    author: Discord.User;
+    url: string;
+}
+
+export default async (message: InputMessage, {forceCompact}: {forceCompact?: boolean} = {}): Promise<boolean> => {
     const attachments = message.attachments.array();
     let isHandled = false;
 
@@ -25,7 +35,12 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
         isHandled = true;
         // Download replay file contents to a temporary file
         const replayFilename = path.join(config.replaysTempPath, `${uuidv4()}.rec`);
-        const data = await download(attachment.url);
+        let data: Buffer;
+        if (attachment.attachment instanceof fs.ReadStream) {
+            data = await readToEnd(attachment.attachment);
+        } else {
+            data = await download(attachment.url);
+        }
         if (data.length < config.minDataLength) {
             throw new Error(`Invalid replay file data length ${data.length}, expected at least ${config.minDataLength}`);
         }
@@ -56,12 +71,12 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
             
             let EmbedType: typeof ReplayEmbed | typeof CompactReplayEmbed;
             const permissions = (message.channel as Discord.TextChannel).permissionsFor(client.user as Discord.User);
-            if (permissions?.has('MANAGE_MESSAGES') && command != 'compact') {
+            if (permissions?.has('MANAGE_MESSAGES') && command != 'compact' && !forceCompact) {
                 EmbedType = ReplayEmbed;
             } else {
                 EmbedType = CompactReplayEmbed;
             }
-            const embed = new EmbedType(client, message, replay, config);
+            const embed = new EmbedType(client, message, attachment, replay, config);
             await embed.submit();
         } catch (error) {
             // Propagate

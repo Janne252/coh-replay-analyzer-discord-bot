@@ -31,7 +31,7 @@
     "minDataLength": 12,
     "flankExecutablePath": "./.flank.bin/release/flank",
     "replaysTempPath": "./.replays",
-    "scenarioPreviewImageRootPath": "./data/map-preview-images",
+    "scenarioPreviewImageRootPath": "./data/scenario-preview-images",
     "localeFilePath": "./data/coh2/RelicCoH2.English.ucs",
     "leaderboardUrl": "http://www.companyofheroes.com/leaderboards#profile/steam/{steamId}/standings",
     "expandChatPreview": {
@@ -45,7 +45,8 @@
       "west_german": "<:west_german:753277450217062411>",
       "aef": "<:aef:753277449944432830>",
       "british": "<:british:753277449957277867>"
-    }
+    },
+    "commanderDatabaseFilepath": "./data/coh2/commanders.json"
   },
   "scripts": {
     "dev": "tsc --project ./tsconfig.json --watch",
@@ -58,11 +59,11 @@
   "author": "Janne Varjo",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^12.3.1",
+    "discord.js": "^12.5.1",
     "download": "^8.0.0",
     "fs-extra": "^9.0.1",
-    "moment": "^2.29.0",
-    "uuid": "^8.3.0"
+    "moment": "^2.29.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@tsconfig/node12": "^1.0.7",

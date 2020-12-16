@@ -8,7 +8,7 @@ The bot provides a summary of the replay's details:
 - Match duration
 - Game version
 
-![](./examples/full-embed.png)
+![](./media/examples/full-embed.png)
 
 The bot also has a mode for creating compact less verbose embeds, where the summary details are:
 - Map name
@@ -16,7 +16,7 @@ The bot also has a mode for creating compact less verbose embeds, where the summ
 - Players (names, factions, links to their leaderboard profiles,)
 - Match duration
 
-![](./examples/compact-embed.png)
+![](./media/examples/compact-embed.png)
 
 This mode is controlled by the `Manage Messages` permission or by the message content (set the "add a comment" field to `compact`). To enable the compact mode, disable `Manage Messages` permission in the bot role permissions (global) or in the channel bot role permissions (per channel). 
 
@@ -30,12 +30,12 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
     |`Manage Messages`| Manage reactions added to a replay embed (chat expansion). |
     |`Embed Links`| Embed markdown links (chat expansion link). |
     |`Attach Files`| Attach map preview images to embeds. |
-    |`Use External Emojis`| Use standalone CoH2 faction emojis from the bot's "home" Discord server: <br /><img title=":german:" src="./discord/emoji/german.png" width="24" height="24"> <img title=":soviet:" src="./discord/emoji/soviet.png" width="24" height="24"> <img title=":west_german:" src="./discord/emoji/west_german.png" width="24" height="24"> <img title=":aef:" src="./discord/emoji/aef.png" width="24" height="24"> <img title=":british:" src="./discord/emoji/british.png" width="24" height="24"> |
+    |`Use External Emojis`| Use standalone CoH2 faction emojis from the bot's "home" Discord server: <br /><img title=":german:" src="./media/discord/emoji/german.png" width="24" height="24"> <img title=":soviet:" src="./media/discord/emoji/soviet.png" width="24" height="24"> <img title=":west_german:" src="./media/discord/emoji/west_german.png" width="24" height="24"> <img title=":aef:" src="./media/discord/emoji/aef.png" width="24" height="24"> <img title=":british:" src="./media/discord/emoji/british.png" width="24" height="24"> |
     |`Add Reactions`| Add chat expansion reaction to a replay embed. |
     
 - ❤️ Please consider inviting `Janne252#7736` to the server(s) the bot has been added to ❤️
 # TODO
-- [ ] See if `"{0}_mm_preview_high.tga"` should have a higher priority than `"{0}_mm_preview.tga"` (Higher resolution, still the same artistic render of the tactical map)
+- [x] See if `"{0}_mm_preview_high.tga"` should have a higher priority than `"{0}_mm_preview.tga"` (Higher resolution, still the same artistic render of the tactical map)
 - [ ] Show player loadouts?
     - [ ] Commanders
     - [ ] Intel bulletins (likely not relevant)

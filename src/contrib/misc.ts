@@ -57,3 +57,8 @@ export function formatString(str: string, args?: StringFormatArgs) {
 export function ensureAbsolutePath(input: string, root = process.cwd()) {
     return path.isAbsolute(input) ? input : path.join(root, input);
 }
+
+export enum Char {
+    ZeroWidthSpace = '\u200b',
+    NoBreakSpace = '\xa0',
+}

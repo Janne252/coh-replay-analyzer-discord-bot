@@ -14,14 +14,14 @@ import i18n from './contrib/i18n';
 import { PackageJsonConfig } from './contrib/config';
 
 // Instances
-const client = new Discord.Client({
+export const client = new Discord.Client({
 
 });
 
-const coh2Locale = new Locale();
-const diagnosticsConfig = new DiagnosticsConfig();
-const replaysConfig = new ReplaysConfig();
-const logger = new ChannelLogger(client, diagnosticsConfig);
+export const coh2Locale = new Locale();
+export const diagnosticsConfig = new DiagnosticsConfig();
+export const replaysConfig = new ReplaysConfig();
+export const logger = new ChannelLogger(client, diagnosticsConfig);
 const shutdownManager = new ShutdownManager(client, logger);
 
 client.on('ready', async () => {
@@ -29,11 +29,12 @@ client.on('ready', async () => {
     client.setMaxListeners(32);
     await PackageJsonConfig.assign(replaysConfig, 'replays');
     await PackageJsonConfig.assign(diagnosticsConfig, 'diagnostics');
+    await replaysConfig.init();
 
     // Prepare .replays folder
     await fs.ensureDir(replaysConfig.replaysTempPath);
     await fs.emptyDir(replaysConfig.replaysTempPath);
-
+    
     await Promise.all([
         coh2Locale.init(replaysConfig.localeFilePath),
         logger.init(),
@@ -65,16 +66,22 @@ client.on('ready', async () => {
 });
 
 client.on('message', async message => {
-    const restoreLocale = i18n.activate(message.guild?.preferredLocale as string);
+    // Filter out non-text channel message
+    if (!(message.channel instanceof Discord.TextChannel)) {
+        return;
+    }
+
+    const textMessage = message as Discord.Message & {channel: Discord.TextChannel};
+    const restoreLocale = i18n.activate(textMessage.guild?.preferredLocale as string);
     try {
-        if (await tryParseCoH2Replay(message, client, logger, replaysConfig))
+        if (await tryParseCoH2Replay(textMessage))
             return;
         
-        if (await tryExecuteAdminCommand(message, client, logger, diagnosticsConfig))
+        if (await tryExecuteAdminCommand(textMessage, client, logger, diagnosticsConfig))
             return;
     } catch (error) {
         // Catch errors with context
-        await logger.error(error, message);
+        await logger.error(error, textMessage);
     } finally {
         restoreLocale();
     }

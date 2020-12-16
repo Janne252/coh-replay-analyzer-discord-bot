@@ -1,0 +1,1042 @@
+[
+  {
+    "name": "usf_airborne_company",
+    "server_id": 186413,
+    "locstring": {
+      "name": 11063826,
+      "description": 11074832,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_us_forces_commander_01",
+      "icon_secondary": "Icons_commander_portrait_us_forces_commander_01_large"
+    }
+  },
+  {
+    "name": "usf_armor_company",
+    "server_id": 186415,
+    "locstring": {
+      "name": 11063828,
+      "description": 11074834,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_us_forces_commander_03",
+      "icon_secondary": "Icons_commander_portrait_us_forces_commander_03_large"
+    }
+  },
+  {
+    "name": "usf_armor_company_devm_edition",
+    "server_id": 451587,
+    "locstring": {
+      "name": 11141005,
+      "description": 11074834,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_us_forces_commander_10",
+      "icon_secondary": "Icons_commander_portrait_us_forces_commander_10_large"
+    }
+  },
+  {
+    "name": "usf_dlc_commander3",
+    "server_id": 450483,
+    "locstring": {
+      "name": 0,
+      "description": 0,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "",
+      "icon_secondary": ""
+    }
+  },
+  {
+    "name": "usf_forward_assault_company",
+    "server_id": 450482,
+    "locstring": {
+      "name": 11099899,
+      "description": 11098978,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_us_forces_commander_07",
+      "icon_secondary": "Icons_commander_portrait_us_forces_commander_07_large"
+    }
+  },
+  {
+    "name": "usf_infantry_company",
+    "server_id": 186414,
+    "locstring": {
+      "name": 11063827,
+      "description": 11074833,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_us_forces_commander_02",
+      "icon_secondary": "Icons_commander_portrait_us_forces_commander_02_large"
+    }
+  },
+  {
+    "name": "usf_mechanized_company",
+    "server_id": 260696,
+    "locstring": {
+      "name": 11072555,
+      "description": 11145644,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_us_forces_commander_05",
+      "icon_secondary": "Icons_commander_portrait_us_forces_commander_05_large"
+    }
+  },
+  {
+    "name": "usf_recon_support_company",
+    "server_id": 254449,
+    "locstring": {
+      "name": 11068337,
+      "description": 11145606,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_us_forces_commander_04",
+      "icon_secondary": "Icons_commander_portrait_us_forces_commander_04_large"
+    }
+  },
+  {
+    "name": "usf_rifle_company",
+    "server_id": 261335,
+    "locstring": {
+      "name": 11072807,
+      "description": 11074836,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_us_forces_commander_06",
+      "icon_secondary": "Icons_commander_portrait_us_forces_commander_06_large"
+    }
+  },
+  {
+    "name": "usf_tactical_support_company",
+    "server_id": 450479,
+    "locstring": {
+      "name": 11097512,
+      "description": 11097999,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_us_forces_commander_08",
+      "icon_secondary": "Icons_commander_portrait_us_forces_commander_08_large"
+    }
+  },
+  {
+    "name": "usf_urban_assault_company",
+    "server_id": 452456,
+    "locstring": {
+      "name": 11167112,
+      "description": 11166617,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_usf_commander_urbanassault",
+      "icon_secondary": "Icons_commander_portrait_usf_commander_urbanassault_large"
+    }
+  },
+  {
+    "name": "british_advanced_emplacement_company",
+    "server_id": 450553,
+    "locstring": {
+      "name": 11106507,
+      "description": 11106510,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_british_commander_07",
+      "icon_secondary": "Icons_commander_portrait_british_commander_07_large"
+    }
+  },
+  {
+    "name": "british_artillery_company",
+    "server_id": 450074,
+    "locstring": {
+      "name": 11085018,
+      "description": 11089964,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_british_commander_05",
+      "icon_secondary": "Icons_commander_portrait_british_commander_05_large"
+    }
+  },
+  {
+    "name": "british_commando_company",
+    "server_id": 450073,
+    "locstring": {
+      "name": 11085017,
+      "description": 11089956,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_british_commander_01",
+      "icon_secondary": "Icons_commander_portrait_british_commander_01_large"
+    }
+  },
+  {
+    "name": "british_engineer_company",
+    "server_id": 450075,
+    "locstring": {
+      "name": 11085019,
+      "description": 11089957,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_british_commander_04",
+      "icon_secondary": "Icons_commander_portrait_british_commander_04_large"
+    }
+  },
+  {
+    "name": "british_lend_lease_assault_company",
+    "server_id": 452455,
+    "locstring": {
+      "name": 11167166,
+      "description": 11166618,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_british_commander_lendleaseassault",
+      "icon_secondary": "Icons_commander_portrait_british_commander_lendleaseassault_large"
+    }
+  },
+  {
+    "name": "british_mobile_assault_company",
+    "server_id": 450554,
+    "locstring": {
+      "name": 11106508,
+      "description": 11106686,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_british_commander_08",
+      "icon_secondary": "Icons_commander_portrait_british_commander_08_large"
+    }
+  },
+  {
+    "name": "british_support_company",
+    "server_id": 450268,
+    "locstring": {
+      "name": 11090938,
+      "description": 11095379,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_british_commander_02",
+      "icon_secondary": "Icons_commander_portrait_british_commander_02_large"
+    }
+  },
+  {
+    "name": "british_vanguard_company",
+    "server_id": 450243,
+    "locstring": {
+      "name": 11091019,
+      "description": 11091020,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_british_commander_03",
+      "icon_secondary": "Icons_commander_portrait_british_commander_03_large"
+    }
+  },
+  {
+    "name": "british_weapons_company",
+    "server_id": 450286,
+    "locstring": {
+      "name": 11094951,
+      "description": 11095786,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_british_commander_06",
+      "icon_secondary": "Icons_commander_portrait_british_commander_06_large"
+    }
+  },
+  {
+    "name": "1941_tow_german_blitzkrieg",
+    "server_id": 6116,
+    "locstring": {
+      "name": 11048776,
+      "description": 11048779,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_11",
+      "icon_secondary": "Icons_commander_portrait_german_commander_11_large"
+    }
+  },
+  {
+    "name": "1941_tow_german_infantry",
+    "server_id": 6118,
+    "locstring": {
+      "name": 11048780,
+      "description": 11048777,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_12",
+      "icon_secondary": "Icons_commander_portrait_german_commander_12_large"
+    }
+  },
+  {
+    "name": "1941_tow_german_mechanized",
+    "server_id": 6117,
+    "locstring": {
+      "name": 11048781,
+      "description": 11048778,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_13",
+      "icon_secondary": "Icons_commander_portrait_german_commander_13_large"
+    }
+  },
+  {
+    "name": "aerial_superiority_doctrine",
+    "server_id": 7554,
+    "locstring": {
+      "name": 11063602,
+      "description": 11063603,
+      "description_short": 11063604
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_21",
+      "icon_secondary": "Icons_commander_portrait_german_commander_21_large"
+    }
+  },
+  {
+    "name": "assault_support_doctrine",
+    "server_id": 5568,
+    "locstring": {
+      "name": 11024620,
+      "description": 11048909,
+      "description_short": 11048910
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_02",
+      "icon_secondary": "Icons_commander_portrait_german_commander_02_large"
+    }
+  },
+  {
+    "name": "festung_armor_doctrine",
+    "server_id": 5570,
+    "locstring": {
+      "name": 11024621,
+      "description": 11048911,
+      "description_short": 11048920
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_03",
+      "icon_secondary": "Icons_commander_portrait_german_commander_03_large"
+    }
+  },
+  {
+    "name": "festung_support_doctrine",
+    "server_id": 5571,
+    "locstring": {
+      "name": 11024623,
+      "description": 11048912,
+      "description_short": 11048921
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_04",
+      "icon_secondary": "Icons_commander_portrait_german_commander_04_large"
+    }
+  },
+  {
+    "name": "fortified_armor_doctrine",
+    "server_id": 5927,
+    "locstring": {
+      "name": 11040304,
+      "description": 11048913,
+      "description_short": 11048922
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_01",
+      "icon_secondary": "Icons_commander_portrait_german_commander_01_large"
+    }
+  },
+  {
+    "name": "german_air_supply",
+    "server_id": 7538,
+    "locstring": {
+      "name": 11053507,
+      "description": 11074819,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_18",
+      "icon_secondary": "Icons_commander_portrait_german_commander_18_large"
+    }
+  },
+  {
+    "name": "german_community_defense",
+    "server_id": 7541,
+    "locstring": {
+      "name": 11054662,
+      "description": 11074820,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_16",
+      "icon_secondary": "Icons_commander_portrait_german_commander_16_large"
+    }
+  },
+  {
+    "name": "german_elite_troops",
+    "server_id": 7537,
+    "locstring": {
+      "name": 11053506,
+      "description": 11074821,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_17",
+      "icon_secondary": "Icons_commander_portrait_german_commander_17_large"
+    }
+  },
+  {
+    "name": "german_encirclement",
+    "server_id": 7540,
+    "locstring": {
+      "name": 11053509,
+      "description": 11074822,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_22",
+      "icon_secondary": "Icons_commander_portrait_german_commander_22_large"
+    }
+  },
+  {
+    "name": "german_infantry_assault",
+    "server_id": 6905,
+    "locstring": {
+      "name": 11051307,
+      "description": 11051308,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_14",
+      "icon_secondary": "Icons_commander_portrait_german_commander_14_large"
+    }
+  },
+  {
+    "name": "german_mobile_defense",
+    "server_id": 258891,
+    "locstring": {
+      "name": 11071071,
+      "description": 11074823,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_19",
+      "icon_secondary": "Icons_commander_portrait_german_commander_19_large"
+    }
+  },
+  {
+    "name": "german_ostruppen_tree",
+    "server_id": 7249,
+    "locstring": {
+      "name": 11050940,
+      "description": 11050941,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_15",
+      "icon_secondary": "Icons_commander_portrait_german_commander_15_large"
+    }
+  },
+  {
+    "name": "german_urban_assault",
+    "server_id": 7539,
+    "locstring": {
+      "name": 11053508,
+      "description": 11074824,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_20",
+      "icon_secondary": "Icons_commander_portrait_german_commander_20_large"
+    }
+  },
+  {
+    "name": "jaeger_armor_doctrine",
+    "server_id": 5572,
+    "locstring": {
+      "name": 11024624,
+      "description": 11048914,
+      "description_short": 11048923
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_05",
+      "icon_secondary": "Icons_commander_portrait_german_commander_05_large"
+    }
+  },
+  {
+    "name": "jaeger_infantry_doctrine",
+    "server_id": 5573,
+    "locstring": {
+      "name": 11024625,
+      "description": 11048915,
+      "description_short": 11048924
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_06",
+      "icon_secondary": "Icons_commander_portrait_german_commander_06_large"
+    }
+  },
+  {
+    "name": "joint_operations_doctrine",
+    "server_id": 5930,
+    "locstring": {
+      "name": 11040303,
+      "description": 11048916,
+      "description_short": 11048925
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_07",
+      "icon_secondary": "Icons_commander_portrait_german_commander_07_large"
+    }
+  },
+  {
+    "name": "lightning_war_doctrine",
+    "server_id": 5921,
+    "locstring": {
+      "name": 11039325,
+      "description": 11048917,
+      "description_short": 11048926
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_08",
+      "icon_secondary": "Icons_commander_portrait_german_commander_08_large"
+    }
+  },
+  {
+    "name": "spearhead_doctrine",
+    "server_id": 5928,
+    "locstring": {
+      "name": 11040302,
+      "description": 11048918,
+      "description_short": 11048927
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_09",
+      "icon_secondary": "Icons_commander_portrait_german_commander_09_large"
+    }
+  },
+  {
+    "name": "storm_tactics_doctrine",
+    "server_id": 5929,
+    "locstring": {
+      "name": 11040301,
+      "description": 11048919,
+      "description_short": 11048928
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_10",
+      "icon_secondary": "Icons_commander_portrait_german_commander_10_large"
+    }
+  },
+  {
+    "name": "strategic_reserves_doctrine",
+    "server_id": 452454,
+    "locstring": {
+      "name": 11167164,
+      "description": 11166613,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_icons_commander_portrait_german_strategic_reserves",
+      "icon_secondary": "Icons_commander_portrait_icons_commander_portrait_strategic_reserves_large"
+    }
+  },
+  {
+    "name": "1941_tow_soviet_combined_arms_army",
+    "server_id": 6120,
+    "locstring": {
+      "name": 11048787,
+      "description": 11048786,
+      "description_short": 11048944
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_11",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_11_large"
+    }
+  },
+  {
+    "name": "1941_tow_soviet_reserve_army",
+    "server_id": 6121,
+    "locstring": {
+      "name": 11048785,
+      "description": 11048784,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_12",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_12_large"
+    }
+  },
+  {
+    "name": "1941_tow_soviet_shock_army",
+    "server_id": 6119,
+    "locstring": {
+      "name": 11048782,
+      "description": 11048783,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_13",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_13_large"
+    }
+  },
+  {
+    "name": "advanced_warfare_tactics",
+    "server_id": 186229,
+    "locstring": {
+      "name": 11063605,
+      "description": 11063606,
+      "description_short": 11063607
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_21",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_21_large"
+    }
+  },
+  {
+    "name": "airbourne_troops_tactics",
+    "server_id": 452461,
+    "locstring": {
+      "name": 11167163,
+      "description": 11166619,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_airborne",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_airborne_large"
+    }
+  },
+  {
+    "name": "anti_infantry_tactics",
+    "server_id": 5926,
+    "locstring": {
+      "name": 11040323,
+      "description": 11040324,
+      "description_short": 11048929
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_01",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_01_large"
+    }
+  },
+  {
+    "name": "conscripts_support_tactics",
+    "server_id": 5922,
+    "locstring": {
+      "name": 11040322,
+      "description": 11145542,
+      "description_short": 11048930
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_02",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_02_large"
+    }
+  },
+  {
+    "name": "guard_motor_coordination_tactics",
+    "server_id": 5575,
+    "locstring": {
+      "name": 11011325,
+      "description": 11036212,
+      "description_short": 11048931
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_03",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_03_large"
+    }
+  },
+  {
+    "name": "guard_motor_coordination_tactics_vonivan_edition",
+    "server_id": 451588,
+    "locstring": {
+      "name": 11141010,
+      "description": 11036212,
+      "description_short": 11048931
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_24",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_24_large"
+    }
+  },
+  {
+    "name": "guard_rifle_anti_tank_tactics",
+    "server_id": 5576,
+    "locstring": {
+      "name": 11007677,
+      "description": 11145613,
+      "description_short": 11048932
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_04",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_04_large"
+    }
+  },
+  {
+    "name": "mechanized_support",
+    "server_id": 5924,
+    "locstring": {
+      "name": 11040320,
+      "description": 11040319,
+      "description_short": 11048933
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_05",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_05_large"
+    }
+  },
+  {
+    "name": "nkvd_rifle_disruption_tactics",
+    "server_id": 5578,
+    "locstring": {
+      "name": 11011323,
+      "description": 11036214,
+      "description_short": 11048934
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_06",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_06_large"
+    }
+  },
+  {
+    "name": "shock_motor_heavy_tactics",
+    "server_id": 5579,
+    "locstring": {
+      "name": 11007673,
+      "description": 11036215,
+      "description_short": 11048935
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_07",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_07_large"
+    }
+  },
+  {
+    "name": "shock_rifle_frontline_tactics",
+    "server_id": 5580,
+    "locstring": {
+      "name": 11011321,
+      "description": 11036216,
+      "description_short": 11048936
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_08",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_08_large"
+    }
+  },
+  {
+    "name": "soviet_community_defense",
+    "server_id": 7546,
+    "locstring": {
+      "name": 11053515,
+      "description": 11074825,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_16",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_16_large"
+    }
+  },
+  {
+    "name": "soviet_counterattack",
+    "server_id": 7246,
+    "locstring": {
+      "name": 11050892,
+      "description": 11074826,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_14",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_14_large"
+    }
+  },
+  {
+    "name": "soviet_industry_commander",
+    "server_id": 7543,
+    "locstring": {
+      "name": 11053511,
+      "description": 11074827,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_18",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_18_large"
+    }
+  },
+  {
+    "name": "soviet_lend_lease",
+    "server_id": 258974,
+    "locstring": {
+      "name": 11072128,
+      "description": 11074828,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_20",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_20_large"
+    }
+  },
+  {
+    "name": "soviet_no_retreat",
+    "server_id": 7544,
+    "locstring": {
+      "name": 11053512,
+      "description": 11074829,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_19",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_19_large"
+    }
+  },
+  {
+    "name": "soviet_partisan",
+    "server_id": 7542,
+    "locstring": {
+      "name": 11053510,
+      "description": 11074830,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_17",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_17_large"
+    }
+  },
+  {
+    "name": "soviet_tank_hunters",
+    "server_id": 7545,
+    "locstring": {
+      "name": 11053513,
+      "description": 11145582,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_22",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_22_large"
+    }
+  },
+  {
+    "name": "soviet_urban",
+    "server_id": 7247,
+    "locstring": {
+      "name": 11050931,
+      "description": 11050932,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_15",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_15_large"
+    }
+  },
+  {
+    "name": "soviet_war_machine",
+    "server_id": 5923,
+    "locstring": {
+      "name": 11040316,
+      "description": 11040318,
+      "description_short": 11048937
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_09",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_09_large"
+    }
+  },
+  {
+    "name": "terror_tactics",
+    "server_id": 5925,
+    "locstring": {
+      "name": 11040315,
+      "description": 11040317,
+      "description_short": 11048938
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_soviet_commander_10",
+      "icon_secondary": "Icons_commander_portrait_soviet_commander_10_large"
+    }
+  },
+  {
+    "name": "okw_battlefield_reconnaissance_doctrine",
+    "server_id": 450495,
+    "locstring": {
+      "name": 11106297,
+      "description": 11098004,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_german_commander_23",
+      "icon_secondary": "Icons_commander_portrait_german_commander_23_large"
+    }
+  },
+  {
+    "name": "okw_breakthrough_doctrine",
+    "server_id": 186419,
+    "locstring": {
+      "name": 11063831,
+      "description": 11074839,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_oberkommand_west_commander_03",
+      "icon_secondary": "Icons_commander_portrait_oberkommand_west_commander_03_large"
+    }
+  },
+  {
+    "name": "okw_dlc_commander_3",
+    "server_id": 450496,
+    "locstring": {
+      "name": 0,
+      "description": 0,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "",
+      "icon_secondary": ""
+    }
+  },
+  {
+    "name": "okw_elite_armored_doctrine",
+    "server_id": 257800,
+    "locstring": {
+      "name": 11071412,
+      "description": 11075204,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_oberkommand_west_commander_06",
+      "icon_secondary": "Icons_commander_portrait_oberkommand_west_commander_06_large"
+    }
+  },
+  {
+    "name": "okw_firestorm_doctrine",
+    "server_id": 450494,
+    "locstring": {
+      "name": 11099909,
+      "description": 11145528,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_oberkommand_west_commander_07",
+      "icon_secondary": "Icons_commander_portrait_oberkommand_west_commander_07_large"
+    }
+  },
+  {
+    "name": "okw_fortifications_doctrine",
+    "server_id": 259929,
+    "locstring": {
+      "name": 11072367,
+      "description": 11074841,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_oberkommand_west_commander_05",
+      "icon_secondary": "Icons_commander_portrait_oberkommand_west_commander_05_large"
+    }
+  },
+  {
+    "name": "okw_grand_offensive_doctrine",
+    "server_id": 452452,
+    "locstring": {
+      "name": 11167165,
+      "description": 11166620,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_okw_commander_grandoffensive",
+      "icon_secondary": "Icons_commander_portrait_okw_commander_grandoffensive_large"
+    }
+  },
+  {
+    "name": "okw_luftwaffe_ground_forces_doctrine",
+    "server_id": 186418,
+    "locstring": {
+      "name": 11063830,
+      "description": 11074838,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_oberkommand_west_commander_02",
+      "icon_secondary": "Icons_commander_portrait_oberkommand_west_commander_02_large"
+    }
+  },
+  {
+    "name": "okw_scavenge_doctrine",
+    "server_id": 259657,
+    "locstring": {
+      "name": 11072278,
+      "description": 11074840,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_oberkommand_west_commander_04",
+      "icon_secondary": "Icons_commander_portrait_oberkommand_west_commander_04_large"
+    }
+  },
+  {
+    "name": "okw_scavenge_doctrine_jesulin_edition",
+    "server_id": 451591,
+    "locstring": {
+      "name": 11141147,
+      "description": 11074840,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_oberkommand_west_commander_08",
+      "icon_secondary": "Icons_commander_portrait_oberkommand_west_commander_08_large"
+    }
+  },
+  {
+    "name": "okw_special_operations_doctrine",
+    "server_id": 186417,
+    "locstring": {
+      "name": 11063829,
+      "description": 11074837,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_oberkommand_west_commander_01",
+      "icon_secondary": "Icons_commander_portrait_oberkommand_west_commander_01_large"
+    }
+  },
+  {
+    "name": "pm_airborne",
+    "server_id": 18369,
+    "locstring": {
+      "name": 11054487,
+      "description": 0,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "",
+      "icon_secondary": ""
+    }
+  },
+  {
+    "name": "pm_battles_hard",
+    "server_id": 347076,
+    "locstring": {
+      "name": 11074874,
+      "description": 0,
+      "description_short": 0
+    },
+    "icon": {
+      "icon": "Icons_commander_portrait_oberkommand_west_commander_01",
+      "icon_secondary": "Icons_commander_portrait_oberkommand_west_commander_01_large"
+    }
+  }
+]
