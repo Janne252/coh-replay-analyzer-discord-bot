@@ -15,3 +15,4 @@ node_modules
 /data-generator/[Oo]bj/
 
 *.rootpath.local
+*.steam-web-api.key
