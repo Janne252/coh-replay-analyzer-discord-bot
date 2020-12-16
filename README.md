@@ -34,15 +34,13 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
     |`Add Reactions`| Add chat expansion reaction to a replay embed. |
     
 - ❤️ Please consider inviting `Janne252#7736` to the server(s) the bot has been added to ❤️
+
+# Custom maps
+Custom map support is based on a curated list of maps in [`custom-scenarios.json`](data-generator/custom-scenarios.json). 
+To add a new custom map to the list, either open a pull request that targets `custom-scenarios.json` (preferred) or open an issue.
+
 # TODO
 - [x] See if `"{0}_mm_preview_high.tga"` should have a higher priority than `"{0}_mm_preview.tga"` (Higher resolution, still the same artistic render of the tactical map)
-- [ ] Show player loadouts?
-    - [ ] Commanders
-    - [ ] Intel bulletins (likely not relevant)
-    - [ ] Skins (likely not relevant)
-- [x] Test with custom maps. If the Steam Workshop item id is present in the replay data somehow, we might be able to fetch the image from Steam (Open Graph meta tags).
-    - Owner of the map who uses a local copy likely won't have this data present, but it's a minor inconvenience. And it's known!
-    - Nope, cannot be done. The replay file contains the asset path of the map.
 - [ ] Handle replay data parser errors. Currently does not affect the bot as players and map info are still parsed.
     - Wikinger mod discord has several mod replay files that will likely recreate this error.
 - [ ] Figure out a better way of signaling handled messages than boolean
