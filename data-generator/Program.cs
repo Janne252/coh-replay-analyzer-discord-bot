@@ -274,6 +274,8 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                 }
 
                 await webClient.DownloadFileTaskAsync(itemInfo.Data.FileUrl, cachedFilepath);
+
+                Console.WriteLine($"\t{epocTimestamp} of {scenario.WorkshopId} successfully downloaded!");
             }
         }
 
