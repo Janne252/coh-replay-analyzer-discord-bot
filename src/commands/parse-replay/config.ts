@@ -12,9 +12,14 @@ export default class ReplaysConfig {
     get flankExecutablePath() { return this._flankExecutablePath; }
     set flankExecutablePath(value: string) { this._flankExecutablePath = ensureAbsolutePath(value)};
 
-    _localeFilePath: string = '';
-    get localeFilePath() { return this._localeFilePath; }
-    set localeFilePath(value: string) { this._localeFilePath = ensureAbsolutePath(value)};
+    _localeFilePaths: Record<string, string> = {};
+    get localeFilePaths() { return this._localeFilePaths; }
+    set localeFilePaths(value: Record<string, string>) { 
+        this._localeFilePaths = {};
+        for (const localeName in value) {
+            this._localeFilePaths[localeName] = ensureAbsolutePath(value[localeName]);
+        }
+    };
 
     _replaysTempPath: string = '';
     get replaysTempPath() { return this._replaysTempPath; }
