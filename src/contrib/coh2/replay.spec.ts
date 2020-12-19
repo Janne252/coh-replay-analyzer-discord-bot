@@ -76,7 +76,7 @@ describe('contrib.coh2.replay', () => {
 
     it('resolveScenarioDisplayName: From locale', () => {
         assert.strictEqual(
-            resolveScenarioDisplayName(mockReplay({name: '$1'}), new Locale({1: '(2) Map'})), 
+            resolveScenarioDisplayName(mockReplay({name: '$1'}), new Locale({'en': {1: '(2) Map'}})), 
             '(2) Map'
         );
     });
