@@ -1,8 +1,8 @@
 import assert from 'assert';
 import {describe, it} from 'mocha';
-import i18n, {I18n} from './i18n';
+import {I18n} from './i18n';
 
-function makeTranslations(...locales: [ string, any][]) {
+function makeTranslations(...locales: [string, any][]) {
     const i18n = new I18n();
     for (const [locale, definition] of locales) {
         i18n.append(definition, locale);
@@ -11,6 +11,18 @@ function makeTranslations(...locales: [ string, any][]) {
 }
 
 describe('contrib.i18n', () => {
+    it('locale name normalization', () => {
+        const i18n = makeTranslations(['EN-us', {foo: 'bar'}], ['Fr-FR', {foo: 'toto'}]);
+        assert.deepStrictEqual(i18n.catalog, {
+            'en.foo': 'bar',
+            'fr.foo': 'toto'
+        });
+        const restoreLocale = i18n.activate('fR-FR');
+        assert.strictEqual(i18n.activeLocale, 'fr');
+        assert.strictEqual(i18n.get('foo'), 'toto');
+        restoreLocale();
+    });
+
     it('translations', () => {
         const i18n = makeTranslations(['en', {word: {'yes': 'yes', 'no': 'no'}}], ['fr', {word: {'yes': 'oui'}}]);
         assert.deepStrictEqual(i18n.catalog, {'en.word.yes': 'yes', 'en.word.no': 'no', 'fr.word.yes': 'oui'});
