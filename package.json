@@ -32,7 +32,10 @@
     "flankExecutablePath": "./.flank.bin/release/flank",
     "replaysTempPath": "./.replays",
     "scenarioPreviewImageRootPath": "./data/scenario-preview-images",
-    "localeFilePath": "./data/coh2/RelicCoH2.English.ucs",
+    "localeFilePaths": {
+      "en": "./data/coh2/RelicCoH2.English.ucs",
+      "fr": "./data/coh2/RelicCoH2.French.ucs"
+    },
     "leaderboardUrl": "http://www.companyofheroes.com/leaderboards#profile/steam/{steamId}/standings",
     "expandChatPreview": {
       "reaction": "💬",

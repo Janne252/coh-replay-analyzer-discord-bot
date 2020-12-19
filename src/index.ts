@@ -36,7 +36,7 @@ client.on('ready', async () => {
     await fs.emptyDir(replaysConfig.replaysTempPath);
     
     await Promise.all([
-        coh2Locale.init(replaysConfig.localeFilePath),
+        coh2Locale.init(replaysConfig.localeFilePaths),
         logger.init(),
         i18n.loadJsonCatalogs(path.join(process.cwd(), 'locale')),
     ]);
