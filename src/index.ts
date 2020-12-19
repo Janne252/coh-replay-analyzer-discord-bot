@@ -72,7 +72,7 @@ client.on('message', async message => {
     }
 
     const textMessage = message as Discord.Message & {channel: Discord.TextChannel};
-    const restoreLocale = i18n.activate(textMessage.guild?.preferredLocale as string);
+    const restoreLocale = i18n.activate((textMessage.guild?.preferredLocale as string || 'en'));
     try {
         if (await tryParseCoH2Replay(textMessage))
             return;
