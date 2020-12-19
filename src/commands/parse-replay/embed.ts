@@ -6,13 +6,14 @@ import fs from 'fs-extra';
 import path from 'path';
 import { InputData } from '../../types';
 import { ReplayPlayer } from '../../contrib/coh2/replay';
-import { autoDeleteRelatedMessages } from '../../contrib/discord';
-import { coh2Locale } from '../..';
+import { autoDeleteRelatedMessages, truncatedEmbedCodeField } from '../../contrib/discord';
+import { coh2Locale, logger } from '../..';
 import { Char } from '../../contrib/misc';
 import { InputMessage } from '.';
+import { LogLevel } from '../../contrib/discord/logging';
 
 export type InputPlayer = InputData<ReplayPlayer, 'commander' | 'name' | 'steam_id_str' | 'faction' | 'team'>;
-export type InputReplay = {map: {name: string, file: string, players: number}, players: InputPlayer[]} & InputData<Replay.Data, 'duration' | 'version' | 'chat'>;
+export type InputReplay = {map: {name: string, file: string, players: number}, players: InputPlayer[]} & InputData<Replay.Data, 'duration' | 'version' | 'chat' | 'error'>;
 
 enum PlayerAppendType {
     PlayerAndCommanderInSeparateColumns,
@@ -157,6 +158,19 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
             triggers: [this.userMessage.id, this.sent.id],
             targets: [this.sent.id, ...this.sentChatLog.map(o => o.id)],
         });
+        if (this.replay.error != null) {
+            logger.log({
+                title: 'Replay parse error', 
+                fields: [
+                    truncatedEmbedCodeField({name: 'Error', value: this.replay.error}),
+                    {name: 'Replay file', value: `[${this.sourceAttachment.name}](${this.sourceAttachment.url})`}
+                ]
+            }, {
+                context: this.sent,
+                level: LogLevel.Warning,
+                tagAdmin: false,
+            });
+        }
     }
 
     protected tryAppendScenarioPreviewImage(type: ScenarioPreviewDisplay) {
@@ -326,6 +340,13 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
             field: {name: title, value: chunks[0].content, inline: false},
         };
     }
+    protected appendErrors() {
+       if (this.replay.error != null) {
+            this.addFields(
+                {name: `⚠️ ${i18n.get('error')}`, value: `_${i18n.get('replay.parseError')}_`},
+            );
+       }
+    }
 
     public abstract build(): void;
 }
@@ -351,6 +372,7 @@ export class ReplayEmbed extends ReplayBaseEmbed {
         this.appendMetadata();
         this.tryAppendScenarioPreviewImage(ScenarioPreviewDisplay.Image);
         this.appendFooter();
+        this.appendErrors();
     }
 }
 
@@ -367,6 +389,7 @@ export class CompactReplayEmbed extends ReplayBaseEmbed {
         this.appendTitle();
         this.appendPlayers(PlayerAppendType.PlayerAndCommanderInSeparateColumns);
         this.tryAppendScenarioPreviewImage(ScenarioPreviewDisplay.Thumbnail);
+        this.appendErrors();
     }
 }
 

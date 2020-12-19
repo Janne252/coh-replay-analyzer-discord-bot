@@ -142,6 +142,7 @@ interface ReplayData {
     };
 
     players: ReplayPlayer[];
+    error: null | string;
 }
 
 // Renamed export

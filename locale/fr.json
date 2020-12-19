@@ -16,7 +16,8 @@
             "noCommandersAvailable": "Pas de commandants disponibles.",
             "team": "Équipe {teamNumber}",
             "commander": "Commandant"
-        }
+        },
+        "parseError": "Une erreur s'est produite lors de l'analyse des données du ralenti. Des informations pourraient manquer ou être incomplètes, comme la durée de la partie."
     },
     "time": {
         "hour": "heure",
@@ -26,5 +27,6 @@
         "second": "seconde",
         "seconds": "secondes"
     },
-    "notAvailable": "ND"
+    "notAvailable": "ND",
+    "error": "Erreur"
 }
