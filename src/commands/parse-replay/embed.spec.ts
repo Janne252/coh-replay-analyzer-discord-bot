@@ -142,4 +142,34 @@ describe('commands.parse-replay', () => {
         );
         restoreTranslations();
     });
+
+    it('embedPlayers commanders', () => {
+        const restoreTranslations = i18n.override(['en', {
+            replay: {
+                player: {
+                    team: 'Team {teamNumber}',
+                    commander: 'Commander',
+                }
+            }
+        }]);
+        const embed = mockEmbed(CompactReplayEmbed, {
+            players: [
+                {name: 'P1', faction: 'faction', team: 0, steam_id_str: '0', commander: 186413},
+                {name: 'P2', faction: 'faction', team: 0, steam_id_str: '0', commander: 5568},
+            ],
+            configOverrides: {factionEmojis: {'faction': '<emoji>'}},
+        });
+
+        assert.deepStrictEqual(embed.fields[0], {
+            name: 'Team 1',
+            inline: true,
+            value: '<emoji>P1\n<emoji>P2\n'
+        });
+        assert.deepStrictEqual(embed.fields[1], {
+            name: 'Commander',
+            inline: true,
+            value: '||`notAvailable\xa0\xa0\xa0\xa0`||\n||`notAvailable\xa0\xa0\xa0\xa0`||\n'
+        });
+        restoreTranslations();
+    });
 });
