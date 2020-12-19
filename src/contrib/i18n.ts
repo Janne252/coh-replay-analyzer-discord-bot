@@ -11,9 +11,14 @@ export class I18n {
 
     }
 
+    private normalizeLocale(locale: string) {
+        // Split by "-"" to get the language part of locale-country pair, e.g. "en-US" -> "en"
+        return locale.toLowerCase().split('-')[0];
+    }
+
     activate(locale: string) {
         const previousLocale = this.activeLocale;
-        this.activeLocale = locale;
+        this.activeLocale = this.normalizeLocale(locale);
 
         return () => this.activate(previousLocale);
     }
@@ -35,17 +40,13 @@ export class I18n {
     public append(translations: TranslationDeclaration, prefix = '') {
         for (const key in translations) {
             const value = translations[key];
-            const id = `${prefix}.${key}`;
+            const id = `${this.normalizeLocale(prefix)}.${key}`;
             if (typeof value === 'object') {
                 this.append(value, id);
             } else {
                 this.catalog[id] = value;
             }
         }
-    }
-
-    private normalizeLocale(locale: string) {
-        return locale.toLowerCase().split('-')[0];
     }
 
     private getTranslationCatalogKey(id: string, locale: string) {
