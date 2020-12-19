@@ -59,12 +59,16 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
     protected appendPlayers(type: PlayerAppendType, {excludeCommanders}: {excludeCommanders?: boolean} = {}) {
         const longestPlayerName = Math.max(...this.replay.players.map(p => p.name.length));
         const longestCommanderName = Math.max(16, ...this.replay.players.map(p => this.formatPlayerCommander(p, {fixedWidth: false, disguise: false}).length));
+        const maxTeam = Math.max(
+            0, // In case there are no players. Otherwise maxTeam is negative infinity.
+            ...this.replay.players.map(p => p.team)
+        );
         // Technically this could be rendered by having 2 embed rows separated by
         // {name: Char.ZeroWidthSpace, value: Char.ZeroWidthSpace}
         // but it leads to a lot of empty space. Faking headers with bolded text
         // and using line breaks leads to a more compact result.
         if (type == PlayerAppendType.PlayerAndCommanderInSeparateColumns) {
-            for (let team = 0; team <= 1; team++) {
+            for (let team = 0; team <= maxTeam; team++) {
                 let playerList = '';
                 let commanderList = '';
                 for (const player of this.replay.players.filter(p => p.team == team)) {
@@ -92,7 +96,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
             }
         } else if (type == PlayerAppendType.PlayerAndCommanderInline) {
 
-            for (let team = 0; team <= 1; team++) {
+            for (let team = 0; team <= maxTeam; team++) {
                 const players = this.replay.players.filter(p => p.team == team);
                 const spacing = Char.NoBreakSpace.repeat(4);
                 let content = '';
