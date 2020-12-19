@@ -1,4 +1,5 @@
 ﻿using COH2ReplayDiscordBotDataGenerator.Attributes;
+using Humanizer;
 using LuaInterface;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -29,7 +30,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
         static List<string> Output = new List<string>();
 
         /// <summary>
-        /// List of possible candiates for scenario preview image in the order of importance (first available will be used).
+        /// List of possible candidates for scenario preview image in the order of importance (first available will be used).
         /// </summary>
         static readonly string[] ScenarioPreviewImageCandidates = new string[]
         {
@@ -106,7 +107,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             Neutral,
         }
         /// <summary>
-        /// Conditional mapping of entities to ingore. Consists of entity name and ownership.
+        /// Conditional mapping of entities to ignore. Consists of entity name and ownership.
         /// </summary>
         static readonly Dictionary<string, ScenarioIconExclusionRule> ScenarioIconsFilenameMapExcludes = new Dictionary<string, ScenarioIconExclusionRule>
         {
@@ -121,6 +122,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
 
         /// <summary>
         /// Entities that should never be suffixed with its owner id.
+        /// Some maps may technically contain player-owned strategic points. We don't have numbered icons for those.
         /// For example "starting_position" will be suffixed with its owner, 
         /// and e.g. with ownership of player 1 it becomes "starting_position__1000". This is mapped to the starting position icon with number 1.
         /// </summary>
@@ -145,7 +147,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
 
         /// <summary>
         /// List of archives from which scenarios should never be loaded from. 
-        /// Mostly Theathre of War or Single Player maps.
+        /// Mostly Theater of War or Single Player maps.
         /// </summary>
         static readonly string[] ExcludeArchives = new string[]
         {
@@ -183,8 +185,18 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             await ExportScenarioPreviewImages();
         }
 
+        /// <summary>
+        /// Iterates over commanders present in the Company of Heroes 2 official modding tool data.
+        /// </summary>
         static void CompileCommanderInfoDatabase()
         {
+            // Technically this step should iterate over data in AttribArchive.sga as the modding tool data is often lagging behind a game update or 2.
+            // However deserialization of .rgd files is a bit more complex. Source code references for this are available, for both
+            // reading Relic Chunky format and the inner RGD data. 
+            // The most important value is the server id of a commander. It's likely safe to assume the server id of an item is never going to change.
+            // The second most important value is the locstring ID of a commander's name. Locstring IDs are also assumed never to change.
+            // We're loading the localized name of the commander from the live game data (RelicCoH2.English.ucs).
+            Console.WriteLine("Beginning to compile Commander database...");
             var result = new List<JObject>();
 
             foreach (var commanderFilepath in Directory.GetFiles(Path.Join(CoH2ModdingToolDataRootPath, @"attributes\instances\commander"), "*.xml", SearchOption.AllDirectories))
@@ -195,7 +207,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                 var commanderId = commanderData.Data.Templates.First(t => t.Name == "server_item" && t.Value == "server_item").UniqueId;
                 if (commanderId.Name != "server_id")
                 {
-                    throw new Exception($"Could not find server_id for commander {commanderFilepath}");
+                    throw new Exception($"\tCould not find server_id for commander {commanderFilepath}");
                 }
 
                 dynamic commander = new JObject();
@@ -216,11 +228,11 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                 var commanderIconFilepath = Path.Join(CommanderIconsRoot, $"{smallIconName}.png");
                 if (smallIconName == "")
                 {
-                    Console.WriteLine($"Commander {commanderName} icon is not set.");
+                    Console.WriteLine($"\tCommander {commanderName} icon is not set.");
                 }
                 else if (!System.IO.File.Exists(commanderIconFilepath))
                 {
-                    throw new Exception($"Commander {commanderName} icon is not available.");
+                    throw new Exception($"\tCommander {commanderName} icon is not available.");
                 }
                 else
                 {
@@ -230,8 +242,11 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             }
 
             System.IO.File.WriteAllText(CommanderDatabaseDestinationFilepath, JsonConvert.SerializeObject(result, Newtonsoft.Json.Formatting.Indented));
+            Console.WriteLine($"Commander database compilation succeeded. Total of {result.Count} commanders processed.\n\n");
         }
-
+        /// <summary>
+        /// Defines the deserialization structure of a custom scenario to include in scenario preview image generation.
+        /// </summary>
         class CustomScenarioDefinition
         {
             [JsonProperty("id")]
@@ -240,8 +255,15 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             public string Name { get; set; }
         }
 
+        /// <summary>
+        /// Iterates over configured custom scenarios and checks if they've changed since the last check.
+        /// Downloads changed items from the Steam Workshop and caches them locally.
+        /// </summary>
+        /// <returns></returns>
         static async Task UpdateCustomScenarios()
         {
+            var customScenarios = JsonConvert.DeserializeObject<List<CustomScenarioDefinition>>(System.IO.File.ReadAllText(Path.Join(StartupRootPath, "custom-scenarios.json")));
+            Console.WriteLine($"Beginning to check updates for {customScenarios.Count} custom scenarios...");
             var apiFactory = new SteamWebInterfaceFactory(System.IO.File.ReadAllText(".steam-web-api.key").Trim());
             var webClient = new WebClient();
             var api = apiFactory.CreateSteamWebInterface<SteamRemoteStorage>(new HttpClient());
@@ -252,13 +274,25 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                 Directory.CreateDirectory(scenarioCacheRootPath);
             }
 
-            foreach (var scenario in JsonConvert.DeserializeObject<List<CustomScenarioDefinition>>(System.IO.File.ReadAllText(Path.Join(StartupRootPath, "custom-scenarios.json"))))
+            var lastCheckedTimestampFilepath = Path.Join(scenarioCacheRootPath, ".last-checked.timestamp");
+            if (System.IO.File.Exists(lastCheckedTimestampFilepath))
             {
-                Console.WriteLine($"Beginning to update scenario {scenario.WorkshopId} ({scenario.Name})");
+                var lastCheckedAt = DateTime.Parse(System.IO.File.ReadAllText(lastCheckedTimestampFilepath).Trim());
+                // If the last checked timestamp is more recent than 24 hours ago
+                if (lastCheckedAt > (DateTime.UtcNow - TimeSpan.FromHours(24)))
+                {
+                    Console.WriteLine($"Custom scenarios were last checked for an update {lastCheckedAt.Humanize()} ({lastCheckedAt}). Skipping the update.");
+                    return;
+                }
+            }
+
+            foreach (var scenario in customScenarios)
+            {
+                Console.WriteLine($"\tBeginning to update scenario {scenario.WorkshopId} ({scenario.Name})");
                 var itemInfo = await api.GetPublishedFileDetailsAsync(scenario.WorkshopId);
                 if (itemInfo == null)
                 {
-                    throw new Exception($"Failed to fetch Steam Workshop item info of {scenario.WorkshopId}");
+                    throw new Exception($"\t\tFailed to fetch Steam Workshop item info of {scenario.WorkshopId}");
                 }
 
                 var lastModified = itemInfo.Data.TimeUpdated;
@@ -266,21 +300,23 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                 var cachedFilepath = Path.Join(StartupRootPath, ".workshop-downloads-cache", $"{epocTimestamp}.{scenario.WorkshopId}.sga");
                 if (System.IO.File.Exists(cachedFilepath))
                 {
-                    Console.WriteLine($"\tLastest version {epocTimestamp} already cached locally.");
+                    Console.WriteLine($"\t\tLatest version {epocTimestamp} already cached locally.");
                     continue;
                 }
 
-                Console.WriteLine($"\tLatest version {epocTimestamp} not found from the local cache. Clearing previous versions and fetching the latest version...");
+                Console.WriteLine($"\t\tLatest version {epocTimestamp} not found from the local cache. Clearing previous versions and fetching the latest version...");
                 foreach (var outdatedScenarioFile in Directory.GetFiles(scenarioCacheRootPath, $"*{scenario.WorkshopId}.sga", SearchOption.AllDirectories))
                 {
                     System.IO.File.Delete(outdatedScenarioFile);
-                    Console.WriteLine($"\t{Path.GetFileName(outdatedScenarioFile)} deleted.");
+                    Console.WriteLine($"\t\t{Path.GetFileName(outdatedScenarioFile)} deleted.");
                 }
 
                 await webClient.DownloadFileTaskAsync(itemInfo.Data.FileUrl, cachedFilepath);
 
-                Console.WriteLine($"\t{epocTimestamp} of {scenario.WorkshopId} successfully downloaded!");
+                Console.WriteLine($"\t\t{epocTimestamp} of {scenario.WorkshopId} successfully downloaded!");
             }
+            Console.WriteLine($"Finished processing {customScenarios.Count} custom scenarios.\n\n");
+            System.IO.File.WriteAllText(lastCheckedTimestampFilepath, DateTime.UtcNow.ToString("s", System.Globalization.CultureInfo.InvariantCulture));
         }
 
         static double scale(double value, double fromMin, double fromMax, double toMin, double toMax)
@@ -463,7 +499,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
 
             foreach (var ignoredArchive in noScenarioRootArchives)
             {
-                Output.Add($"[warning] Ignored achive {ignoredArchive.Name}: No scenario root folder found.");
+                Output.Add($"[warning] Ignored archive {ignoredArchive.Name}: No scenario root folder found.");
             }
 
             foreach (var scenario in noPreviewImageFoundScenarios)
