@@ -8,14 +8,14 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace COH2ReplayDiscordBotDataGenerator.Output
+namespace COH2ReplayDiscordBotDataGenerator.Tasks
 {
-    public static class CommanderDatabase
+    public static class GenerateCommanderDatabase
     {
         /// <summary>
         /// Iterates over commanders present in the Company of Heroes 2 official modding tool data.
         /// </summary>
-        public static void Output(string CoH2ModdingToolDataSourceRootPath, string CommanderIconsSourceRoot, string CommanderIconDestinationRoot, string CommanderDatabaseDestinationFilepath)
+        public static void Run(string CoH2ModdingToolDataSourceRootPath, string CommanderIconsSourceRoot, string CommanderIconDestinationRoot, string CommanderDatabaseDestinationFilepath)
         {
             // Technically this step should iterate over data in AttribArchive.sga as the modding tool data is often lagging behind a game update or 2.
             // However deserialization of .rgd files is a bit more complex. Source code references for this are available, for both

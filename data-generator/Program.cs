@@ -1,5 +1,5 @@
-﻿using COH2ReplayDiscordBotDataGenerator.Attributes;
-using COH2ReplayDiscordBotDataGenerator.Output;
+using COH2ReplayDiscordBotDataGenerator.Attributes;
+using COH2ReplayDiscordBotDataGenerator.Tasks;
 using Humanizer;
 using LuaInterface;
 using Newtonsoft.Json;
@@ -182,7 +182,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
 
         static async Task Main(string[] args)
         {
-            CommanderDatabase.Output(
+            GenerateCommanderDatabase.Run(
                 CoH2ModdingToolDataSourceRootPath,
                 CommanderIconsSourceRoot,
                 CommanderIconDestinationRoot,
