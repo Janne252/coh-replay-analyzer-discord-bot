@@ -163,7 +163,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
             targets: [this.sent.id, ...this.sentChatLog.map(o => o.id)],
         });
         if (this.replay.error != null) {
-            logger.log({
+            await logger.log({
                 title: 'Replay parse error', 
                 fields: [
                     truncatedEmbedCodeField({name: 'Error', value: this.replay.error}),
