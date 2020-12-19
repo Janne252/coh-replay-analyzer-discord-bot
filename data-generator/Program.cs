@@ -35,22 +35,22 @@ namespace COH2ReplayDiscordBotMapImageExtractor
         /// </summary>
         public static string StartupRootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-        public static string CoH2GameRootPath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".coh2.game.rootpath.local")).Trim();
-        public static string CoH2ArchivesRootPath = Path.Join(CoH2GameRootPath, "CoH2", "Archives");
+        public static string CoH2GameSourceRootPath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".coh2.game.rootpath.local")).Trim();
+        public static string CoH2ArchivesSourceRootPath = Path.Join(CoH2GameSourceRootPath, "CoH2", "Archives");
         public static string CoH2ModdingToolDataSourceRootPath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".coh2.modding-tool-data.rootpath.local")).Trim();
         public static string ScenarioPreviewImageDestinationRootPath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".scenario-images.output.rootpath.local")).Trim();
-        public static string CommanderIconDestinationRoot = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".commander-icons.output.rootpath.local")).Trim();
+        public static string CommanderIconDestinationRootPath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".commander-icons.output.rootpath.local")).Trim();
         public static string CommanderDatabaseDestinationFilepath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".commander-database.output.rootpath.local")).Trim();
         public static string ScenarioIconsSourceRootPath = Path.Join(StartupRootPath, @"assets\icons\minimap");
-        public static string CommanderIconsSourceRoot = Path.Join(StartupRootPath, @"assets\icons\commander");
+        public static string CommanderIconsSourceRootPath = Path.Join(StartupRootPath, @"assets\icons\commander");
         public static string CachedCustomScenariosOutputRootPath = Path.Join(StartupRootPath, ".workshop-downloads-cache");
 
         static async Task Main(string[] args)
         {
             GenerateCommanderDatabase.Run(
                 CoH2ModdingToolDataSourceRootPath,
-                CommanderIconsSourceRoot,
-                CommanderIconDestinationRoot,
+                CommanderIconsSourceRootPath,
+                CommanderIconDestinationRootPath,
                 CommanderDatabaseDestinationFilepath
             );
             await UpdateCustomScenarios.Run(
@@ -58,7 +58,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
                 CachedCustomScenariosOutputRootPath
             );
             GenerateScenarioPreviewImages.Run(
-                CoH2ArchivesRootPath,
+                CoH2ArchivesSourceRootPath,
                 CachedCustomScenariosSourceRootPath: CachedCustomScenariosOutputRootPath,
                 ScenarioPreviewImageDestinationRootPath,
                 ScenarioIconsSourceRootPath
