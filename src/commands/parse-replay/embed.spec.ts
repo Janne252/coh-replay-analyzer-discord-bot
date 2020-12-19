@@ -28,7 +28,8 @@ function mockEmbed(type: typeof ReplayEmbed | typeof CompactReplayEmbed, {config
         players: players ?? [
             {name: 'Player 1', steam_id: 0, steam_id_str: '', faction: '', team: 0, commander: 0},
             {name: 'Player 2', steam_id: 0, steam_id_str: '', faction: 'test', team: 1, commander: 0},
-        ]
+        ],
+        error: null,
     }
     const result = new type(client, message as InputMessage, attachment, replay, config);
     result.build();
