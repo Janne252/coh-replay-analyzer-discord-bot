@@ -59,7 +59,7 @@ namespace COH2ReplayDiscordBotMapImageExtractor
             );
             GenerateScenarioPreviewImages.Run(
                 CoH2ArchivesRootPath,
-                CachedCustomScenariosOutputRootPath,
+                CachedCustomScenariosSourceRootPath: CachedCustomScenariosOutputRootPath,
                 ScenarioPreviewImageDestinationRootPath,
                 ScenarioIconsSourceRootPath
             );
