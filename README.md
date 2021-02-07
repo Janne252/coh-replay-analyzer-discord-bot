@@ -3,14 +3,15 @@ This Discord bot processes Company of Heroes 2 replay files (`.rec`) that users 
 The bot provides a summary of the replay's details:
 - Map name
 - Map tactical map image
-- Players (names, factions, links to their leaderboard profiles,)
+- Players (names, factions, links to their leaderboard profiles)
 - Chat
 - Match duration
 - Game version
+- Chosen commanders
 
 ![](./media/examples/full-embed.png)
 
-The bot also has a mode for creating compact less verbose embeds, where the summary details are:
+The bot also has a mode for creating compact, less verbose embeds, where the summary details are:
 - Map name
 - Map tactical map image (as a small thumbnail image)
 - Players (names, factions, links to their leaderboard profiles,)
