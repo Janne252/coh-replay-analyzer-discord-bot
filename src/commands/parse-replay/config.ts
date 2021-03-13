@@ -39,6 +39,7 @@ export default class ReplaysConfig {
     expandChatPreview: { reaction: string; timeoutSeconds: number; } = {reaction: '', timeoutSeconds: 0};
 
     commanderDatabase: CommanderDatabaseEntry[] = [];
+    customMapSupportRequestInviteUrl: string = '';
 
     async init() {
         this.commanderDatabase = JSON.parse(await fs.readFile(this.commanderDatabaseFilepath, {encoding: 'utf-8'}));

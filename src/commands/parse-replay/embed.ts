@@ -7,7 +7,7 @@ import path from 'path';
 import { InputData } from '../../types';
 import { ReplayPlayer } from '../../contrib/coh2/replay';
 import { autoDeleteRelatedMessages, truncatedEmbedCodeField } from '../../contrib/discord';
-import { coh2Locale, diagnosticsConfig, logger } from '../..';
+import { coh2Locale, logger, replaysConfig } from '../..';
 import { Char } from '../../contrib/misc';
 import { InputMessage } from '.';
 import { LogLevel } from '../../contrib/discord/logging';
@@ -132,7 +132,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
     }
 
     protected appendNoScenarioPreviewImageAvailable() {
-        this.addField('\u200b', `_${i18n.get('replay.noMapPreviewImageAvailable')}_\n${`[${i18n.get('replay.requestCustomMapSupportLinkTitle')}](${diagnosticsConfig.support.inviteUrl})`}`);
+        this.addField('\u200b', `_${i18n.get('replay.noMapPreviewImageAvailable')}_\n${`[${i18n.get('replay.requestCustomMapSupportLinkTitle')}](${replaysConfig.customMapSupportRequestInviteUrl})`}`);
     }
 
     protected appendMetadata({duration, gameVersion}: {duration?: boolean, gameVersion?: boolean} = {}) {

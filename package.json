@@ -54,7 +54,8 @@
       "aef": "<:aef:753277449944432830>",
       "british": "<:british:753277449957277867>"
     },
-    "commanderDatabaseFilepath": "./data/coh2/commanders.json"
+    "commanderDatabaseFilepath": "./data/coh2/commanders.json",
+    "customMapSupportRequestInviteUrl": "https://discord.gg/nBQQ4Xh5RR"
   },
   "scripts": {
     "dev": "tsc --project ./tsconfig.json --watch",
