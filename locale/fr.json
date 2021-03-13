@@ -3,7 +3,8 @@
     "replay": {
         "matchDuration": "Durée de la partie",
         "gameVersion": "Version du jeu",
-        "noMapPreviewImageAvailable": "L'image de prévisualisation de la carte n'est pas disponible. Si c'est une carte officielle, merci de contacter l'administrateur du serveur.",
+        "noMapPreviewImageAvailable": "L'image de prévisualisation de la carte n'est pas disponible.",
+        "requestCustomMapSupportLinkTitle": "Request support for this map",
         "chat": {
             "loadAllByReacting": "{@user} Réagis avec {emoji} pour charger tous les messages du chat.",
             "title": "Chat",
@@ -28,5 +29,8 @@
         "seconds": "secondes"
     },
     "notAvailable": "ND",
-    "error": "Erreur"
+    "error": "Erreur",
+    "errors": {
+        "missingPermissions": "{@bot} does not have the necessary permissions to access the channel {channel} on {server}. If you believe this is an error, please notify an administrator on the server."
+    }
 }
