@@ -1,3 +1,5 @@
+[![](https://img.shields.io/discord/753277157027086427?color=%2336393f&label=Support%20Discord&logo=discord&logoColor=white)](https://discord.gg/RwCZTUwMd3)
+
 # Intro
 This Discord bot processes Company of Heroes 2 replay files (`.rec`) that users have attached to their messages.
 The bot provides a summary of the replay's details:
@@ -38,14 +40,8 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
 
 # Custom maps
 Custom map support is based on a curated list of maps in [`custom-scenarios.json`](data-generator/custom-scenarios.json). 
-To add a new custom map to the list, either open a pull request that targets `custom-scenarios.json` (preferred) or open an issue.
+To add a new custom map to the list, open a pull request that targets `custom-scenarios.json` (preferred).
+Alternatively you can request support fora custom map on the [support Discord server](https://discord.gg/nBQQ4Xh5RR) or by opening an issue on the GitHub repository.
 
-# TODO
-- [x] See if `"{0}_mm_preview_high.tga"` should have a higher priority than `"{0}_mm_preview.tga"` (Higher resolution, still the same artistic render of the tactical map)
-- [ ] Handle replay data parser errors. Currently does not affect the bot as players and map info are still parsed.
-    - Wikinger mod discord has several mod replay files that will likely recreate this error.
-- [ ] Figure out a better way of signaling handled messages than boolean
-- [ ] "Self-made" configuration system (loads package.json via JSON.parse and takes a section of it) works but probably isn't the best way of doing things
-    - Separate config file?
 # License
 [MIT License](./LICENSE.txt)
