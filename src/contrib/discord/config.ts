@@ -19,4 +19,10 @@ export class DiagnosticsConfig {
         readonly guild?: string;
         readonly user?: string;
     } = {};
+
+    support: {
+        readonly guild?: string;
+        readonly channel?: string;
+        readonly inviteUrl?: string;
+    } = {};
 }

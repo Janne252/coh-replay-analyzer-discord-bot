@@ -4,6 +4,11 @@
   "description": "",
   "main": "./dist/index.js",
   "diagnostics": {
+    "support": {
+      "guild": "753277157027086427",
+      "channel": "820346619186511873",
+      "inviteUrl": "https://discord.gg/RwCZTUwMd3"
+    },
     "log": {
       "guild": "753277157027086427",
       "channel": "753552456574697522"
