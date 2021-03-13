@@ -171,7 +171,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
                 ]
             }, {
                 context: this.sent,
-                level: LogLevel.Warning,
+                level: LogLevel.Log,
                 tagAdmin: false,
             });
         }
