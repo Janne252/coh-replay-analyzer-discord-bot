@@ -1,4 +1,5 @@
 import * as Discord from 'discord.js';
+
 import fs from 'fs-extra';
 import path from 'path';
 import { Locale } from './contrib/coh2';
@@ -82,6 +83,8 @@ client.on('message', async message => {
     } catch (error) {
         // Catch errors with context
         await logger.error(error, textMessage);
+        // Try reporting to the end user 
+        await logger.tryNotifyEndUser(error, textMessage);
     } finally {
         restoreLocale();
     }

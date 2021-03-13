@@ -2,6 +2,8 @@ import * as Discord from 'discord.js';
 import { getGuildUrl, truncatedEmbedCodeField } from './index';
 import { DiagnosticsConfig } from './config';
 import os from 'os';
+import { client } from '../..';
+import i18n from '../i18n';
 
 /* istanbul ignore next */
 /**
@@ -116,20 +118,31 @@ export class ChannelLogger {
         const fields: Discord.EmbedFieldData[] = [
             truncatedEmbedCodeField({name: 'Name', value: error.name || '_No error available._'}),
             truncatedEmbedCodeField({name: 'Message', value: error.message || '_No message available._'}),
-            truncatedEmbedCodeField({name: 'Stacktrace', value: error.stack ? 'Loading...' : '_No stacktrace available._'}),
         ];
-      
+        
+        // Treat some specific errors as less critical
+        let level = LogLevel.Error;
+        if (
+            error instanceof Discord.DiscordAPIError && 
+            [Discord.Constants.APIErrors.MISSING_PERMISSIONS as number].includes(error.code)
+        ) {
+            level = LogLevel.Log;
+        }
+
         const {embed, result} = await this.log({
             title: `❗ ${error}`,
             fields,
         }, {
             context, 
-            level: LogLevel.Error,
-            environmentInfo: true,
+            level: level,
+            environmentInfo: level == LogLevel.Error,
         });
 
-        if (error.stack) {
-            const stacktraceMessages = await this.destination[LogLevel.Error.name].channel.send(
+        if (error.stack && level == LogLevel.Error) {
+            fields.push(
+                truncatedEmbedCodeField({name: 'Stacktrace', value: error.stack ? 'Loading...' : '_No stacktrace available._'})
+            );
+            const stacktraceMessages = await this.destination[level.name].channel.send(
                 error.stack
                     .split('\n')
                     .map(line => `> ${line}`), 
@@ -137,7 +150,7 @@ export class ChannelLogger {
             );
             // When split is set to true, discord.js typings declare the return type as an array
             const url = stacktraceMessages[0].url;
-            embed.fields[2].value = `[Show](${url})`;
+            embed.fields[embed.fields.length - 1].value = `[Show](${url})`;
             await result.edit(embed);
         }
     }
@@ -159,6 +172,21 @@ export class ChannelLogger {
         
         process.on('uncaughtException', callback);
         process.on('unhandledRejection', callback);
+    }
+
+    async tryNotifyEndUser(error: Discord.DiscordAPIError, message: Discord.Message) {
+        switch (error.code) {
+            case Discord.Constants.APIErrors.MISSING_PERMISSIONS:
+                await message.author.send(new Discord.MessageEmbed({
+                    description: i18n.get('errors.missingPermissions', {format: {
+                        '@bot': String(client.user),
+                        'channel': String(message.channel),
+                        'server': String(message.guild),
+                    }}), 
+                    color: LogLevel.Error.color,
+                }))
+                break;
+        }
     }
 }
 
