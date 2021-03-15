@@ -31,6 +31,6 @@
     "notAvailable": "ND",
     "error": "Erreur",
     "errors": {
-        "missingPermissions": "{@bot} does not have the necessary permissions to access the channel {channel} on {server}. If you believe this is an error, please notify an administrator on the server."
+        "missingPermissions": "{@bot} n'a pas les permissions nécessaires pour accéder au salon {channel} de {server}. Si vous pensez que c'est une erreur, merci d'avertir l'administrateur du serveur."
     }
 }
