@@ -58,7 +58,7 @@
     "customMapSupportRequestInviteUrl": "https://discord.gg/nBQQ4Xh5RR"
   },
   "scripts": {
-    "dev": "tsc --project ./tsconfig.json --watch",
+    "dev": "rimraf ./dist && tsc --project ./tsconfig.json --watch",
     "build": "rimraf ./dist && tsc --project ./tsconfig.json",
     "build:flank": "cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.bin",
     "start": "node ./dist/index.js --enable-source-maps",
