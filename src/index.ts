@@ -14,12 +14,10 @@ import { ChannelLogger, Color, LogLevel } from './contrib/discord/logging';
 import i18n from './contrib/i18n';
 import { PackageJsonConfig } from './contrib/config';
 
-const intents = new Discord.Intents();
-intents.add(
+const intents = new Discord.Intents([
     Discord.Intents.FLAGS.GUILDS,
     Discord.Intents.FLAGS.GUILD_MESSAGES,
-    Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
- );
+]);
 
 // Instances
 export const client = new Discord.Client({
