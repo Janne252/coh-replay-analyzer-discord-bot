@@ -151,7 +151,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
        
     public async submit() {
         await this.build();
-        this.sent = await this.userMessage.channel.send({
+        this.sent = await (this.userMessage.reply ?? this.userMessage.channel.send).apply(this.userMessage, [{
             embeds: [this], 
             files: this.attachments,
             components: [
