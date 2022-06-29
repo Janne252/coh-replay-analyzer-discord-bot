@@ -19,6 +19,7 @@ export interface InputMessage {
     channel: Discord.TextChannel;
     author: Discord.User;
     url: string;
+    reply?: Discord.Message['reply']
 }
 
 export default async (message: InputMessage, {forceCompact}: {forceCompact?: boolean} = {}): Promise<boolean> => {
