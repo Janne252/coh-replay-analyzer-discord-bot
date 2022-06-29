@@ -227,11 +227,13 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         }
         this.sent.awaitMessageComponent({componentType: 'BUTTON', time: this.config.expandChatPreview.timeoutSeconds * 1000}).then(async () => {
             for (const chunk of Util.splitMessage(this.replay.chat.map(message => `> ${Replay.formatChatMessage(message, {noNewline: true})}`).join('\n'))) {
-                const result = await this.userMessage.channel.send(chunk);
+                const result = await this.sent.reply(chunk);
             }
-        }).catch(() => {});
-        // Remove button
-        this.sent.edit({components: []});
+        }).catch(() => {})
+        .finally(async () => {
+            // Remove button
+            await this.sent.edit({components: []});
+        });
     }
 
     protected getPlayerTeamCommanderListEmbed(
