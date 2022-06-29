@@ -154,13 +154,13 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         this.sent = await (this.userMessage.reply ?? this.userMessage.channel.send).apply(this.userMessage, [{
             embeds: [this], 
             files: this.attachments,
-            components: [
+            components: this.chatPreview?.complete == false ? [
                 new Discord.MessageActionRow()
                 .addComponents(
                     new MessageButton().setCustomId('expand-chat').setLabel(i18n.get('replay.chat.expand')).setStyle('PRIMARY')
                 )
-            ],
-        });
+            ] : [],
+        }]);
         await this.expandChatPreview();    
         autoDeleteRelatedMessages({
             client: this.client,
