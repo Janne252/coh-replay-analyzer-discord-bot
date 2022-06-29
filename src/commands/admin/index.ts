@@ -51,7 +51,7 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
             const targetChannel = targetGuild.channels.cache.get(channelId) as Discord.TextChannel;
             const targetMessage = await targetChannel.messages.fetch(messageId);
             const attachment = new Discord.MessageAttachment(Readable.from(JSON.stringify(targetMessage.toJSON(), null, 4)), `${messageId}.json`);
-            await message.reply(attachment);
+            await message.reply({attachments: [attachment]});
         } else if (command.startsWith('test:replay ')) {
             const testReplayFilepath = path.join(root, 'tests/replays', command.substring('test:replay'.length).trim());
             await sendLocalReplayEmbed(message, testReplayFilepath);
@@ -65,25 +65,26 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
                 return true;
             // Used to get a quick overview of the servers the bot is currently in
             case 'telemetry:servers': {
-                const guilds = client.guilds.cache.array();
-                await message.reply(`${client.user} is currently active on ${guilds.length} server${guilds.length == 1 ? '' : 's'}.`);
-                for (const guild of guilds) {
+                const guilds = await client.guilds.fetch();
+                await message.reply(`${client.user} is currently active on ${guilds.size} server${guilds.size == 1 ? '' : 's'}.`);
+                for (const [id, oAuthGuild] of guilds) {
+                    const guild = await oAuthGuild.fetch();
                     const iconUrl = guild.iconURL();
-                    await message.reply(new Discord.MessageEmbed({
+                    await message.reply({embeds: [new Discord.MessageEmbed({
                         title: guild.name,
                         thumbnail: iconUrl ? {url: iconUrl } : undefined,
                         description: `[View in browser](${getGuildUrl(guild)})`,
                         fields: [
-                            ...getGuildEmbedInfoFields(guild, {user: client.user, excludeName: true}),
+                            ...await getGuildEmbedInfoFields(guild, {user: client.user, excludeName: true}),
                         ],
                         footer: guild.description ? {text: guild.description} : undefined,
-                    }));
+                    })]});
                 }
                 return true;
             }
             case 'test:logs': {
                 for (const logLevel of LogLevels) {
-                    await message.reply(new Discord.MessageEmbed({description: `Beginning to write "${logLevel.name}" to ${logger.destination[logLevel.name].channel}...`}));
+                    await message.reply({embeds: [new Discord.MessageEmbed({description: `Beginning to write "${logLevel.name}" to ${logger.destination[logLevel.name].channel}...`})]});
                     await logger.log({
                         title: `Test: "${logLevel.name}"`,
                         fields: [
@@ -117,7 +118,7 @@ export function isAdminCommand(message: Discord.Message, client: Discord.Client,
 }
 
 async function testReplays(userMessage: Discord.Message, channel: Discord.TextChannel, {forceCompact}: {forceCompact?: boolean} = {}) {
-    await userMessage.reply(new Discord.MessageEmbed({description: `Beginning to upload replays to ${channel}...`}));
+    await userMessage.reply({embeds: [new Discord.MessageEmbed({description: `Beginning to upload replays to ${channel}...`})]});
     const replaysRootPath = path.join(root, 'tests/replays');
     for (const file of await fs.readdir(replaysRootPath)) {
         await sendLocalReplayEmbed(userMessage, path.join(replaysRootPath, file), {forceCompact});

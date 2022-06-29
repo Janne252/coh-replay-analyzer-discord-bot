@@ -22,7 +22,7 @@ export interface InputMessage {
 }
 
 export default async (message: InputMessage, {forceCompact}: {forceCompact?: boolean} = {}): Promise<boolean> => {
-    const attachments = message.attachments.array();
+    const attachments = [...message.attachments].map(([id, attachment]) => attachment);
     let isHandled = false;
 
     for (const attachment of attachments) {

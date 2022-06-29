@@ -45,7 +45,7 @@ export class ChannelLogger {
      */
     private appendMessage(embed: Discord.MessageEmbed, message: Discord.Message) {
         if (message.channel) {
-            this.appendChannel(embed, message.channel);
+            this.appendChannel(embed, message.channel as Discord.TextChannel);
         }
         embed.fields.push({ name: 'Message', value: `[${message.id}](${message.url})`, inline: false });
     }
@@ -107,7 +107,7 @@ export class ChannelLogger {
         if (tagAdmin) {
             await channel.send(`${this.admin}`);
         }
-        const result = await channel.send(embed);
+        const result = await channel.send({embeds: [embed]});
         return {embed, result};
     }
 
@@ -142,16 +142,18 @@ export class ChannelLogger {
             fields.push(
                 truncatedEmbedCodeField({name: 'Stacktrace', value: error.stack ? 'Loading...' : '_No stacktrace available._'})
             );
-            const stacktraceMessages = await this.destination[level.name].channel.send(
-                error.stack
-                    .split('\n')
-                    .map(line => `> ${line}`), 
-                { split: true }
-            );
+            const stacktraceMessages: Discord.Message[] = [];
+            for (const chunk of Discord.Util.splitMessage(error.stack
+                .split('\n')
+                .map(line => `> ${line}`)
+                .join('\n'))
+            ) {
+                stacktraceMessages.push(await this.destination[level.name].channel.send(chunk)); 
+            }
             // When split is set to true, discord.js typings declare the return type as an array
             const url = stacktraceMessages[0].url;
             embed.fields[embed.fields.length - 1].value = `[Show](${url})`;
-            await result.edit(embed);
+            await result.edit({embeds: [embed]});
         }
     }
 
@@ -177,14 +179,14 @@ export class ChannelLogger {
     async tryNotifyEndUser(error: Discord.DiscordAPIError, message: Discord.Message) {
         switch (error.code) {
             case Discord.Constants.APIErrors.MISSING_PERMISSIONS:
-                await message.author.send(new Discord.MessageEmbed({
+                await message.author.send({embeds: [new Discord.MessageEmbed({
                     description: i18n.get('errors.missingPermissions', {format: {
                         '@bot': String(client.user),
                         'channel': String(message.channel),
                         'server': String(message.guild),
                     }}), 
                     color: LogLevel.Error.color,
-                }))
+                })]})
                 break;
         }
     }

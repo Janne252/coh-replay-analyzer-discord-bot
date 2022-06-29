@@ -1,4 +1,4 @@
-import Discord, { DiscordAPIError, Guild, TextChannel } from 'discord.js';
+import Discord, { DiscordAPIError, Guild, OAuth2Guild, TextChannel } from 'discord.js';
 import { ChannelLogger, LogLevel } from './logging';
 import moment from 'moment';
 
@@ -68,7 +68,7 @@ export class MessageHelpers {
     }
 }
 
-export function getGuildUrl(guild: Guild | string, channel?: Discord.Channel | string) {
+export function getGuildUrl(guild: Discord.Guild | string, channel?: Discord.Channel | string) {
     const guildId = typeof guild === 'string' ? guild : guild.id;
     const channelId = channel ? (typeof channel === 'string' ? channel : channel.id) : null;
     return `https://discord.com/channels/${guildId}${channelId ? '/' + channelId : ''}`;
@@ -79,7 +79,7 @@ export async function getAllChannelMessages(channel: TextChannel, sort = true) {
     const count = 100;
     const result: Discord.Message[] = [];
     while (true) {
-        const batch: Discord.Message[] = (await channel.messages.fetch({ limit: count, before })).array();
+        const batch: Discord.Message[] = [...(await channel.messages.fetch({ limit: count, before }))].map(([key, message]) => message);
         if (batch.length == 0) {
             break;
         }
@@ -125,16 +125,16 @@ export async function autoDeleteRelatedMessages({client, timeoutSeconds, trigger
     setTimeout(removeListener, timeoutSeconds * 1000);
 }
 
-export function getUserReferenceEmbedField(user?: Discord.User): string {
+export function getUserReferenceEmbedField(user?: Discord.GuildMember): string {
 
     if (!user) {
         return `_N/A_`;
     }
 
-    return `${user} (${user.username}#${user.discriminator})`;
+    return `${user} (${user.user.username}#${user.user.discriminator})`;
 }
 
-export function getGuildEmbedInfoFields(guild: Discord.Guild, {user, excludeName}: {user?: Discord.User | null, excludeName?: boolean} = {}): Discord.EmbedFieldData[] {
+export async function getGuildEmbedInfoFields(guild: Discord.Guild, {user, excludeName}: {user?: Discord.User | null, excludeName?: boolean} = {}): Promise<Discord.EmbedFieldData[]> {
     const result: Discord.EmbedFieldData[] = [];
     if (!excludeName) {
         result.push({
@@ -142,15 +142,14 @@ export function getGuildEmbedInfoFields(guild: Discord.Guild, {user, excludeName
         });
     }
     result.push(
-        { name: 'Owner', value: getUserReferenceEmbedField(guild.owner?.user), inline: true },
-        { name: 'Members', value: guild.memberCount, inline: true },
+        { name: 'Owner', value: getUserReferenceEmbedField(await guild.fetchOwner()), inline: true },
+        { name: 'Members', value: `${guild.memberCount}`, inline: true },
         { name: 'Created at', value: `${guild.createdAt.toDateString()} (_${moment(guild.createdAt).from(moment.utc())}_)`, inline: true },
         { name: 'Locale', value: `\`${guild.preferredLocale}\``, inline: true, },
-        { name: 'Region', value: `\`${guild.region}\``, inline: true, },
     );
 
     if (user) {                    
-        const guildMember = guild.member(user?.id as string) as Discord.GuildMember;
+        const guildMember = await guild.members.fetch(user?.id as string) as Discord.GuildMember;
         result.push({ 
             name: `Member since`, 
             value: (guildMember ? 

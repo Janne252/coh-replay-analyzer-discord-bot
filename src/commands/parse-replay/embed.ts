@@ -1,4 +1,4 @@
-import Discord, { EmbedField } from 'discord.js';
+import Discord, { EmbedField, MessageButton, Util } from 'discord.js';
 import * as Replay from '../../contrib/coh2/replay';
 import i18n from '../../contrib/i18n';
 import ReplaysConfig, { CommanderDatabaseEntry } from './config';
@@ -27,7 +27,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
     //@ts-expect-error 2564
     protected sent: Discord.Message;
     protected sentChatLog: Discord.Message[] = [];
-
+    protected attachments: Discord.MessageAttachment[] = [];
     constructor(
         protected readonly client: Discord.Client, 
         protected readonly userMessage: InputMessage, 
@@ -124,9 +124,6 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
             }}
         );
         this.chatPreview = this.getChatPreviewEmbed({charsPerChunk: 1024 - this.loadAllChatTip.length});
-        if (!this.chatPreview.complete) {
-            this.chatPreview.field.value += this.loadAllChatTip;
-        }
         this.addFields(this.chatPreview.field);
         this.chatPreviewIndex = this.fields.length - 1;
     }
@@ -149,12 +146,21 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
     }
 
     protected appendFooter() {
-        this.setFooter(`${this.client.user?.username}`, this.client.user?.avatarURL() as string);
+        this.setFooter({text: `${this.client.user?.username}`, iconURL: this.client.user?.avatarURL() as string});
     }
        
     public async submit() {
         await this.build();
-        this.sent = await this.userMessage.channel.send(this);
+        this.sent = await this.userMessage.channel.send({
+            embeds: [this], 
+            files: this.attachments,
+            components: [
+                new Discord.MessageActionRow()
+                .addComponents(
+                    new MessageButton().setCustomId('expand-chat').setLabel(i18n.get('replay.chat.expand')).setStyle('PRIMARY')
+                )
+            ],
+        });
         await this.expandChatPreview();    
         autoDeleteRelatedMessages({
             client: this.client,
@@ -197,7 +203,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         const filepath = this.buildScenarioPreviewFilepath(this.buildScenarioPreviewImageFilename({suffix}));
         const name = 'preview.png';
         if (fs.existsSync(filepath)) {
-            this.attachFiles([new Discord.MessageAttachment(filepath, name)]);
+            this.attachments.push(new Discord.MessageAttachment(filepath, name));
             const url = `attachment://${name}`;
             switch (type) {
                 case ScenarioPreviewDisplay.Image:
@@ -219,29 +225,13 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         if (this.chatPreview == null || this.chatPreview.complete) {
             return;
         }
-        // Placeholder reaction for the user
-        const selfReaction = await this.sent.react(this.config.expandChatPreview.reaction);
-        const reactions = await this.sent.awaitReactions(
-            (reaction, user) => user.id == this.userMessage.author.id && reaction.emoji.name == this.config.expandChatPreview.reaction, 
-            {time: this.config.expandChatPreview.timeoutSeconds * 1000, max: 1}
-        );
-        if (reactions.array().some(reaction => reaction.emoji.name == this.config.expandChatPreview.reaction)) {
-            await selfReaction.remove();
-            // Send replay chat as block quote messages
-            // Utilize Discord's automatic splitting functionality when passing message data as an array
-            const result = await this.userMessage.channel.send(
-                this.replay.chat.map(message => `> ${Replay.formatChatMessage(message, {noNewline: true})}`), 
-                {split: true}
-            );
-            this.sentChatLog.push(...(!Array.isArray(result) ? [result] : result));
-            this.fields[this.chatPreviewIndex].name = i18n.get('replay.chat.title');
-            this.fields[this.chatPreviewIndex].value = `[${i18n.get('replay.chat.jumpToFullChatLinkText')}](${this.sentChatLog[0].url})`;
-        } else {
-            // Re-render chat without expansion tip
-            this.fields[this.chatPreviewIndex] = this.getChatPreviewEmbed().field;
-        }
-        await this.sent.edit(this);
-        await selfReaction.remove();
+        this.sent.awaitMessageComponent({componentType: 'BUTTON', time: this.config.expandChatPreview.timeoutSeconds * 1000}).then(async () => {
+            for (const chunk of Util.splitMessage(this.replay.chat.map(message => `> ${Replay.formatChatMessage(message, {noNewline: true})}`).join('\n'))) {
+                const result = await this.userMessage.channel.send(chunk);
+            }
+        }).catch(() => {});
+        // Remove button
+        this.sent.edit({components: []});
     }
 
     protected getPlayerTeamCommanderListEmbed(
