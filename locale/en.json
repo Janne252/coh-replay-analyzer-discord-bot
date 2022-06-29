@@ -10,7 +10,8 @@
             "title": "Chat",
             "noChatAvailable": "No chat.",
             "partial": "Chat ({count}/{total})",
-            "jumpToFullChatLinkText": "Show"
+            "jumpToFullChatLinkText": "Show",
+            "expand": "Expand chat"
         },
         "player": {
             "noPlayersAvailable": "No players available.",
