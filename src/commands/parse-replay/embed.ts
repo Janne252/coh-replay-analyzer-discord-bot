@@ -275,7 +275,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         if (player.steam_id_str && player.steam_id_str != '0') {
             const url = (
                 this.config.leaderboardUrl ?? 
-                `http://www.companyofheroes.com/leaderboards#profile/steam/{steamId}/standings`
+                `https://www.coh2.org/ladders/playercard/steamid/{steamId}`
             )
                 .replace(/\{steamId\}/g, player.steam_id_str)
             ;

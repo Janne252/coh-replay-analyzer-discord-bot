@@ -41,7 +41,7 @@
       "en": "./data/coh2/RelicCoH2.English.ucs",
       "fr": "./data/coh2/RelicCoH2.French.ucs"
     },
-    "leaderboardUrl": "http://www.companyofheroes.com/leaderboards#profile/steam/{steamId}/standings",
+    "leaderboardUrl": "https://www.coh2.org/ladders/playercard/steamid/{steamId}",
     "expandChatPreview": {
       "reaction": "💬",
       "timeoutSeconds": 30
