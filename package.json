@@ -41,7 +41,10 @@
       "en": "./data/coh2/RelicCoH2.English.ucs",
       "fr": "./data/coh2/RelicCoH2.French.ucs"
     },
-    "leaderboardUrl": "https://coh2stats.com/players/{steamId}",
+    "leaderboardUrl": {
+      "template": "https://coh2stats.com/players/{steamId}",
+      "query": {"utm_source": "coh2-replay-bot"}
+    },
     "expandChatPreview": {
       "reaction": "💬",
       "timeoutSeconds": 30

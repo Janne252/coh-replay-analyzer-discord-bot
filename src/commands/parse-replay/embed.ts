@@ -273,11 +273,12 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         let playerName = player.name.replace(/ /g, Char.NoBreakSpace);
         let playerNameDisplay = playerName;
         if (player.steam_id_str && player.steam_id_str != '0') {
-            const url = (
-                this.config.leaderboardUrl ?? 
-                `https://coh2stats.com/players/{steamId}`
-            )
-                .replace(/\{steamId\}/g, player.steam_id_str)
+            const url = new URL(
+                (this.config.leaderboardUrl?.template ?? `https://coh2stats.com/players/{steamId}`)
+                .replace(/\{steamId\}/g, player.steam_id_str),
+            );
+            Object.entries(this.config.leaderboardUrl?.query ?? {})
+                .forEach(([key, value]) => url.searchParams.append(key, value))
             ;
             if (fixedWidth) {
                 // Maximum length of Steam display name is 32

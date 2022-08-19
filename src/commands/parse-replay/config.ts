@@ -5,7 +5,7 @@ import * as fs from 'fs-extra';
 /* istanbul ignore next */
 export default class ReplaysConfig {
     factionEmojis: Record<string, string> = {};
-    leaderboardUrl?: string | undefined;
+    leaderboardUrl?: {template: string, query: Record<string, string>};
     waitForDeletionTimeoutSeconds: number = 0;
 
     private _flankExecutablePath: string = '';
