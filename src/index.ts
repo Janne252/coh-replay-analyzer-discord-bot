@@ -16,7 +16,6 @@ import { PackageJsonConfig } from './contrib/config';
 
 const intents = new Discord.Intents([
     Discord.Intents.FLAGS.GUILDS,
-    Discord.Intents.FLAGS.GUILD_MEMBERS,
     Discord.Intents.FLAGS.GUILD_MESSAGES,
 ]);
 
