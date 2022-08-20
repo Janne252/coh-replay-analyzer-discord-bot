@@ -225,6 +225,7 @@ namespace COH2ReplayDiscordBotDataGenerator.Tasks
                     scenarioId = Regex.Replace(scenarioId, "[\\-]+", "-");
 
                     var imageFilename = Path.Join(ScenarioPreviewImageDestinationRootPath, $"{scenarioId}.jpg");
+                    var imageFilenameLossless = Path.Join(ScenarioPreviewImageDestinationRootPath, $"{scenarioId}-x300.png");
                     var thumbnailImageFilenamex64 = Path.Join(ScenarioPreviewImageDestinationRootPath, $"{scenarioId}-x64.jpg");
                     var thumbnailImageFilenamex80 = Path.Join(ScenarioPreviewImageDestinationRootPath, $"{scenarioId}-x80.jpg");
                     var horizontallyPaddedFilename = Path.Join(ScenarioPreviewImageDestinationRootPath, $"{scenarioId}-padded.png");
@@ -297,6 +298,11 @@ namespace COH2ReplayDiscordBotDataGenerator.Tasks
                     });
                     horizontallyPadded.Save(horizontallyPaddedFilename, pngEncoder);
                     */
+                    if (System.IO.File.Exists(imageFilenameLossless))
+                    {
+                        Console.WriteLine($".sgb filename collision: {scenario.File.Name}");
+                    }
+                    image.Save(imageFilenameLossless, pngEncoder);
                     image.Save(imageFilename, jpgEncoder);
                     var thumbnailx64 = image.Clone();
                     thumbnailx64.Mutate(_ => _
