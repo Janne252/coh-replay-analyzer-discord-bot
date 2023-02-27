@@ -6,10 +6,10 @@ import download from 'download';
 import { exec } from '../../contrib/misc';
 import * as Replay from '../../contrib/coh2/replay';
 import Config from './config';
-import { ChannelLogger } from '../../contrib/discord/logging';
+import { ChannelLogger, LogLevel } from '../../contrib/discord/logging';
 import { ReplayEmbed, CompactReplayEmbed } from './embed';
 import { MessageHelpers } from '../../contrib/discord';
-import { client, replaysConfig as config } from '../..';
+import { client, logger, replaysConfig as config } from '../..';
 import { readToEnd } from '../../contrib/io';
 
 export interface InputMessage {
@@ -49,10 +49,12 @@ export default async (message: InputMessage, {forceCompact}: {forceCompact?: boo
         
         // Not a CoH2 replay or too early version for https://github.com/ryantaylor/vault
         if (magic != config.magic) {
-            throw new Error(`Unexpected replay header magic "${magic}", expected "${config.magic}"`);
+            logger.log({title: 'Invalid magic', description: `Unexpected replay header magic "${magic}", expected "${config.magic}"`}, {level: LogLevel.Log});
+            continue
         }
-        if (version < config.minVersion) {
-            throw new Error(`Unexpected replay header version ${version}, expected at least ${config.minVersion}`);
+        else if (version < config.minVersion) {
+            logger.log({title: 'Unsupported version', description: `Unexpected replay header version ${version}, expected at least ${config.minVersion}`}, {level: LogLevel.Warning});
+            continue
         }
 
         try {
