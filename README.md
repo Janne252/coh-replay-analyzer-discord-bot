@@ -43,5 +43,8 @@ Custom map support is based on a curated list of maps in [`custom-scenarios.json
 To add a new custom map to the list, open a pull request that targets `custom-scenarios.json` (preferred).
 Alternatively you can request support fora custom map on the [support Discord server](https://discord.gg/nBQQ4Xh5RR) or by opening an issue on the GitHub repository.
 
+# Support
+[Support server (Discord)](https://discord.gg/nBQQ4Xh5RR)
+
 # License
 [MIT License](./LICENSE.txt)
