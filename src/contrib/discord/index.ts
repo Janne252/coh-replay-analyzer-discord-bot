@@ -8,7 +8,7 @@ import moment from 'moment';
 export function truncatedEmbedCodeField(
     {name, value, inline}: {name: string, value: string, inline?: boolean}, 
     {maxLength}: {maxLength: number} = {maxLength: 1024}
-): Discord.EmbedFieldData {
+): Discord.APIEmbedField {
     const prefix = '```\n';
     const suffix = '\n```';
     const max = maxLength - (prefix.length + suffix.length);
@@ -100,7 +100,7 @@ export async function deleteMessageById(channel: Discord.TextChannel, ...ids: st
             const message = await channel.messages.fetch(id);
             await message.delete();
         } catch (error) {
-            if (error instanceof DiscordAPIError && error.httpStatus === 404 && error.message === 'Unknown Message') {
+            if (error instanceof DiscordAPIError && error.status === 404 && error.message === 'Unknown Message') {
                 // Already deleted
             } else {
                 // Some other failure, propagate
@@ -134,8 +134,8 @@ export function getUserReferenceEmbedField(user?: Discord.GuildMember): string {
     return `${user} (${user.user.username}#${user.user.discriminator})`;
 }
 
-export async function getGuildEmbedInfoFields(guild: Discord.Guild, {user, excludeName}: {user?: Discord.User | null, excludeName?: boolean} = {}): Promise<Discord.EmbedFieldData[]> {
-    const result: Discord.EmbedFieldData[] = [];
+export async function getGuildEmbedInfoFields(guild: Discord.Guild, {user, excludeName}: {user?: Discord.User | null, excludeName?: boolean} = {}): Promise<Discord.APIEmbedField[]> {
+    const result: Discord.APIEmbedField[] = [];
     if (!excludeName) {
         result.push({
             name: 'Name', value: guild.name,

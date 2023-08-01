@@ -11,11 +11,12 @@ import { ReplayEmbed, CompactReplayEmbed } from './embed';
 import { MessageHelpers } from '../../contrib/discord';
 import { client, logger, replaysConfig as config } from '../..';
 import { readToEnd } from '../../contrib/io';
+import { AttachmentStub } from '../../types';
 
 export interface InputMessage {
     id: Discord.Snowflake;
     content: string;
-    attachments: Discord.Collection<Discord.Snowflake, Discord.MessageAttachment>;
+    attachments: Discord.Collection<Discord.Snowflake, AttachmentStub>;
     channel: Discord.TextChannel;
     author: Discord.User;
     url: string;
@@ -36,12 +37,10 @@ export default async (message: InputMessage, {forceCompact}: {forceCompact?: boo
         isHandled = true;
         // Download replay file contents to a temporary file
         const replayFilename = path.join(config.replaysTempPath, `${uuidv4()}.rec`);
-        let data: Buffer;
-        if (attachment.attachment instanceof fs.ReadStream) {
-            data = await readToEnd(attachment.attachment);
-        } else {
-            data = await download(attachment.url);
+        if (attachment.stream == null && attachment.url == null) {
+            throw new Error(`either url or stream of attachment must be set`)
         }
+        const data = attachment.stream ? await readToEnd(attachment.stream as fs.ReadStream) : await download(attachment.url as string)
         if (data.length < config.minDataLength) {
             throw new Error(`Invalid replay file data length ${data.length}, expected at least ${config.minDataLength}`);
         }
@@ -74,7 +73,7 @@ export default async (message: InputMessage, {forceCompact}: {forceCompact?: boo
             
             let EmbedType: typeof ReplayEmbed | typeof CompactReplayEmbed;
             const permissions = (message.channel as Discord.TextChannel).permissionsFor(client.user as Discord.User);
-            if (permissions?.has('MANAGE_MESSAGES') && command != 'compact' && !forceCompact) {
+            if (permissions?.has(Discord.PermissionFlagsBits.ManageMessages) && command != 'compact' && !forceCompact) {
                 EmbedType = ReplayEmbed;
             } else {
                 EmbedType = CompactReplayEmbed;

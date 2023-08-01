@@ -1,16 +1,17 @@
-import Discord, { EmbedField, MessageButton, Util } from 'discord.js';
+import Discord, { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedField } from 'discord.js';
 import * as Replay from '../../contrib/coh2/replay';
 import i18n from '../../contrib/i18n';
 import ReplaysConfig, { CommanderDatabaseEntry } from './config';
 import fs from 'fs-extra';
 import path from 'path';
-import { InputData } from '../../types';
+import { AttachmentStub, InputData } from '../../types';
 import { ReplayPlayer } from '../../contrib/coh2/replay';
 import { autoDeleteRelatedMessages, truncatedEmbedCodeField } from '../../contrib/discord';
 import { coh2Locale, logger, replaysConfig } from '../..';
 import { Char } from '../../contrib/misc';
 import { InputMessage } from '.';
 import { LogLevel } from '../../contrib/discord/logging';
+import Util from '../../contrib/discord/util';
 
 export type InputPlayer = InputData<ReplayPlayer, 'commander' | 'name' | 'steam_id_str' | 'faction' | 'team'>;
 export type InputReplay = {map: {name: string, file: string, players: number}, players: InputPlayer[]} & InputData<Replay.Data, 'duration' | 'version' | 'chat' | 'error'>;
@@ -20,18 +21,17 @@ enum PlayerAppendType {
     PlayerAndCommanderInline,
 }
 
-export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
+export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
     protected loadAllChatTip: string = '';
-    protected chatPreviewIndex: number = 0;
     protected chatPreview: ChatPreview | null = null;
     //@ts-expect-error 2564
     protected sent: Discord.Message;
     protected sentChatLog: Discord.Message[] = [];
-    protected attachments: Discord.MessageAttachment[] = [];
+    protected attachments: Discord.AttachmentBuilder[] = [];
     constructor(
         protected readonly client: Discord.Client, 
         protected readonly userMessage: InputMessage, 
-        protected readonly sourceAttachment: Discord.MessageAttachment,
+        protected readonly sourceAttachment: AttachmentStub,
         protected readonly replay: InputReplay, 
         private readonly config: ReplaysConfig
     ) {
@@ -125,11 +125,10 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         );
         this.chatPreview = this.getChatPreviewEmbed({charsPerChunk: 1024 - this.loadAllChatTip.length});
         this.addFields(this.chatPreview.field);
-        this.chatPreviewIndex = this.fields.length - 1;
     }
 
     protected appendNoScenarioPreviewImageAvailable() {
-        this.addField('\u200b', `_${i18n.get('replay.noMapPreviewImageAvailable')}_\n${`[${i18n.get('replay.requestCustomMapSupportLinkTitle')}](${replaysConfig.customMapSupportRequestInviteUrl})`}`);
+        this.addFields({ name: '\u200b', value: `_${i18n.get('replay.noMapPreviewImageAvailable')}_\n${`[${i18n.get('replay.requestCustomMapSupportLinkTitle')}](${replaysConfig.customMapSupportRequestInviteUrl})`}`});
     }
 
     protected appendMetadata({duration, gameVersion}: {duration?: boolean, gameVersion?: boolean} = {}) {
@@ -155,11 +154,11 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
             embeds: [this], 
             files: this.attachments,
             components: this.chatPreview?.complete == false ? [
-                new Discord.MessageActionRow()
+                new ActionRowBuilder<ButtonBuilder>()
                 .addComponents(
-                    new MessageButton().setCustomId('expand-chat').setLabel(i18n.get('replay.chat.expand')).setStyle('PRIMARY')
+                    new ButtonBuilder().setCustomId('expand-chat').setLabel(i18n.get('replay.chat.expand')).setStyle(ButtonStyle.Primary)
                 )
-            ] : [],
+            ] : undefined,
         }]);
         await this.expandChatPreview();    
         autoDeleteRelatedMessages({
@@ -203,7 +202,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         const filepath = this.buildScenarioPreviewFilepath(this.buildScenarioPreviewImageFilename({suffix}));
         const name = 'preview.png';
         if (fs.existsSync(filepath)) {
-            this.attachments.push(new Discord.MessageAttachment(filepath, name));
+            this.attachments.push(new Discord.AttachmentBuilder(filepath).setName(name));
             const url = `attachment://${name}`;
             switch (type) {
                 case ScenarioPreviewDisplay.Image:
@@ -225,7 +224,7 @@ export abstract class ReplayBaseEmbed extends Discord.MessageEmbed {
         if (this.chatPreview == null || this.chatPreview.complete) {
             return;
         }
-        this.sent.awaitMessageComponent({componentType: 'BUTTON', time: this.config.expandChatPreview.timeoutSeconds * 1000}).then(async () => {
+        this.sent.awaitMessageComponent({componentType: ComponentType.Button, time: this.config.expandChatPreview.timeoutSeconds * 1000}).then(async () => {
             for (const chunk of Util.splitMessage(this.replay.chat.map(message => `> ${Replay.formatChatMessage(message, {noNewline: true})}`).join('\n'))) {
                 const result = await this.sent.reply(chunk);
             }
