@@ -7,6 +7,7 @@ import { ChannelLogger, LogLevels } from '../../contrib/discord/logging';
 import { Readable } from 'stream';
 import tryParseCoH2Replay from '../../commands/parse-replay';
 import { v4 as uuidv4 } from 'uuid';
+import { client } from '../..';
 
 const root = process.cwd();
 
@@ -20,6 +21,7 @@ async function sendLocalReplayEmbed(context: Discord.Message, replayFilepath: st
     const stream = fs.createReadStream(replayFilepath);
     try {
         await tryParseCoH2Replay({
+            client: context.client,
             author: context.author,
             channel: context.channel as Discord.TextChannel,
             content: context.content,
@@ -28,7 +30,8 @@ async function sendLocalReplayEmbed(context: Discord.Message, replayFilepath: st
             attachments: new Discord.Collection([[
                 replayId, 
                 { name: `${replayId}.rec`, stream }
-            ]])
+            ]]),
+            reply: context.reply.bind(context),
         }, {forceCompact});
     } finally {
         stream.close();

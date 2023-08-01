@@ -150,7 +150,7 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
        
     public async submit() {
         await this.build();
-        this.sent = await (this.userMessage.reply ?? this.userMessage.channel.send).apply(this.userMessage, [{
+        const message: Discord.MessageCreateOptions = {
             embeds: [this], 
             files: this.attachments,
             components: this.chatPreview?.complete == false ? [
@@ -159,7 +159,8 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
                     new ButtonBuilder().setCustomId('expand-chat').setLabel(i18n.get('replay.chat.expand')).setStyle(ButtonStyle.Primary)
                 )
             ] : undefined,
-        }]);
+        }
+        this.sent = await (this.userMessage.reply ?? this.userMessage.channel.send)(message);
         await this.expandChatPreview();    
         autoDeleteRelatedMessages({
             client: this.client,

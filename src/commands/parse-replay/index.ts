@@ -14,10 +14,11 @@ import { readToEnd } from '../../contrib/io';
 import { AttachmentStub } from '../../types';
 
 export interface InputMessage {
+    client: Discord.Message['client'];
     id: Discord.Snowflake;
     content: string;
     attachments: Discord.Collection<Discord.Snowflake, AttachmentStub>;
-    channel: Discord.TextChannel;
+    channel: Discord.Message['channel'];
     author: Discord.User;
     url: string;
     reply?: Discord.Message['reply']
