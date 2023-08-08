@@ -7,6 +7,7 @@ import { ChannelLogger, LogLevels } from '../../contrib/discord/logging';
 import { Readable } from 'stream';
 import tryParseCoH2Replay from '../../commands/parse-replay';
 import { v4 as uuidv4 } from 'uuid';
+import { client } from '../..';
 
 const root = process.cwd();
 
@@ -18,10 +19,9 @@ async function sendLocalReplayEmbed(context: Discord.Message, replayFilepath: st
 
     const replayId = uuidv4();
     const stream = fs.createReadStream(replayFilepath);
-    const attachment = new Discord.MessageAttachment(stream, `${replayId}.rec`);
-    attachment.id = replayId;
     try {
         await tryParseCoH2Replay({
+            client: context.client,
             author: context.author,
             channel: context.channel as Discord.TextChannel,
             content: context.content,
@@ -29,8 +29,9 @@ async function sendLocalReplayEmbed(context: Discord.Message, replayFilepath: st
             url: context.url,
             attachments: new Discord.Collection([[
                 replayId, 
-                attachment
-            ]])
+                { name: `${replayId}.rec`, stream }
+            ]]),
+            reply: context.reply.bind(context),
         }, {forceCompact});
     } finally {
         stream.close();
@@ -50,8 +51,8 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
             const targetGuild = await client.guilds.fetch(guildId);
             const targetChannel = targetGuild.channels.cache.get(channelId) as Discord.TextChannel;
             const targetMessage = await targetChannel.messages.fetch(messageId);
-            const attachment = new Discord.MessageAttachment(Readable.from(JSON.stringify(targetMessage.toJSON(), null, 4)), `${messageId}.json`);
-            await message.reply({attachments: [attachment]});
+            const attachment = new Discord.AttachmentBuilder(Readable.from(JSON.stringify(targetMessage.toJSON(), null, 4))).setName(`${messageId}.json`);
+            await message.reply({files: [attachment]});
         } else if (command.startsWith('test:replay ')) {
             const testReplayFilepath = path.join(root, 'tests/replays', command.substring('test:replay'.length).trim());
             await sendLocalReplayEmbed(message, testReplayFilepath);
@@ -70,7 +71,7 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
                 for (const [id, oAuthGuild] of guilds) {
                     const guild = await oAuthGuild.fetch();
                     const iconUrl = guild.iconURL();
-                    await message.reply({embeds: [new Discord.MessageEmbed({
+                    await message.reply({embeds: [new Discord.EmbedBuilder({
                         title: guild.name,
                         thumbnail: iconUrl ? {url: iconUrl } : undefined,
                         description: `[View in browser](${getGuildUrl(guild)})`,
@@ -84,7 +85,7 @@ export default async (message: Discord.Message, client: Discord.Client, logger: 
             }
             case 'test:logs': {
                 for (const logLevel of LogLevels) {
-                    await message.reply({embeds: [new Discord.MessageEmbed({description: `Beginning to write "${logLevel.name}" to ${logger.destination[logLevel.name].channel}...`})]});
+                    await message.reply({embeds: [new Discord.EmbedBuilder({description: `Beginning to write "${logLevel.name}" to ${logger.destination[logLevel.name].channel}...`})]});
                     await logger.log({
                         title: `Test: "${logLevel.name}"`,
                         fields: [
@@ -118,7 +119,7 @@ export function isAdminCommand(message: Discord.Message, client: Discord.Client,
 }
 
 async function testReplays(userMessage: Discord.Message, channel: Discord.TextChannel, {forceCompact}: {forceCompact?: boolean} = {}) {
-    await userMessage.reply({embeds: [new Discord.MessageEmbed({description: `Beginning to upload replays to ${channel}...`})]});
+    await userMessage.reply({embeds: [new Discord.EmbedBuilder({description: `Beginning to upload replays to ${channel}...`})]});
     const replaysRootPath = path.join(root, 'tests/replays');
     for (const file of await fs.readdir(replaysRootPath)) {
         await sendLocalReplayEmbed(userMessage, path.join(replaysRootPath, file), {forceCompact});

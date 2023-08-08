@@ -14,14 +14,13 @@ import { ChannelLogger, Color, LogLevel } from './contrib/discord/logging';
 import i18n from './contrib/i18n';
 import { PackageJsonConfig } from './contrib/config';
 
-const intents = new Discord.Intents([
-    Discord.Intents.FLAGS.GUILDS,
-    Discord.Intents.FLAGS.GUILD_MESSAGES,
-]);
-
 // Instances
 export const client = new Discord.Client({
-    intents
+    intents: [
+        Discord.GatewayIntentBits.Guilds,
+        Discord.GatewayIntentBits.GuildMessages,
+        Discord.GatewayIntentBits.MessageContent,
+    ]
 });
 
 export const coh2Locale = new Locale();
@@ -53,7 +52,7 @@ client.on('ready', async () => {
         try {
             await client.user?.setActivity({
                 name: i18n.get('watchingActivity'),
-                type: 'WATCHING'
+                type: Discord.ActivityType.Watching,
             });
         } finally {
             setTimeout(updateStatus, 30 * 60 * 1000);
@@ -71,7 +70,7 @@ client.on('ready', async () => {
     });
 });
 
-client.on('messageCreate', async message => {
+client.on(Discord.Events.MessageCreate, async message => {
     // Filter out non-text channel message
     if (!(message.channel instanceof Discord.TextChannel)) {
         return;
@@ -95,14 +94,14 @@ client.on('messageCreate', async message => {
     }
 });
 
-client.on('guildCreate', async enteredGuild => {
+client.on(Discord.Events.GuildCreate, async enteredGuild => {
     logger.log({title: 'Joined a server', fields: await getGuildEmbedInfoFields(enteredGuild, {user: client.user})}, {
         tagAdmin: true,
         color: Color.Green,
     });
 });
 
-client.on('guildDelete', async exitedGuild => {
+client.on(Discord.Events.GuildDelete, async exitedGuild => {
     logger.log({title: 'Removed from a server', fields: await getGuildEmbedInfoFields(exitedGuild, {user: client.user})}, {
         tagAdmin: true,
         color: Color.Orange,

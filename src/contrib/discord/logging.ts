@@ -4,14 +4,15 @@ import { DiagnosticsConfig } from './config';
 import os from 'os';
 import { client } from '../..';
 import i18n from '../i18n';
+import Util from './util'
+import {DiscordErrorCode} from './constants'
 
 /* istanbul ignore next */
 /**
  * Helper for writing log messages to a discord channel.
  */
 export class ChannelLogger {
-    
-    //@ts-expect-error 2564
+    // @ts-ignore
     private admin: Discord.GuildMember;
     public readonly destination: Record<string, {guild: Discord.Guild, channel: Discord.TextChannel}> = {};
 
@@ -26,28 +27,28 @@ export class ChannelLogger {
     /**
      * Appends a reference of the guild to the embed.
      */
-    private appendGuild(embed: Discord.MessageEmbed, guild: Discord.Guild) {
-        embed.fields.push({ name: 'Server', value: `[${guild}](${getGuildUrl(guild)})`, inline: false });
+    private appendGuild(embed: Discord.EmbedBuilder, guild: Discord.Guild) {
+        embed.addFields({ name: 'Server', value: `[${guild}](${getGuildUrl(guild)})`, inline: false });
     }
 
     /**
      * Appends a reference of the channel to the embed.
      */
-    private appendChannel(embed: Discord.MessageEmbed, channel: Discord.Channel | null) {
+    private appendChannel(embed: Discord.EmbedBuilder, channel: Discord.Channel | null) {
         if (channel instanceof Discord.GuildChannel) {
             this.appendGuild(embed, channel.guild);
         }
-        embed.fields.push({ name: 'Channel', value: `${channel}`, inline: false });
+        embed.addFields({ name: 'Channel', value: `${channel}`, inline: false });
     }
 
     /**
      * Appends a reference of the message to the embed.
      */
-    private appendMessage(embed: Discord.MessageEmbed, message: Discord.Message) {
+    private appendMessage(embed: Discord.EmbedBuilder, message: Discord.Message) {
         if (message.channel) {
             this.appendChannel(embed, message.channel as Discord.TextChannel);
         }
-        embed.fields.push({ name: 'Message', value: `[${message.id}](${message.url})`, inline: false });
+        embed.addFields({ name: 'Message', value: `[${message.id}](${message.url})`, inline: false });
     }
 
     /**
@@ -65,7 +66,7 @@ export class ChannelLogger {
         this.admin = await (await this.client.guilds.fetch(this.config.admin.guild as string)).members.fetch(this.config.admin.user as string);
     }
     
-    async log(content: Discord.MessageEmbedOptions = {}, options?: {context?: LoggerContext, level?: LogLevelOption, environmentInfo?: boolean, tagAdmin?: boolean, color?: number}) {
+    async log(content: Discord.EmbedData = {}, options?: {context?: LoggerContext, level?: LogLevelOption, environmentInfo?: boolean, tagAdmin?: boolean, color?: number}) {
         const timestamp = new Date();
         const level = options?.level ?? LogLevel.Log;
         const context = options?.context;
@@ -81,12 +82,12 @@ export class ChannelLogger {
             // Overrides
             ...content,
         }
-        const embed = new Discord.MessageEmbed(content);
+        const embed = new Discord.EmbedBuilder(content);
         if (context) {
             if (context instanceof Discord.Guild) {
                 this.appendGuild(embed, context);
 
-            } else if (context instanceof Discord.Channel) {
+            } else if (context instanceof Discord.TextChannel) {
                 this.appendChannel(embed, context);
 
             } else if (context instanceof Discord.Message) {
@@ -115,7 +116,7 @@ export class ChannelLogger {
      * Writes an error message.
      */
     async error(error: Error, context?: LoggerContext) {
-        const fields: Discord.EmbedFieldData[] = [
+        const fields: Discord.APIEmbedField[] = [
             truncatedEmbedCodeField({name: 'Name', value: error.name || '_No error available._'}),
             truncatedEmbedCodeField({name: 'Message', value: error.message || '_No message available._'}),
         ];
@@ -124,7 +125,7 @@ export class ChannelLogger {
         let level = LogLevel.Error;
         if (
             error instanceof Discord.DiscordAPIError && 
-            [Discord.Constants.APIErrors.MISSING_PERMISSIONS as number].includes(error.code)
+            [DiscordErrorCode.MISSING_PERMISSIONS].includes(error.code as number)
         ) {
             level = LogLevel.Log;
         }
@@ -143,7 +144,7 @@ export class ChannelLogger {
                 truncatedEmbedCodeField({name: 'Stacktrace', value: error.stack ? 'Loading...' : '_No stacktrace available._'})
             );
             const stacktraceMessages: Discord.Message[] = [];
-            for (const chunk of Discord.Util.splitMessage(error.stack
+            for (const chunk of Util.splitMessage(error.stack
                 .split('\n')
                 .map(line => `> ${line}`)
                 .join('\n'))
@@ -152,7 +153,6 @@ export class ChannelLogger {
             }
             // When split is set to true, discord.js typings declare the return type as an array
             const url = stacktraceMessages[0].url;
-            embed.fields[embed.fields.length - 1].value = `[Show](${url})`;
             await result.edit({embeds: [embed]});
         }
     }
@@ -178,8 +178,8 @@ export class ChannelLogger {
 
     async tryNotifyEndUser(error: Discord.DiscordAPIError, message: Discord.Message) {
         switch (error.code) {
-            case Discord.Constants.APIErrors.MISSING_PERMISSIONS:
-                await message.author.send({embeds: [new Discord.MessageEmbed({
+            case DiscordErrorCode.MISSING_PERMISSIONS: 
+                await message.author.send({embeds: [new Discord.EmbedBuilder({
                     description: i18n.get('errors.missingPermissions', {format: {
                         '@bot': String(client.user),
                         'channel': String(message.channel),
