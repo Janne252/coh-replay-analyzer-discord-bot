@@ -160,7 +160,11 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
                 )
             ] : undefined,
         }
-        this.sent = await (this.userMessage.reply ?? this.userMessage.channel.send)(message);
+        if (this.userMessage.reply) {
+            this.sent = await this.userMessage.reply(message);
+        } else {
+            this.sent = await this.userMessage.channel.send(message);
+        }
         await this.expandChatPreview();    
         autoDeleteRelatedMessages({
             client: this.client,
