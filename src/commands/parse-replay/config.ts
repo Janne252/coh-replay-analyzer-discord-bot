@@ -40,6 +40,7 @@ export default class ReplaysConfig {
     flankArgs: string = '';
     commanderDatabase: CommanderDatabaseEntry[] = [];
     customMapSupportRequestInviteUrl: string = '';
+    commanderColumnTitle: string = '';
 
     async init() {
         this.commanderDatabase = JSON.parse(await fs.readFile(this.commanderDatabaseFilepath, {encoding: 'utf-8'}));

@@ -88,7 +88,7 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
                 ]);
                 if (!excludeCommanders) {
                     this.addFields([
-                        {name: i18n.get('replay.player.commander'), value: commanderList, inline: true},
+                        {name: i18n.get(this.config.commanderColumnTitle || 'replay.player.commander'), value: commanderList, inline: true},
                         // Additional column to make the "row" 3 fields.
                         // This works wonderfully on the desktop version of Discord, but not so well on mobile,
                         // where the embed fields appear to be forced to a single column (one per line)
@@ -248,7 +248,7 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
     ) {
         return { 
             inline: true, 
-            name: i18n.get('replay.player.commander'), 
+            name: i18n.get(this.config.commanderColumnTitle || 'replay.player.commander'), 
             value: replay.players
                 .filter(player => player.team == team)
                 .map(player => this.formatPlayerCommander(player, {fixedWidth: true, disguise: true}))

@@ -17,7 +17,8 @@
             "noPlayersAvailable": "No players available.",
             "noCommandersAvailable": "No commanders available.",
             "team": "Team {teamNumber}",
-            "commander": "Commander"
+            "commander": "Commander",
+            "battlegroup": "Battlegroup"
         },
         "parseError": "An error occurred while parsing the replay data. Some information may be missing or incomplete, like the match duration."
     },

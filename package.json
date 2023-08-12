@@ -62,8 +62,9 @@
       "soviet": "<:coh2_soviet:1139926823992574002>",
       "west_german": "<:coh2_west_german:1139926826513350698>",
       "aef": "<:coh2_aef:1139926813737484309>",
-      "british": "<:coh2_british:1139926818393174086>>"
-    }
+      "british": "<:coh2_british:1139926818393174086>"
+    },
+    "commanderColumnTitle": "replay.player.commander"
   },
   "replays.magic.COH3_RE": {
     "magic": "COH3_RE",
@@ -87,7 +88,8 @@
       "Americans": "<:coh3_american:1139926474359570464>",
       "AfrikaKorps": "<:coh3_afrika_korps:1139926471541006336>",
       "British": "<:coh3_british:1139926475823386734>"
-    }
+    },
+    "commanderColumnTitle": "replay.player.battlegroup"
   },
   "scripts": {
     "dev": "rimraf ./dist && tsc --project ./tsconfig.json --watch",
