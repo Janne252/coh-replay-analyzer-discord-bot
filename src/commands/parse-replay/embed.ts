@@ -7,13 +7,14 @@ import path from 'path';
 import { AttachmentStub, InputData } from '../../types';
 import { ReplayPlayer } from '../../contrib/coh2/replay';
 import { autoDeleteRelatedMessages, truncatedEmbedCodeField } from '../../contrib/discord';
-import { coh2Locale, logger, replaysConfig } from '../..';
+import { logger, replaysConfig } from '../..';
 import { Char } from '../../contrib/misc';
 import { InputMessage } from '.';
 import { LogLevel } from '../../contrib/discord/logging';
 import Util from '../../contrib/discord/util';
+import { Locale } from '../../contrib/coh2';
 
-export type InputPlayer = InputData<ReplayPlayer, 'commander' | 'name' | 'steam_id_str' | 'faction' | 'team'>;
+export type InputPlayer = InputData<ReplayPlayer, 'commander' | 'name' | 'steam_id_str' | 'profile_id' | 'faction' | 'team'>;
 export type InputReplay = {map: {name: string, file: string, players: number}, players: InputPlayer[]} & InputData<Replay.Data, 'duration' | 'version' | 'chat' | 'error'>;
 
 enum PlayerAppendType {
@@ -33,7 +34,8 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
         protected readonly userMessage: InputMessage, 
         protected readonly sourceAttachment: AttachmentStub,
         protected readonly replay: InputReplay, 
-        private readonly config: ReplaysConfig
+        private readonly config: ReplaysConfig,
+        protected readonly locale: Locale,
     ) {
         super();
     }
@@ -47,7 +49,7 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
     }
 
     protected appendTitle() {
-        this.setTitle(`${Replay.resolveScenarioDisplayName(this.replay)}`);
+        this.setTitle(`${Replay.resolveScenarioDisplayName(this.replay, this.locale)}`);
     }
 
     protected disguiseCommanderName(name: string) {
@@ -195,10 +197,10 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
         let suffix = '';
         switch (type) {
             case ScenarioPreviewDisplay.Image:
-                suffix = '';
+                suffix = '.x300';
                 break;
             case ScenarioPreviewDisplay.Thumbnail:
-                suffix = '-x80';
+                suffix = '.x80';
                 break;
             default:
                 throw new Error(`Unsupported preview type "${type}"`);
@@ -277,10 +279,14 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
         let playerName = player.name.replace(/ /g, Char.NoBreakSpace);
         let playerNameDisplay = playerName;
         if (player.steam_id_str && player.steam_id_str != '0') {
-            const url = new URL(
-                (this.config.leaderboardUrl?.template ?? `https://coh2stats.com/players/{steamId}`)
-                .replace(/\{steamId\}/g, player.steam_id_str),
-            );
+            let urlTemplate = (this.config.leaderboardUrl?.template ?? `https://coh2stats.com/players/{steamId}`)
+            if (urlTemplate.includes('{steamId}')) {
+                urlTemplate = urlTemplate.replace(/\{steamId\}/g, player.steam_id_str)
+            }
+            if (urlTemplate.includes('{profileId}') && player.profile_id != null) {
+                urlTemplate = urlTemplate.replace(/\{profileId\}/g, String(player.profile_id))
+            }
+            const url = new URL(urlTemplate);
             Object.entries(this.config.leaderboardUrl?.query ?? {})
                 .forEach(([key, value]) => url.searchParams.append(key, value))
             ;
@@ -305,7 +311,7 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
             }
         }
 
-        let result = (coh2Locale.get(commander?.locstring.name as any) || i18n.get('notAvailable'));
+        let result = (this.locale.get(commander?.locstring.name as any) || i18n.get('notAvailable'));
         if (noWrap) {
             result = result.replace(/ /g, Char.NoBreakSpace);
         }
@@ -379,7 +385,7 @@ export class ReplayEmbed extends ReplayBaseEmbed {
 
 export class CompactReplayEmbed extends ReplayBaseEmbed {
     protected appendTitle() {
-        this.setTitle(`${Replay.resolveScenarioDisplayName(this.replay)} \xa0 ⏱ \xa0||\`${this.getDurationDisplay({units: false})}\`||`);
+        this.setTitle(`${Replay.resolveScenarioDisplayName(this.replay, this.locale)} \xa0 ⏱ \xa0||\`${this.getDurationDisplay({units: false})}\`||`);
     }
 
     protected appendNoScenarioPreviewImageAvailable() {

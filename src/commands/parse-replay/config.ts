@@ -37,7 +37,7 @@ export default class ReplaysConfig {
     magic: string = '';
     minVersion: number = 0;
     expandChatPreview: { reaction: string; timeoutSeconds: number; } = {reaction: '', timeoutSeconds: 0};
-
+    flankArgs: string = '';
     commanderDatabase: CommanderDatabaseEntry[] = [];
     customMapSupportRequestInviteUrl: string = '';
 

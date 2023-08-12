@@ -4,6 +4,7 @@ import { LocaleLike } from '.';
 import { InputData } from '../../types';
 import ReplaysConfig from '../../commands/parse-replay/config';
 import i18n from '../i18n';
+import md5 from 'md5';
 
 export function formatChatMessage(
     message: InputData<ReplayChatMessage, 'message' | 'name' | 'tick'>, 
@@ -15,7 +16,7 @@ export function formatChatMessage(
     return `${timestamp} **${message.name}**: ${message.message}${noNewline ? '' : '\n'}`;
 }
 
-export function splitChat(replay: InputData<ReplayData, 'chat'>, {charsPerChunk}: {charsPerChunk?: number} = {}) {
+export function splitChat(replay: InputData<CoH2ReplayData, 'chat'>, {charsPerChunk}: {charsPerChunk?: number} = {}) {
     charsPerChunk = charsPerChunk ?? 1024;
     const chunks: ({count: number, content: string})[] = [];
     const prefix = '||';
@@ -72,22 +73,24 @@ export function getReplayDurationDisplay(ticks: number, {units}: {units?: boolea
     return [hh, mm, ss].filter(o => !!o).join(' ');
 }
 
-export function resolveScenarioId(replay: {map: {file: string}}) {
+export function resolveScenarioNormalizedFilepath(replay: {map: {file: string}}) {
     return replay.map.file
+        .toLowerCase()
         .replace(/data:/gi, '')
         .replace(/\\/g, '/')
-        .replace(/\//g, '-')
-        .replace(/ /g, '-')
-        .replace(/_/g, '-')
-        .replace(/:/g, '')
-        .replace(/[\-]+/g, '-')
-        .replace(/^\//g, '').replace(/\/$/g, '')  // Same as C# .Trim('\\')
-        .replace(/^-/g, '').replace(/-$/g, '')  // Same as C# .Trim('-')
-        .toLowerCase()
+        .replace(/^\//g, '').replace(/\/$/g, '')  // Same as C# .Trim('/')
     ;
 }
 
-export function resolveScenarioDisplayName(replay: {map: {name: string, file: string, players: number}}, locale?: LocaleLike) {
+
+export function resolveScenarioId(replay: {map: {file: string}}) {
+    const filepath = resolveScenarioNormalizedFilepath(replay);
+    const hash = md5(filepath);
+    console.log({filepath, hash})
+    return `${filepath.split('/').reverse()[0]}.${hash}`;
+}
+
+export function resolveScenarioDisplayName(replay: {map: {name: string, file: string, players: number}}, locale: LocaleLike) {
     let result = (locale ? locale.get(replay.map.name) : '') || '';
     // Fallback to provided name if it is not a LocString reference
     if (!result && !/\$[abcdef\d]+(:[abcdef\d]+)?/.test(replay.map.name)) {
@@ -125,7 +128,7 @@ export function resolveScenarioDisplayName(replay: {map: {name: string, file: st
  * Definition for https://github.com/ryantaylor/vault JSON output.
  * Semantic name "ReplayData" in the replay module and Replay.Data in external modules.
  */
-interface ReplayData {
+export interface CoH2ReplayData {
     version: string;
     chat: ReplayChatMessage[];
     date_time: string;
@@ -145,8 +148,21 @@ interface ReplayData {
     error: null | string;
 }
 
+export interface CoH3ReplayData {
+    version: string;
+    timestamp: string;
+    matchhistory_id: number;
+    map: {
+        filename: string;
+        localized_name_id: string;
+        localized_description_id: string;
+    },
+    players: {name: string, faction: string, team: string, steam_id: string, profile_id: number, messages: {tick: number, message: string}[]}[];
+    length: number;
+}
+
 // Renamed export
-export interface Data extends ReplayData {};
+export type Data = CoH2ReplayData;
 
 export interface ReplayChatMessage {
     tick: number;
@@ -159,6 +175,7 @@ export interface ReplayPlayer {
     name: string;
     steam_id: number;
     steam_id_str: string;
+    profile_id?: number;
     team: 0 | 1;
     faction: string;
     commander: number;

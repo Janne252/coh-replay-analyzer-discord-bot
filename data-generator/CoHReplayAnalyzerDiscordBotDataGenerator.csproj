@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BCnEncoderNet45, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\BCnEncoder.Net45.0.0.1\lib\net45\BCnEncoderNet45.dll</HintPath>
+    </Reference>
     <Reference Include="DotNetEnv, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\DotNetEnv.2.5.0\lib\netstandard1.3\DotNetEnv.dll</HintPath>
     </Reference>
@@ -220,15 +223,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Environment.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tasks\ArchiveIterator.cs" />
+    <Compile Include="Tasks\BuildLocaleDatabase\BuildLocaleDatabase.cs" />
     <Compile Include="Tasks\GenerateScenarioPreviewImages\RGTConverter.cs" />
     <Compile Include="Tasks\GenerateScenarioPreviewImages\GenerateScenarioPreviewImages.cs" />
     <Compile Include="Tasks\GenerateScenarioPreviewImages\ScenarioFolder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".env">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include=".env.local">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include=".secrets">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="App.config" />
     <None Include="packages.config" />
@@ -239,8 +251,176 @@
     </PreBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="assets\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_minimap_mm_starting_point_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_minimap_mm_starting_point_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_minimap_mm_starting_point_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_minimap_mm_starting_point_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_minimap_mm_starting_point_5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_minimap_mm_starting_point_6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_minimap_mm_starting_point_7.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_minimap_mm_starting_point_8.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_resources_minimap_icon_radiotower.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_symbols_building_common_guard_tower_symbol.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_symbols_building_common_munitions_symbol.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_symbols_building_common_support_bay_symbol.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_symbols_building_military_field_hospital_symbol.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_symbols_flag_fuel_symbol.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_symbols_flag_null_symbol.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh2\Icons_symbols_flag_victory_symbol.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\mm_ammo_point.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\mm_ammo_point_high.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\mm_ammo_point_med.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\mm_fuel_point.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\mm_fuel_point_high.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\mm_fuel_point_med.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\mm_territory_point.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\mm_victory_point.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_01_blue.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_01_red.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_02_blue.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_02_red.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_03_blue.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_03_red.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_04_blue.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_04_red.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_05_blue.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_05_red.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_06_blue.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_06_red.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_07_blue.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_07_red.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_08_blue.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_08_red.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\benghazi_6p_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\catania_crossing_6p_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\cliff_crossing_2p_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\desert_airfield_6p_mkii_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\desert_village_2p_mkiii_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\gardens_2p_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\industrial_railyard_6p_mkii_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\monte_cavo_8p_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\mountain_ruins_6p_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\mountain_ruins_8p_mkii_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\rails_and_sand_4p_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\rural_castle_4p_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\rural_town_2p_mkii_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\rural_town_4p_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\torrente_4p_mkiii_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\twin_beach_2p_mkii_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-images\coh3\winter_line_8p_mkii_mm_generated.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 </Project>

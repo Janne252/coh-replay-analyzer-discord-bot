@@ -26,134 +26,24 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
 {
     internal class GenerateScenarioPreviewImages
     {
-        static readonly Dictionary<string, string> ScenarioIconsFilenameMap = new Dictionary<string, string>
-        {
-            {"territory_point",  "Icons_symbols_flag_null_symbol" },
-            {"territory_point_command",  "Icons_symbols_flag_null_symbol" },
-            { "territory_point_mp", "Icons_symbols_flag_null_symbol" },
-            { "starting_position_shared_territory__1000", "Icons_minimap_mm_starting_point_1" },
-            { "starting_position_shared_territory__1001", "Icons_minimap_mm_starting_point_2" },
-            { "starting_position_shared_territory__1002", "Icons_minimap_mm_starting_point_3" },
-            { "starting_position_shared_territory__1003", "Icons_minimap_mm_starting_point_4" },
-            { "starting_position_shared_territory__1004", "Icons_minimap_mm_starting_point_5" },
-            { "starting_position_shared_territory__1005", "Icons_minimap_mm_starting_point_6" },
-            { "starting_position_shared_territory__1006", "Icons_minimap_mm_starting_point_7" },
-            { "starting_position_shared_territory__1007", "Icons_minimap_mm_starting_point_8" },
-
-            { "starting_position_sp__1000", "Icons_minimap_mm_starting_point_1" },
-            { "starting_position_sp__1001", "Icons_minimap_mm_starting_point_2" },
-            { "starting_position_sp__1002", "Icons_minimap_mm_starting_point_3" },
-            { "starting_position_sp__1003", "Icons_minimap_mm_starting_point_4" },
-            { "starting_position_sp__1004", "Icons_minimap_mm_starting_point_5" },
-            { "starting_position_sp__1005", "Icons_minimap_mm_starting_point_6" },
-            { "starting_position_sp__1006", "Icons_minimap_mm_starting_point_7" },
-            { "starting_position_sp__1007", "Icons_minimap_mm_starting_point_8" },
-
-            { "starting_position__1000", "Icons_minimap_mm_starting_point_1" },
-            { "starting_position__1001", "Icons_minimap_mm_starting_point_2" },
-            { "starting_position__1002", "Icons_minimap_mm_starting_point_3" },
-            { "starting_position__1003", "Icons_minimap_mm_starting_point_4" },
-            { "starting_position__1004", "Icons_minimap_mm_starting_point_5" },
-            { "starting_position__1005", "Icons_minimap_mm_starting_point_6" },
-            { "starting_position__1006", "Icons_minimap_mm_starting_point_7" },
-            { "starting_position__1007", "Icons_minimap_mm_starting_point_8" },
-
-            { "victory_point", "Icons_symbols_flag_victory_symbol" },
-            { "victory_point_no_swap", "Icons_symbols_flag_victory_symbol" },
-            { "victory_point_no_ticker", "Icons_symbols_flag_victory_symbol" },
-
-            { "territory_munitions_point", "Icons_symbols_building_common_munitions_symbol" },
-            { "territory_munitions_point_mp", "Icons_symbols_building_common_munitions_symbol" },
-            { "tow_kalach_munitions_point", "Icons_symbols_building_common_munitions_symbol" },
-
-            { "territory_fuel_point", "Icons_symbols_flag_fuel_symbol" },
-            { "territory_fuel_point_mp", "Icons_symbols_flag_fuel_symbol" },
-            { "tow_kalach_fuel_point", "Icons_symbols_flag_fuel_symbol" },
-
-            { "support_bay", "Icons_symbols_building_common_support_bay_symbol" },
-            { "military_hospital", "Icons_symbols_building_common_support_bay_symbol" },
-            { "m10_military_hospital", "Icons_symbols_building_common_support_bay_symbol" },
-
-            { "tow_kalach_radio_tower", "Icons_resources_minimap_icon_radiotower" },
-            { "radio_tower_point_occupation", "Icons_resources_minimap_icon_radiotower" },
-            { "radio_tower_point_mp", "Icons_resources_minimap_icon_radiotower" },
-            { "radio_antenna", "Icons_resources_minimap_icon_radiotower" },
-            { "radio_antenna_no_abilities", "Icons_resources_minimap_icon_radiotower" },
-
-            { "watchtower", "Icons_symbols_building_common_guard_tower_symbol" },
-            { "tow_kalach_watchtower", "Icons_symbols_building_common_guard_tower_symbol" },
-        };
-
-        enum ScenarioIconExclusionRule
-        {
-            All,
-            Neutral,
-        }
-        /// <summary>
-        /// Conditional mapping of entities to ignore. Consists of entity name and ownership.
-        /// </summary>
-        static readonly Dictionary<string, ScenarioIconExclusionRule> ScenarioIconsFilenameMapExcludes = new Dictionary<string, ScenarioIconExclusionRule>
-        {
-            // Some maps have neutral starting positions
-            { "starting_position", ScenarioIconExclusionRule.Neutral },
-            { "starting_position_sp", ScenarioIconExclusionRule.Neutral },
-            { "starting_position_shared_territory", ScenarioIconExclusionRule.Neutral },
-            // Ignore invisible territory points
-            { "territory_point_invisible", ScenarioIconExclusionRule.All },
-            { "territory_point_invisible_command", ScenarioIconExclusionRule.All },
-        };
-
-        /// <summary>
-        /// Entities that should never be suffixed with its owner id.
-        /// Some maps may technically contain player-owned strategic points. We don't have numbered icons for those.
-        /// For example "starting_position" will be suffixed with its owner, 
-        /// and e.g. with ownership of player 1 it becomes "starting_position__1000". This is mapped to the starting position icon with number 1.
-        /// </summary>
-        static readonly string[] ScenarioIconNoOwnerVariant = new string[]
-        {
-            "territory_point", "territory_point_command", "territory_point_mp",
-
-            "victory_point", "victory_point_no_swap", "victory_point_no_ticker",
-
-            "territory_munitions_point", "territory_munitions_point_mp", "tow_kalach_munitions_point",
-
-            "territory_fuel_point", "territory_fuel_point_mp", "tow_kalach_fuel_point",
-
-            "radio_tower_point_occupation",
-
-            "support_bay", "military_hospital", "m10_military_hospital",
-
-            "radio_antenna", "radio_antenna_no_abilities",
-
-            "watchtower", "tow_kalach_watchtower",
-        };
-
-        /// <summary>
-        /// List of archives from which scenarios should never be loaded from. 
-        /// Mostly Theater of War or Single Player maps.
-        /// </summary>
-        static readonly string[] ExcludeArchives = new string[]
-        {
-            "DLC1Scenarios.sga",
-            "DLC2Scenarios.sga",
-            "DLC3Scenarios.sga",
-            "SPScenariosAA.sga",
-            "SPScenariosEF.sga",
-            "TOWScenarios.sga",
-        };
+        public Dictionary<string, string> ScenarioIconsFilenameMap { get; private set; }
+        public Dictionary<string, string> ScenarioPreviewImageIconExclusions { get; private set; }
 
         /// <summary>
         /// Runtime cache of scenario icon Image instances.
         /// </summary>
         private Dictionary<string, Image> ScenarioIconCache = new Dictionary<string, Image>();
 
-        public static string StartupRootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
         public string GameArchivesRootPath { get; private set; }
         public string[] ScenarioPreviewImageCandidates { get; private set; }
         public string ScenarioPreviewImageIconsRootPath { get; private set; }
         public string ScenarioPreviewImageOutputRootPath { get; private set; }
         public string[] ExcludedArchiveNames { get; private set; }
+        public string[] ScenarioFileExtensions { get; private set; }
+        public string PreviewImageSourceRootPath { get; private set; }
+
+        public string[] SuffixPreviewImageIconNameWithOwner { get; private set; }
+        public string[] SuffixPreviewImageIconNameWithPlayerCount { get; private set; }
 
         public bool LoadScenarioIconsInfo { get; private set; }
         static JpegEncoder JpegEncoder = new JpegEncoder()
@@ -165,18 +55,42 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
         public GenerateScenarioPreviewImages(string envSuffix)
         {
             GameArchivesRootPath = Env.GetString($"{envSuffix}_GAME_ARCHIVES_ROOT_PATH");
-            ScenarioPreviewImageIconsRootPath = Path.Combine(StartupRootPath, Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_ICONS_RELATIVE_PATH"));
-            ScenarioPreviewImageOutputRootPath = Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_OUTPUT_ROOT_PATH");
-            ExcludedArchiveNames = Env.GetString($"{envSuffix}_EXCLUDED_ARCHIVE_FILE_NAMES").Split(',');
-            ScenarioPreviewImageCandidates = Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_CANDIDATES").Split(',');
             LoadScenarioIconsInfo = Env.GetBool($"{envSuffix}_LOAD_SCENARIO_ICONS_INFO");
+            ScenarioFileExtensions = Env.GetString($"{envSuffix}_SCENARIO_FILE_EXTENSION").Split(',');
+
+            ScenarioPreviewImageIconsRootPath = Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_ICONS_ROOT_PATH");
+            if (ScenarioPreviewImageIconsRootPath == null && LoadScenarioIconsInfo)
+            {
+                throw new ApplicationException($"environment variable {envSuffix}_SCENARIO_PREVIEW_IMAGE_ICONS_ROOT_PATH must be set when {envSuffix}_LOAD_SCENARIO_ICONS_INFO is enabled");
+            }
+
+            ScenarioPreviewImageOutputRootPath = Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_OUTPUT_ROOT_PATH");
+            ExcludedArchiveNames = Env.GetString($"{envSuffix}_EXCLUDED_ARCHIVE_FILE_NAMES", fallback: "").Split(',');
+            ScenarioPreviewImageCandidates = Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_CANDIDATES", fallback: "").Split(',');
 
             if (GameArchivesRootPath == null || GameArchivesRootPath.Length == 0 || !Directory.Exists(GameArchivesRootPath))
             {
                 throw new ArgumentException($"Invalid gameArchivesRootPath: Path \"{GameArchivesRootPath}\" doesn't exist for env suffix ${envSuffix}");
             }
 
+            PreviewImageSourceRootPath = Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_SOURCE_ROOT_PATH", fallback: null);
+            ScenarioIconsFilenameMap = parseEnvDictionary(Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_ENTITY_ICONS"));
 
+            ScenarioPreviewImageIconExclusions = parseEnvDictionary(Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_ICON_EXCLUSIONS", fallback: ""));
+
+            SuffixPreviewImageIconNameWithOwner = Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_ICON_SUFFIX_OWNER", fallback: "").Split(',');
+            SuffixPreviewImageIconNameWithPlayerCount = Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_ICON_SUFFIX_PLAYER_COUNT", fallback: "").Split(',');
+        }
+
+        private static Dictionary<string, string> parseEnvDictionary(string raw)
+        {
+            return raw.Trim()
+                .Split('\n')
+                .Select((row) => row.Trim())
+                .Where((row) => row.Length > 0)
+                .Select((row) => row.Split('=').Select((token) => token.Trim()))
+                .ToDictionary(tokens => tokens.ElementAt(0), tokens => tokens.ElementAt(1))
+            ;
         }
         public void Run()
         {
@@ -191,12 +105,9 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
                     continue;
                 }
 
-                Debug.WriteLine(archiveFilePath);
                 var scenarioFolders = getScenarioFolders(new Archive(archiveFilePath));
                 foreach (var scenarioFolder in scenarioFolders)
                 {
-                    Debug.WriteLine(scenarioFolder.ScenarioName);
-
                     RenderPreviewImage(scenarioFolder);
                 }
             }
@@ -204,8 +115,9 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
 
         private void RenderPreviewImage(ScenarioFolder scenario)
         {
-            var outputImageFilePath = Path.Combine(ScenarioPreviewImageOutputRootPath, $"{scenario.ScenarioName}.{scenario.ScenarioId}.jpg");
-            var outputImageFilePathLossless = Path.Combine(ScenarioPreviewImageOutputRootPath, $"{scenario.ScenarioName}.{scenario.ScenarioId}.png");
+            var outputImageFilePath = Path.Combine(ScenarioPreviewImageOutputRootPath, $"{scenario.ScenarioName}.{scenario.ScenarioId}.x300.jpg");
+            var outputImageFilePathCompact = Path.Combine(ScenarioPreviewImageOutputRootPath, $"{scenario.ScenarioName}.{scenario.ScenarioId}.x80.jpg");
+            var outputImageFilePathLossless = Path.Combine(ScenarioPreviewImageOutputRootPath, $"{scenario.ScenarioName}.{scenario.ScenarioId}.x300.png");
             var basePreviewImage = scenario.GetPreviewImageData();
             // Maximum width of Discord embed image
             var targetWidth = 300;
@@ -222,8 +134,7 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
                 );
             }
 
-
-            var iconOverlayScale = basePreviewImage.Width * 1.0 / Math.Max(scenario.ScenarioWidth, scenario.ScenarioHeight);
+            var iconOverlayScale = basePreviewImage.Width * 1.0 / System.Math.Max(scenario.ScenarioWidth, scenario.ScenarioHeight);
             var xScale = basePreviewImage.Width * 1.0 / scenario.ScenarioWidth;
             var yScale = basePreviewImage.Height * 1.0 / scenario.ScenarioHeight;
 
@@ -240,11 +151,11 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
             foreach (var icon in scenario.Icons)
             {
                 if (
-                        ScenarioIconsFilenameMapExcludes.ContainsKey(icon.EbpName) && (
+                        ScenarioPreviewImageIconExclusions.ContainsKey(icon.EbpName) && (
                         // global ignore; No comparison
-                        ScenarioIconsFilenameMapExcludes[icon.EbpName] == ScenarioIconExclusionRule.All ||
+                        ScenarioPreviewImageIconExclusions[icon.EbpName] == "ALL" ||
                         // Ignore neutral
-                        (ScenarioIconsFilenameMapExcludes[icon.EbpName] == ScenarioIconExclusionRule.Neutral && icon.OwnerId == 0)
+                        (ScenarioPreviewImageIconExclusions[icon.EbpName] == "NEUTRAL" && icon.OwnerId == 0)
                     )
                 )
                 {
@@ -252,7 +163,11 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
                     continue;
                 }
 
-                var iconImage = GetScenarioIconImage(icon);
+                var iconImage = GetScenarioIconImage(scenario, icon);
+                if (iconImage == null)
+                {
+                    continue;
+                }
                 var x = (basePreviewImage.Width / 2.0) + scale(icon.X * iconOverlayScale / xScale, scenarioWidthMin, scenarioWidthMax, imageWidthMin, imageWidthMax) - iconImage.Width / 2.0;
                 var y = (basePreviewImage.Height / 2.0) + scale(flip(icon.Y) * iconOverlayScale / yScale, scenarioHeightMin, scenarioHeightMax, imageHeightMin, imageHeightMax) - iconImage.Height / 2.0;
 
@@ -261,22 +176,43 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
                 );
 
             }
+
+            var thumbnailx80 = basePreviewImage.CloneAs<SixLabors.ImageSharp.PixelFormats.Argb32>();
+            thumbnailx80.Mutate(_ => _
+                .Resize(new ResizeOptions()
+                {
+                    Mode = ResizeMode.Max,
+                    Size = new SixLabors.ImageSharp.Size(80, 80)
+                })
+            );
+
+            thumbnailx80.Save(outputImageFilePathCompact, JpegEncoder);
             basePreviewImage.Save(outputImageFilePathLossless, PngEncoder);
-            // basePreviewImage.Save(outputImageFilePath, JpegEncoder);
+            basePreviewImage.Save(outputImageFilePath, JpegEncoder);
         }
 
-        private Image GetScenarioIconImage(ScenarioFolder.ScenarioIcon icon)
+        private Image GetScenarioIconImage(ScenarioFolder scenario, ScenarioFolder.ScenarioIcon icon)
         {
             var iconKey = icon.EbpName;
-            if (icon.OwnerId != 0 && !ScenarioIconNoOwnerVariant.Contains(icon.EbpName))
+            if (icon.OwnerId != 0 && SuffixPreviewImageIconNameWithOwner.Any((ebpName) => ebpName == icon.EbpName))
             {
                 iconKey = $"{iconKey}__{icon.OwnerId}";
             }
-            iconKey = Path.Combine(ScenarioPreviewImageIconsRootPath, $"{ScenarioIconsFilenameMap[iconKey]}.png");
+            if (SuffixPreviewImageIconNameWithPlayerCount.Any((ebpName) => ebpName == icon.EbpName))
+            {
+                iconKey = $"{iconKey}__{scenario.PlayerCount}p";
+            }
+            if (!ScenarioIconsFilenameMap.ContainsKey(iconKey))
+            {
+                Debug.WriteLine($"Missing icon for entity: {iconKey}=");
+                return null;
+            }
+
+            iconKey = Path.Combine(ScenarioPreviewImageIconsRootPath, $"{ScenarioIconsFilenameMap[iconKey]}");
 
             if (!ScenarioIconCache.ContainsKey(iconKey))
             {
-                var image = SixLabors.ImageSharp.Image.Load(iconKey); ;
+                var image = SixLabors.ImageSharp.Image.Load(iconKey);
                 ScenarioIconCache[iconKey] = image;
                 if (image.Width > 24 && image.Height > 24)
                 {
@@ -293,7 +229,7 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
             return (value - fromMin) * (toMax - toMin) / (fromMax - fromMin) + toMin;
         }
 
-        private static double flip(double number) => number < 0 ? Math.Abs(number) : 0 - number;
+        private static double flip(double number) => number < 0 ? System.Math.Abs(number) : 0 - number;
 
         private IEnumerable<ScenarioFolder> getScenarioFolders(INode root)
         {
@@ -301,20 +237,29 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
             Action<INode> iterator = null;
             iterator = (INode node) =>
             {
-                if (node.Name.EndsWith(".sgb"))
+                if (ScenarioFileExtensions.Any((extension) => node.Name.EndsWith(extension)))
                 {
                     try
                     {
-                        var scenarioFolder = new ScenarioFolder(node as ArchiveFile, ScenarioPreviewImageCandidates, LoadScenarioIconsInfo);
+                        var scenarioFolder = new ScenarioFolder(
+                            node as ArchiveFile, 
+                            ScenarioPreviewImageCandidates, 
+                            LoadScenarioIconsInfo,
+                            PreviewImageSourceRootPath
+                        );
                         result.Add(scenarioFolder);
                     }
-                    catch (ScenarioFolder.MissingInfoFileException)
+                    catch (ScenarioFolder.MissingInfoFileException e)
                     {
-                        Debug.WriteLine($"[warning] Map {node.Name} in {node.Archive} does not have an info file.");
+                        Debug.WriteLine($"[warning] {node.Name} @ {node.Archive}: {e.Message}");
                     }
                     catch (ScenarioFolder.InvalidInfoFileException e)
                     {
-                        Debug.WriteLine($"[warning] {e.Message} {node.Name} in {node.Archive} ({e.InfoFile.Name}):\n\t{e.InnerException?.ToString()}");
+                        Debug.WriteLine($"[warning] {node.Name} @ {node.Archive}: {e.Message} :\n\t{e.InnerException?.ToString()}");
+                    }
+                    catch (ScenarioFolder.MissingPreviewImageFileException e)
+                    {
+                        Debug.WriteLine($"[warning] {node.Name} @ {node.Archive}: {e.Message}");
                     }
                 }
                 else if (node.Children != null && node.Children.Count > 0)
