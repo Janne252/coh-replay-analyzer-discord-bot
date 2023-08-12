@@ -44,6 +44,7 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
 
         public string[] SuffixPreviewImageIconNameWithOwner { get; private set; }
         public string[] SuffixPreviewImageIconNameWithPlayerCount { get; private set; }
+        public string CustomScenariosRootPath { get; private set; }
 
         public bool LoadScenarioIconsInfo { get; private set; }
         static JpegEncoder JpegEncoder = new JpegEncoder()
@@ -80,6 +81,7 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
 
             SuffixPreviewImageIconNameWithOwner = Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_ICON_SUFFIX_OWNER", fallback: "").Split(',');
             SuffixPreviewImageIconNameWithPlayerCount = Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_ICON_SUFFIX_PLAYER_COUNT", fallback: "").Split(',');
+            CustomScenariosRootPath = Env.GetString($"{envSuffix}_CUSTOM_SCENARIOS_DOWNLOAD_CACHE_ROOT_PATH", fallback: null);
         }
 
         private static Dictionary<string, string> parseEnvDictionary(string raw)
@@ -98,7 +100,14 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
                 Directory.Delete(ScenarioPreviewImageOutputRootPath, true);
             Directory.CreateDirectory(ScenarioPreviewImageOutputRootPath);
 
-            foreach (var archiveFilePath in Directory.GetFiles(GameArchivesRootPath, "*.sga", SearchOption.AllDirectories))
+            var archiveFilePaths = new List<string>();
+            if (CustomScenariosRootPath != null)
+            {
+                archiveFilePaths.AddRange(Directory.GetFiles(CustomScenariosRootPath, "*.sga", SearchOption.AllDirectories));
+            }
+            archiveFilePaths.AddRange(Directory.GetFiles(GameArchivesRootPath, "*.sga", SearchOption.AllDirectories));
+            
+            foreach (var archiveFilePath in archiveFilePaths)
             {
                 if (ExcludedArchiveNames.Contains(Path.GetFileName(archiveFilePath)))
                 {

@@ -46,7 +46,7 @@
     "flankExecutablePath": "./.flank.coh2.bin/release/flank",
     "flankArgs": "--wipecmd",
     "scenarioPreviewImageRootPath": "./data/scenario-preview-images/coh2",
-    "commanderDatabaseFilepath": "./data/coh2/commanders.json",
+    "commanderDatabaseFilepath": "./data/game-data/coh2/commanders.json",
     "localeFilePaths": {
       "en": "./data/locale/coh2/English.ucs",
       "fr": "./data/locale/coh2/French.ucs"
@@ -71,7 +71,7 @@
     "flankExecutablePath": "./.flank.coh3.bin/release/flank",
     "flankArgs": "",
     "scenarioPreviewImageRootPath": "./data/scenario-preview-images/coh3",
-    "commanderDatabaseFilepath": "./data/coh2/commanders.json",
+    "commanderDatabaseFilepath": "./data/game-data/coh2/commanders.json",
     "localeFilePaths": {
       "en": "./data/locale/coh3/English.ucs",
       "fr": "./data/locale/coh3/French.ucs"
