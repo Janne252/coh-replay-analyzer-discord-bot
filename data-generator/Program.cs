@@ -1,68 +1,48 @@
-﻿using COH2ReplayDiscordBotDataGenerator.Attributes;
-using COH2ReplayDiscordBotDataGenerator.Tasks;
-using Humanizer;
-using LuaInterface;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using RelicCore.Archive;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Processing;
-using SteamWebAPI2.Interfaces;
-using SteamWebAPI2.Utilities;
+﻿using CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreviewImages;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Serialization;
 
-namespace COH2ReplayDiscordBotMapImageExtractor
+using DotNetEnv;
+using System.IO;
+using System.Reflection;
+using System.Diagnostics;
+using CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.BuildLocaleDatabase;
+using CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.BuildGameDatabase;
+using CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.UpdateCustomScenarios;
+
+namespace CoHReplayAnalyzerDiscordBotDataGenerator
 {
-    class Program
+    internal class Program
     {
-        static List<string> Output = new List<string>();
 
-        /// <summary>
-        /// Absolute path to the directory from which the program entrypoint is located.
-        /// </summary>
-        public static string StartupRootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-        public static string CoH2GameSourceRootPath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".coh2.game.rootpath.local")).Trim();
-        public static string CoH2ArchivesSourceRootPath = Path.Join(CoH2GameSourceRootPath, "CoH2", "Archives");
-        public static string CoH2ModdingToolDataSourceRootPath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".coh2.modding-tool-data.rootpath.local")).Trim();
-        public static string ScenarioPreviewImageDestinationRootPath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".scenario-images.output.rootpath.local")).Trim();
-        public static string CommanderIconDestinationRootPath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".commander-icons.output.rootpath.local")).Trim();
-        public static string CommanderDatabaseDestinationFilepath = System.IO.File.ReadAllText(Path.Join(StartupRootPath, ".commander-database.output.rootpath.local")).Trim();
-        public static string ScenarioIconsSourceRootPath = Path.Join(StartupRootPath, @"assets\icons\minimap");
-        public static string CommanderIconsSourceRootPath = Path.Join(StartupRootPath, @"assets\icons\commander");
-        public static string CachedCustomScenariosOutputRootPath = Path.Join(StartupRootPath, ".workshop-downloads-cache");
-
-        static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
-            GenerateCommanderDatabase.Run(
-                CoH2ModdingToolDataSourceRootPath,
-                CommanderIconsSourceRootPath,
-                CommanderIconDestinationRootPath,
-                CommanderDatabaseDestinationFilepath
-            );
-            await UpdateCustomScenarios.Run(
-                StartupRootPath,
-                CachedCustomScenariosOutputRootPath
-            );
-            GenerateScenarioPreviewImages.Run(
-                CoH2ArchivesSourceRootPath,
-                CachedCustomScenariosSourceRootPath: CachedCustomScenariosOutputRootPath,
-                ScenarioPreviewImageDestinationRootPath,
-                ScenarioIconsSourceRootPath
-            );
+            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
+            // Auto-generated environment variables
+            var baseEnv = new StringBuilder();
+            var rootPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            baseEnv.AppendLine($"STARTUP_ROOT_PATH={rootPath}");
+            baseEnv.AppendLine($"ASSETS_ROOT_PATH={Path.Combine(rootPath, "assets")}");
+            DotNetEnv.Env.LoadContents(baseEnv.ToString());
+            DotNetEnv.Env.Load(".secrets");
+            DotNetEnv.Env.Load(".env.local");
+            DotNetEnv.Env.Load(".env");
+
+            new BuildLocaleDatabase("COH1").Run();
+            new BuildLocaleDatabase("COH2").Run();
+            new BuildLocaleDatabase("COH3").Run();
+
+            new GenerateCommanderDatabase("COH2").Run();
+
+            new UpdateCustomScenarios("COH2").Run().Wait();
+
+            // new GenerateScenarioPreviewImages("COH1").Run();
+            new GenerateScenarioPreviewImages("COH2").Run();
+            // new GenerateScenarioPreviewImages("COH3").Run();
+
         }
     }
 }

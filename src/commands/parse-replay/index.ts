@@ -5,13 +5,14 @@ import { v4 as uuidv4 } from 'uuid';
 import download from 'download';
 import { exec } from '../../contrib/misc';
 import * as Replay from '../../contrib/coh2/replay';
-import Config from './config';
 import { ChannelLogger, LogLevel } from '../../contrib/discord/logging';
 import { ReplayEmbed, CompactReplayEmbed } from './embed';
 import { MessageHelpers } from '../../contrib/discord';
-import { client, logger, replaysConfig as config } from '../..';
+import { client, locales, logger } from '../..';
 import { readToEnd } from '../../contrib/io';
 import { AttachmentStub } from '../../types';
+import ReplaysConfig from './config';
+import { PackageJsonConfig } from '../../contrib/config';
 
 export interface InputMessage {
     client: Discord.Message['client'];
@@ -25,6 +26,8 @@ export interface InputMessage {
 }
 
 export default async (message: InputMessage, {forceCompact}: {forceCompact?: boolean} = {}): Promise<boolean> => {
+    let config = new ReplaysConfig();
+    PackageJsonConfig.assign(config, 'replays.common');
     const attachments = [...message.attachments].map(([id, attachment]) => attachment);
     let isHandled = false;
 
@@ -45,7 +48,12 @@ export default async (message: InputMessage, {forceCompact}: {forceCompact?: boo
         if (data.length < config.minDataLength) {
             throw new Error(`Invalid replay file data length ${data.length}, expected at least ${config.minDataLength}`);
         }
-        const [, , version, magic] = [data[0], data[1], data.readInt16LE(2), String.fromCharCode.apply(null, [...data.slice(4, 12)])];
+        const [, , version, magic] = [data[0], data[1], data.readInt16LE(2), String.fromCharCode.apply(null, [...data.slice(4, 12)]).replace(/\0$/, '')];
+        
+        config = new ReplaysConfig();
+        await PackageJsonConfig.assign(config, 'replays.common');
+        await PackageJsonConfig.assign(config, `replays.magic.${magic}`);
+        await config.init();
         
         // Not a CoH2 replay or too early version for https://github.com/ryantaylor/vault
         if (magic != config.magic) {
@@ -55,6 +63,10 @@ export default async (message: InputMessage, {forceCompact}: {forceCompact?: boo
         else if (version < config.minVersion) {
             logger.log({title: 'Unsupported version', description: `Unexpected replay header version ${version}, expected at least ${config.minVersion}`}, {level: LogLevel.Warning});
             continue
+        }
+
+        if (locales[magic] && !locales[magic].isInitialized) {
+            await locales[magic].init(config.localeFilePaths);
         }
 
         try {
@@ -69,8 +81,50 @@ export default async (message: InputMessage, {forceCompact}: {forceCompact?: boo
                     -h, --help       Prints help information
                     -V, --version    Prints version information
             */
-            const {stdout} = await exec(`${config.flankExecutablePath} --wipecmd ${replayFilename}`);
-            const replay: Replay.Data = JSON.parse(stdout);
+            const {stdout} = await exec(`${config.flankExecutablePath} ${config.flankArgs} ${replayFilename}`);
+            let rawData = JSON.parse(stdout);
+            let replay: Replay.Data;
+
+            if (magic == 'COH3_RE') {
+                let data = rawData as Replay.CoH3ReplayData;
+                replay = {
+                    map: {
+                        file: data.map.filename,
+                        name: data.map.localized_name_id,
+                        description: data.map.localized_description_id,
+                        description_long: '',
+                        width: 0,
+                        height: 0,
+                        players: data.players.length,
+                    },
+                    chat: [], 
+                    date_time: data.timestamp,
+                    duration: data.length,
+                    error: null,
+                    players: data.players.map((player) => ({
+                        name: player.name,
+                        commander: 0,
+                        faction: player.faction,
+                        id: 0,
+                        items: [],
+                        team: player.team === 'First' ? 0 : 1,
+                        steam_id: Number(player.steam_id),
+                        steam_id_str: player.steam_id,
+                        profile_id: player.profile_id,
+                    })),
+                    game_type: '',
+                    version: data.version,
+                }
+                for (const player of data.players) {
+                    replay.chat.push(...player.messages.map(({message, tick}) => ({
+                        message, 
+                        tick,
+                        name: player.name
+                    })))
+                }
+            } else {
+                replay = rawData 
+            }
             
             let EmbedType: typeof ReplayEmbed | typeof CompactReplayEmbed;
             const permissions = (message.channel as Discord.TextChannel).permissionsFor(client.user as Discord.User);
@@ -79,7 +133,7 @@ export default async (message: InputMessage, {forceCompact}: {forceCompact?: boo
             } else {
                 EmbedType = CompactReplayEmbed;
             }
-            const embed = new EmbedType(client, message, attachment, replay, config);
+            const embed = new EmbedType(client, message, attachment, replay, config, locales[magic]);
             await embed.submit();
         } catch (error) {
             // Propagate

@@ -1,6 +1,7 @@
 node_modules
 /.replays
 /.flank.bin
+/.flank.*.bin
 /.map-image-extractor.bin
 /.data-generator.bin
 /.discord.token
@@ -16,3 +17,6 @@ node_modules
 
 *.rootpath.local
 *.steam-web-api.key
+
+.secrets
+.env.local

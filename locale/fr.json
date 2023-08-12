@@ -17,7 +17,8 @@
             "noPlayersAvailable": "Aucun joueurs disponibles.",
             "noCommandersAvailable": "Pas de commandants disponibles.",
             "team": "Équipe {teamNumber}",
-            "commander": "Commandant"
+            "commander": "Commandant",
+            "battlegroup": "Groupement"
         },
         "parseError": "Une erreur s'est produite lors de l'analyse des données du ralenti. Des informations pourraient manquer ou être incomplètes, comme la durée de la partie."
     },

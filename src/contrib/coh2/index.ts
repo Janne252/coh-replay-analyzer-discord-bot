@@ -6,7 +6,8 @@ import i18n from '../i18n';
  */
 export class Locale implements LocaleLike {
     public static readonly Empty = new Locale();
-    
+    public isInitialized = false;
+
     /**
      * @param idPrefix Prefixed added to each message ID. Defaults to '$'.
      */
@@ -25,6 +26,7 @@ export class Locale implements LocaleLike {
                 this.messages[localeName][Number(id)] = message;
             }
         }
+        this.isInitialized = true;
     }
 
     get(id: number | string, locale?: string) {

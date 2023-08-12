@@ -30,40 +30,72 @@
       "user": "163578909965811712"
     }
   },
-  "replays": {
-    "magic": "COH2_REC",
-    "minVersion": 19545,
-    "minDataLength": 12,
-    "flankExecutablePath": "./.flank.bin/release/flank",
+  "replays.common": {
     "replaysTempPath": "./.replays",
-    "scenarioPreviewImageRootPath": "./data/scenario-preview-images",
-    "localeFilePaths": {
-      "en": "./data/coh2/RelicCoH2.English.ucs",
-      "fr": "./data/coh2/RelicCoH2.French.ucs"
-    },
-    "leaderboardUrl": {
-      "template": "https://coh2stats.com/players/{steamId}",
-      "query": {"utm_source": "coh2-replay-bot"}
-    },
+    "minDataLength": 12,
     "expandChatPreview": {
       "reaction": "💬",
       "timeoutSeconds": 30
     },
     "waitForDeletionTimeoutSeconds": 30,
-    "factionEmojis": {
-      "german": "<:german:753277450171056208>",
-      "soviet": "<:soviet:753277450489954375>",
-      "west_german": "<:west_german:753277450217062411>",
-      "aef": "<:aef:753277449944432830>",
-      "british": "<:british:753277449957277867>"
-    },
-    "commanderDatabaseFilepath": "./data/coh2/commanders.json",
     "customMapSupportRequestInviteUrl": "https://discord.gg/nBQQ4Xh5RR"
+  },
+  "replays.magic.COH2_REC": {
+    "magic": "COH2_REC",
+    "minVersion": 19545,
+    "flankExecutablePath": "./.flank.coh2.bin/release/flank",
+    "flankArgs": "--wipecmd",
+    "scenarioPreviewImageRootPath": "./data/scenario-preview-images/coh2",
+    "commanderDatabaseFilepath": "./data/game-data/coh2/commanders.json",
+    "localeFilePaths": {
+      "en": "./data/locale/coh2/English.ucs",
+      "fr": "./data/locale/coh2/French.ucs"
+    },
+    "leaderboardUrl": {
+      "template": "https://coh2stats.com/players/{steamId}",
+      "query": {
+        "utm_source": "coh-replay-analyzer-discord-bot"
+      }
+    },
+    "factionEmojis": {
+      "german": "<:coh2_german:1139926822109323364>",
+      "soviet": "<:coh2_soviet:1139926823992574002>",
+      "west_german": "<:coh2_west_german:1139926826513350698>",
+      "aef": "<:coh2_aef:1139926813737484309>",
+      "british": "<:coh2_british:1139926818393174086>"
+    },
+    "commanderColumnTitle": "replay.player.commander"
+  },
+  "replays.magic.COH3_RE": {
+    "magic": "COH3_RE",
+    "minVersion": 8369,
+    "flankExecutablePath": "./.flank.coh3.bin/release/flank",
+    "flankArgs": "",
+    "scenarioPreviewImageRootPath": "./data/scenario-preview-images/coh3",
+    "commanderDatabaseFilepath": "./data/game-data/coh2/commanders.json",
+    "localeFilePaths": {
+      "en": "./data/locale/coh3/English.ucs",
+      "fr": "./data/locale/coh3/French.ucs"
+    },
+    "leaderboardUrl": {
+      "template": "https://coh3stats.com/players/{profileId}",
+      "query": {
+        "utm_source": "coh-replay-analyzer-discord-bot"
+      }
+    },
+    "factionEmojis": {
+      "Wehrmacht": "<:coh3_german:1139926477115228200>",
+      "Americans": "<:coh3_american:1139926474359570464>",
+      "AfrikaKorps": "<:coh3_afrika_korps:1139926471541006336>",
+      "British": "<:coh3_british:1139926475823386734>"
+    },
+    "commanderColumnTitle": "replay.player.battlegroup"
   },
   "scripts": {
     "dev": "rimraf ./dist && tsc --project ./tsconfig.json --watch",
     "build": "rimraf ./dist && tsc --project ./tsconfig.json",
-    "build:flank": "cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.bin",
+    "build:flank:coh2": "rimraf ./.flank.coh2.bin && cd flank && git checkout v0.6.0 && cd .. && cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.coh2.bin",
+    "build:flank:coh3": "rimraf ./.flank.coh3.bin && cd flank && git checkout v1.0.0 && cd .. && cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.coh3.bin",
     "start": "node ./dist/index.js --enable-source-maps",
     "test": "ts-mocha -p ./tsconfig.json ./src/**/*.spec.ts --exit",
     "test:coverage": "nyc --cache false --reporter=text --reporter=html npm test"
@@ -71,9 +103,11 @@
   "author": "Janne Varjo",
   "license": "MIT",
   "dependencies": {
+    "@types/md5": "^2.3.2",
     "discord.js": "^14.12.1",
     "download": "^8.0.0",
     "fs-extra": "^11.1.1",
+    "md5": "^2.3.0",
     "moment": "^2.29.4",
     "uuid": "^9.0.0"
   },

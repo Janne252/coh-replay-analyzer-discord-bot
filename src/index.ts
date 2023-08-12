@@ -23,7 +23,11 @@ export const client = new Discord.Client({
     ]
 });
 
-export const coh2Locale = new Locale();
+export const locales: Record<string, Locale> = {
+    'COH2_REC': new Locale(),
+    'COH3_RE': new Locale(),
+}
+
 export const diagnosticsConfig = new DiagnosticsConfig();
 export const replaysConfig = new ReplaysConfig();
 export const logger = new ChannelLogger(client, diagnosticsConfig);
@@ -32,16 +36,14 @@ const shutdownManager = new ShutdownManager(client, logger);
 client.on('ready', async () => {
     // Replay deletion listers can exceed 10 if both test:replays and test:replays-compact are executed
     client.setMaxListeners(32);
-    await PackageJsonConfig.assign(replaysConfig, 'replays');
+    await PackageJsonConfig.assign(replaysConfig, 'replays.common');
     await PackageJsonConfig.assign(diagnosticsConfig, 'diagnostics');
-    await replaysConfig.init();
 
     // Prepare .replays folder
     await fs.ensureDir(replaysConfig.replaysTempPath);
     await fs.emptyDir(replaysConfig.replaysTempPath);
     
     await Promise.all([
-        coh2Locale.init(replaysConfig.localeFilePaths),
         logger.init(),
         i18n.loadJsonCatalogs(path.join(process.cwd(), 'locale')),
     ]);
