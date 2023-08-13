@@ -94,8 +94,8 @@
   "scripts": {
     "dev": "rimraf ./dist && tsc --project ./tsconfig.json --watch",
     "build": "rimraf ./dist && tsc --project ./tsconfig.json",
-    "build:flank:coh2": "rimraf ./.flank.coh2.bin && cd flank && git checkout v0.6.0 && cd .. && cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.coh2.bin",
-    "build:flank:coh3": "rimraf ./.flank.coh3.bin && cd flank && git checkout v1.1.0 && cd .. && cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.coh3.bin",
+    "build:flank:coh2": "rimraf ./.flank.coh2.bin && cd flank && git pull origin master && git checkout v0.6.0 && cd .. && cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.coh2.bin",
+    "build:flank:coh3": "rimraf ./.flank.coh3.bin && cd flank && git pull origin master && git checkout v1.1.0 && cd .. && cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.coh3.bin",
     "start": "node ./dist/index.js --enable-source-maps",
     "test": "ts-mocha -p ./tsconfig.json ./src/**/*.spec.ts --exit",
     "test:coverage": "nyc --cache false --reporter=text --reporter=html npm test"
