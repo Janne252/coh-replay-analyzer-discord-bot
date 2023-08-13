@@ -86,7 +86,7 @@ export function resolveScenarioNormalizedFilepath(replay: {map: {file: string}})
 export function resolveScenarioId(replay: {map: {file: string}}) {
     const filepath = resolveScenarioNormalizedFilepath(replay);
     const hash = md5(filepath);
-    console.log({filepath, hash})
+    // console.log({filepath, hash})
     return `${filepath.split('/').reverse()[0]}.${hash}`;
 }
 

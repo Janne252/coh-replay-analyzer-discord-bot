@@ -34,5 +34,10 @@
     "error": "Error",
     "errors": {
         "missingPermissions": "{@bot} does not have the necessary permissions to access the channel {channel} on {server}. If you believe this is an error, please notify an administrator on the server."
+    },
+    "command": {
+        "messageContextMenu": {
+            "createReplayEmbed": "Parse replay"
+        }
     }
 }

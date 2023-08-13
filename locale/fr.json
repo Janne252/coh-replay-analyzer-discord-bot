@@ -34,5 +34,10 @@
     "error": "Erreur",
     "errors": {
         "missingPermissions": "{@bot} n'a pas les permissions nécessaires pour accéder au salon {channel} de {server}. Si vous pensez que c'est une erreur, merci d'avertir l'administrateur du serveur."
+    },
+    "command": {
+        "messageContextMenu": {
+            "createReplayEmbed": "Parse replay"
+        }
     }
 }
