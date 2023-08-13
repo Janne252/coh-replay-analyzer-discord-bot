@@ -152,8 +152,20 @@ client.on(Discord.Events.MessageCreate, async message => {
 });
 
 client.on(Discord.Events.InteractionCreate, async (interaction) => {
-	if (interaction.isMessageContextMenuCommand() && interaction.commandName === tryParseReplayViaInteraction.commandName) {
-        await tryParseReplayViaInteraction.handler(interaction as any as Discord.MessageContextMenuCommandInteraction);
+    let reply: Discord.InteractionResponse | null = null;
+    if (interaction.isRepliable()) {
+        reply = await interaction.deferReply();
+    }
+    let deleteReply = true;
+    try {
+        if (interaction.isMessageContextMenuCommand() && interaction.commandName === tryParseReplayViaInteraction.commandName) {
+            const result = await tryParseReplayViaInteraction.handler(interaction as any as Discord.MessageContextMenuCommandInteraction);
+            deleteReply = result.deleteReply;
+        }
+    } finally {
+        if (deleteReply) {
+            await reply?.delete();
+        }
     }
 });
 
