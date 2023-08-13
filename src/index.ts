@@ -12,8 +12,9 @@ import tryExecuteAdminCommand from './commands/admin';
 import { getGuildEmbedInfoFields, ShutdownManager } from './contrib/discord';
 import { DiagnosticsConfig } from './contrib/discord/config';
 import { ChannelLogger, Color, LogLevel } from './contrib/discord/logging';
-import i18n from './contrib/i18n';
+import i18n, { I18n } from './contrib/i18n';
 import { PackageJsonConfig } from './contrib/config';
+import { ApplicationCommandScope } from './types';
 
 // Instances
 export const client = new Discord.Client({
@@ -64,51 +65,51 @@ client.on(Discord.Events.ClientReady, async () => {
 
 
     const registerCommands = async () => {
-        const commandDefinitions: {command: Discord.ContextMenuCommandBuilder, deployed: Record<string, boolean | undefined>}[] = [
-            { command: new Discord.ContextMenuCommandBuilder()
-                .setName(tryParseReplayViaInteraction.commandName)
-                .setNameLocalization('en-US', i18n.get('command.messageContextMenu.createReplayEmbed'))
-                .setNameLocalization('en-GB', i18n.get('command.messageContextMenu.createReplayEmbed'))
-                .setNameLocalization('fr', i18n.get('command.messageContextMenu.createReplayEmbed', {locale: 'fr'}))
-                .setType(Discord.ApplicationCommandType.Message), deployed: {} }
+        const commandDefinitions: {command: (i18n: I18n, scope: ApplicationCommandScope) => Discord.ContextMenuCommandBuilder, deployed: Record<string, boolean | undefined>, commandName: string}[] = [
+            { command: tryParseReplayViaInteraction.getOptions, deployed: {}, commandName: tryParseReplayViaInteraction.commandName }
         ];
 
         const guild = await client.guilds.fetch(diagnosticsConfig.support.guild as string);
         const globalCommands = await client.application!.commands.fetch();
         const guildCommands = await guild.commands.fetch();
-        for (const { scope, commands, manager } of [
-            { scope: 'global', commands: globalCommands, manager: client.application!.commands }, 
-            { scope: `guild<${guild.id}>`, commands: guildCommands, manager: guild.commands }
+        for (const { scope, scopeId, commands, manager } of [
+            { scope: ApplicationCommandScope.Global, scopeId: '', commands: globalCommands, manager: client.application!.commands }, 
+            { scope: ApplicationCommandScope.Guild, scopeId: guild.id, commands: guildCommands, manager: guild.commands }
         ]) {
+            const scopeKey = `${scope}<${scopeId}>`;
+
             for (const [id, command] of commands) {
                 let isDefined = false;
                 for (const definition of commandDefinitions) {
-                    if (definition.command.name === command.name) {
+                    if (definition.commandName === command.name) {
+                        const defined = definition.command(i18n, scope);
                         isDefined = true;
-                        if (definition.command.type !== command.type) {
+                        if (defined.type !== command.type) {
                             await command.delete();
-                            console.log(`[${scope}] Deleted command "${definition.command.name}" (incompatible with existing)`);
-                            definition.deployed[scope] = false
+                            console.log(`[${scopeKey}] Deleted command "${definition.commandName}" (incompatible with existing)`);
+                            definition.deployed[scopeKey] = false
                         } else {
-                            definition.deployed[scope] = true
+                            definition.deployed[scopeKey] = true
                         }
 
-                        if (definition.deployed[scope]) {
-                            await command.edit(definition.command);
-                            console.log(`[${scope}] Updated command "${definition.command.name}"`);
+                        if (definition.deployed[scopeKey]) {
+                            await command.edit(defined);
+                            console.log(`[${scopeKey}] Updated command "${definition.commandName}"`);
                         }
                     }
                 }
                 if (!isDefined) {
                     await command.delete();
-                    console.log(`[${scope}] Deleted command "${command.name}" (non-defined)`);
+                    console.log(`[${scopeKey}] Deleted command "${command.name}" (non-defined)`);
                 }   
             }
             
             for (const definition of commandDefinitions) {
-                if (!definition.deployed[scope]) {
-                    await manager.create(definition.command);
-                    console.log(`[${scope}] Created command "${definition.command.name}"`);
+                if (!definition.deployed[scopeKey]) {
+                    const defined = definition.command(i18n, scope);
+                    await manager.create(defined);
+                    console.log(`[${scopeKey}] Created command "${definition.commandName}"`);
+                    definition.deployed[scopeKey] = true;
                 }
             }
         }

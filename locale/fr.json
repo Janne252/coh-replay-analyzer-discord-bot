@@ -37,7 +37,10 @@
     },
     "command": {
         "messageContextMenu": {
-            "createReplayEmbed": "Parse replay"
+            "createReplayEmbed": {
+                "global": "Parse replay",
+                "guild": "[LOCAL] Parse replay"
+            }
         }
     }
 }
