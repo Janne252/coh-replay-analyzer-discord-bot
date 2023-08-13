@@ -15,11 +15,12 @@ export const getOptions = (i18n: I18n, scope: ApplicationCommandScope) => {
 }
 
 export const handler = async (interaction: Discord.MessageContextMenuCommandInteraction) => {
+    const reply = await interaction.deferReply();
     const message = interaction.targetMessage;
     try {
         await tryParseReplay(message);
     } finally {
-        return { deleteReply: true }
+        await reply.delete();
     }
 }
 
