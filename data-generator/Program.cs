@@ -31,13 +31,13 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator
             DotNetEnv.Env.Load(".env.local");
             DotNetEnv.Env.Load(".env");
 
-            new BuildLocaleDatabase("COH1").Run();
-            new BuildLocaleDatabase("COH2").Run();
-            new BuildLocaleDatabase("COH3").Run();
+            // new BuildLocaleDatabase("COH1").Run();
+            // new BuildLocaleDatabase("COH2").Run();
+            // new BuildLocaleDatabase("COH3").Run();
 
-            new GenerateCommanderDatabase("COH2").Run();
+            // new GenerateCommanderDatabase("COH2").Run();
 
-            new UpdateCustomScenarios("COH2").Run().Wait();
+            // new UpdateCustomScenarios("COH2").Run().Wait();
 
             // new GenerateScenarioPreviewImages("COH1").Run();
             new GenerateScenarioPreviewImages("COH2").Run();

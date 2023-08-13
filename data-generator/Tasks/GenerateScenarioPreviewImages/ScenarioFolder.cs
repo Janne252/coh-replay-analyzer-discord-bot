@@ -25,11 +25,11 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
     internal class ScenarioFolder
     {
         public class MissingInfoFileException : FileNotFoundException {
-            public MissingInfoFileException(string filename): base("", filename) { }
+            public MissingInfoFileException(string filename): base($".info file not found ({filename})", filename) { }
         }
         public class MissingPreviewImageFileException : FileNotFoundException
         {
-            public MissingPreviewImageFileException(string filename) : base("", filename) {} 
+            public MissingPreviewImageFileException(string filename) : base($"Preview image not found ({filename})", filename) {} 
         }
         public class InvalidInfoFileException : Exception
         {
@@ -42,6 +42,17 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
             public InvalidInfoFileException(string message, ArchiveFile infoFile) : base(message)
             {
                 InfoFile = infoFile;
+            }
+        }
+
+        internal class DuplicatScenarioException : Exception
+        {
+            public ScenarioFolder ScenarioFolder { get; private set; }
+            public ScenarioFolder[] Duplicates { get; private set; }
+            public DuplicatScenarioException(ScenarioFolder scenarioFolder, ScenarioFolder[] duplicates) : base($"Duplicate scenario: {scenarioFolder.ReferenceName} -> [{String.Join(", ", duplicates.Select(s => s.ReferenceName))}]")
+            {
+                ScenarioFolder = scenarioFolder;
+                Duplicates = duplicates;
             }
         }
 
@@ -77,6 +88,7 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
             }
         }
 
+        public ArchiveFile ScenarioFile { get; private set; }
         public string ScenarioName { get; private set; }
         public ArchiveFolder Folder { get; private set; }
         public ArchiveFile InfoFile { get; private set; }
@@ -87,28 +99,41 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
         public ScenarioIcon[] Icons { get; private set; }
 
         public string NormalizedScenarioFilepath { get; private set; }
-        public string ScenarioId { get; private set; }
 
+        public string NormalizedShortName { get; private set; }
+        public string ReferenceName { get; private set; }
+        public string ScenarioId { get; private set; }
+        public string ScenarioFileChecksum { get; private set; }
         public uint PlayerCount { get; private set; } = 0;
 
         private static MD5 ScenarioIdHasher = MD5.Create();
 
         public string PreviewImageSourceRootPath { get; private set; }
-        public ScenarioFolder(ArchiveFile scenarioFile, string[] scenarioPreviewImageCandidates, bool loadInfo, string previewImageSourceRootPath)
+        public ScenarioFolder(
+            ArchiveFile scenarioFile, string[] 
+            scenarioPreviewImageCandidates, 
+            bool loadInfo, 
+            string previewImageSourceRootPath,
+            List<ScenarioFolder> others
+        )
         {
-
+            PreviewImageSourceRootPath = previewImageSourceRootPath;
+            ScenarioFile = scenarioFile;
+            ScenarioFileChecksum = scenarioFile.CRC32.ToString("x2");
             ScenarioName = Path.GetFileNameWithoutExtension(scenarioFile.Name);
+            ReferenceName = $"{ScenarioFile.Archive.Name}::{ScenarioFile.FullName}";
             NormalizedScenarioFilepath = Path.Combine(Path.GetDirectoryName(scenarioFile.FullName), Path.GetFileNameWithoutExtension(scenarioFile.FullName))
                 .ToLower()
                 .Replace("data:", "")
                 .Replace("\\", "/")
                 .Trim('/')
             ;
+            NormalizedShortName = NormalizedScenarioFilepath.Split('/').Last();
             ScenarioId = BitConverter.ToString(ScenarioIdHasher.ComputeHash(Encoding.ASCII.GetBytes(NormalizedScenarioFilepath)))
                 .ToLower()
                 .Replace("-", "")
             ;
-            Debug.WriteLine($"{NormalizedScenarioFilepath}\n\t{ScenarioId}\n");
+            // Debug.WriteLine($"{NormalizedScenarioFilepath}\n\t{ScenarioId}\n");
             Folder = scenarioFile.Parent as ArchiveFolder;
             var infoFilename = $"{ScenarioName}.info";
             InfoFile = Folder.Children.FirstOrDefault(file => file.Name == infoFilename) as ArchiveFile;
@@ -178,22 +203,15 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
             }
             Icons = icons.ToArray();
 
-            PreviewImageSourceRootPath = previewImageSourceRootPath;
-        }
-
-        public struct Block
-        {
-            public uint DataSizeUncompressed;
-            public uint DataSizeCompressed;
-            public Block(uint dataSizeUncompressed, uint dataSizeCompressed)
+            if (others.Any(o => o.ScenarioFileChecksum == ScenarioFileChecksum))
             {
-                DataSizeUncompressed = dataSizeUncompressed;
-                DataSizeCompressed = dataSizeCompressed;
+                throw new DuplicatScenarioException(this, others.Where(o => o.ScenarioFileChecksum == ScenarioFileChecksum).ToArray());
             }
         }
 
         private static FourCC DATA_TMAN = FourCC.Parse("TMAN");
         private static FourCC DATA_TDAT = FourCC.Parse("TDAT");
+
         public Image GetPreviewImageData()
         {
             var rawImageData = PreviewImageFile.GetData();
@@ -295,6 +313,11 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
             {
                 throw new ArgumentException($"Unsupported image type {extension} ({PreviewImageFile.Name})");
             }
+        }
+
+        public override string ToString()
+        {
+            return $"<{NormalizedShortName}>[{ScenarioFile.Archive.Name}]";
         }
     }
 }

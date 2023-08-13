@@ -21,11 +21,14 @@ using System.Reflection;
 using SixLabors.ImageSharp.Processing;
 using System.Runtime.CompilerServices;
 using SixLabors.ImageSharp.Formats.Pbm;
+using System.Xml.Linq;
 
 namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreviewImages
 {
     internal class GenerateScenarioPreviewImages
     {
+        public List<ScenarioFolder> ScenarioFolders { get; } = new List<ScenarioFolder>();
+
         public Dictionary<string, string> ScenarioIconsFilenameMap { get; private set; }
         public Dictionary<string, string> ScenarioPreviewImageIconExclusions { get; private set; }
 
@@ -106,7 +109,9 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
                 archiveFilePaths.AddRange(Directory.GetFiles(CustomScenariosRootPath, "*.sga", SearchOption.AllDirectories));
             }
             archiveFilePaths.AddRange(Directory.GetFiles(GameArchivesRootPath, "*.sga", SearchOption.AllDirectories));
-            
+
+            var scenarioShortNameMap = new Dictionary<string, List<ScenarioFolder>>();
+
             foreach (var archiveFilePath in archiveFilePaths)
             {
                 if (ExcludedArchiveNames.Contains(Path.GetFileName(archiveFilePath)))
@@ -114,11 +119,21 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
                     continue;
                 }
 
-                var scenarioFolders = getScenarioFolders(new Archive(archiveFilePath));
-                foreach (var scenarioFolder in scenarioFolders)
+                LoadScenarioFolders(new Archive(archiveFilePath));
+            }
+            foreach (var scenarioFolder in ScenarioFolders)
+            {
+                RenderPreviewImage(scenarioFolder);
+
+                if (!scenarioShortNameMap.ContainsKey(scenarioFolder.NormalizedShortName))
                 {
-                    RenderPreviewImage(scenarioFolder);
+                    scenarioShortNameMap[scenarioFolder.NormalizedShortName] = new List<ScenarioFolder>();
                 }
+                if (scenarioShortNameMap[scenarioFolder.NormalizedShortName].Count > 0)
+                {
+                    Debug.WriteLine($"[warning] duplicate scenario NormalizedShortName: {scenarioFolder.NormalizedShortName} ({String.Join(", ", scenarioShortNameMap[scenarioFolder.NormalizedShortName].Select(s => s.ReferenceName))})");
+                }
+                scenarioShortNameMap[scenarioFolder.NormalizedShortName].Add(scenarioFolder);
             }
         }
 
@@ -240,47 +255,41 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
 
         private static double flip(double number) => number < 0 ? System.Math.Abs(number) : 0 - number;
 
-        private IEnumerable<ScenarioFolder> getScenarioFolders(INode root)
+        private void LoadScenarioFolders(INode root)
         {
-            var result = new List<ScenarioFolder>();
-            Action<INode> iterator = null;
-            iterator = (INode node) =>
+            ArchiveIterator.EachFile(root as Archive, (file) =>
             {
-                if (ScenarioFileExtensions.Any((extension) => node.Name.EndsWith(extension)))
+                if (ScenarioFileExtensions.Any((extension) => file.Name.EndsWith(extension)))
                 {
                     try
                     {
                         var scenarioFolder = new ScenarioFolder(
-                            node as ArchiveFile, 
-                            ScenarioPreviewImageCandidates, 
+                            file,
+                            ScenarioPreviewImageCandidates,
                             LoadScenarioIconsInfo,
-                            PreviewImageSourceRootPath
+                            PreviewImageSourceRootPath,
+                            ScenarioFolders
                         );
-                        result.Add(scenarioFolder);
+                        ScenarioFolders.Add(scenarioFolder);
                     }
                     catch (ScenarioFolder.MissingInfoFileException e)
                     {
-                        Debug.WriteLine($"[warning] {node.Name} @ {node.Archive}: {e.Message}");
+                        Debug.WriteLine($"[warning] {file.Name} @ {file.Archive}: {e.Message}");
                     }
                     catch (ScenarioFolder.InvalidInfoFileException e)
                     {
-                        Debug.WriteLine($"[warning] {node.Name} @ {node.Archive}: {e.Message} :\n\t{e.InnerException?.ToString()}");
+                        Debug.WriteLine($"[warning] {file.Name} @ {file.Archive}: {e.Message}{(e.InnerException != null ? ":\n\t" : "")}{e.InnerException?.ToString()}");
                     }
                     catch (ScenarioFolder.MissingPreviewImageFileException e)
                     {
-                        Debug.WriteLine($"[warning] {node.Name} @ {node.Archive}: {e.Message}");
+                        Debug.WriteLine($"[warning] {file.Name} @ {file.Archive}: {e.Message}");
                     }
-                }
-                else if (node.Children != null && node.Children.Count > 0)
-                {
-                    foreach (var childNode in node.Children)
+                    catch (ScenarioFolder.DuplicatScenarioException e)
                     {
-                        iterator(childNode);
+                        Debug.WriteLine($"4[warning] {file.Name} @ {file.Archive}: {e.Message}");
                     }
                 }
-            };
-            iterator(root);
-            return result;
+            });
         }
     }
 }
