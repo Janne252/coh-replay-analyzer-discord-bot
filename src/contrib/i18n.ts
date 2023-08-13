@@ -34,13 +34,13 @@ export class I18n {
     private async read(filename: string) {
         const localeName = path.basename(filename, '.json');
         const translations = JSON.parse(await fs.readFile(filename, {encoding: 'utf8'}));
-        this.append(translations, localeName);
+        this.append(translations, this.normalizeLocale(localeName));
     }
 
     public append(translations: TranslationDeclaration, prefix = '') {
         for (const key in translations) {
             const value = translations[key];
-            const id = `${this.normalizeLocale(prefix)}.${key}`;
+            const id = `${prefix}.${key}`;
             if (typeof value === 'object') {
                 this.append(value, id);
             } else {
