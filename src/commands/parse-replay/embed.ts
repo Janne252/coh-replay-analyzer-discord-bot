@@ -1,7 +1,7 @@
 import Discord, { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedField } from 'discord.js';
 import * as Replay from '../../contrib/coh2/replay';
 import i18n from '../../contrib/i18n';
-import ReplaysConfig, { CommanderDatabaseEntry } from './config';
+import ReplaysConfig, { BattlegroupDatabaseEntry, CommanderDatabaseEntry } from './config';
 import fs from 'fs-extra';
 import path from 'path';
 import { AttachmentStub, InputData } from '../../types';
@@ -14,7 +14,7 @@ import { LogLevel } from '../../contrib/discord/logging';
 import Util from '../../contrib/discord/util';
 import { Locale } from '../../contrib/coh2';
 
-export type InputPlayer = InputData<ReplayPlayer, 'commander' | 'name' | 'steam_id_str' | 'profile_id' | 'faction' | 'team'>;
+export type InputPlayer = InputData<ReplayPlayer, 'commander' | 'battlegroup' | 'name' | 'steam_id_str' | 'profile_id' | 'faction' | 'team'>;
 export type InputReplay = {map: {name: string, file: string, players: number}, players: InputPlayer[]} & InputData<Replay.Data, 'duration' | 'version' | 'chat' | 'error'>;
 
 enum PlayerAppendType {
@@ -303,15 +303,17 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
 
     protected formatPlayerCommander(player: InputPlayer, {fixedWidth, disguise, noWrap, monospace}: {fixedWidth: boolean | number, disguise: boolean, noWrap?: boolean, monospace?: boolean}) {
         let commander: CommanderDatabaseEntry | null = null;
-
+        let commanderDisplayName: string = ''
         for (const availableCommander of this.config.commanderDatabase) {
-            if (availableCommander.server_id == player.commander) {
-                commander = availableCommander;
+            if ((availableCommander as CommanderDatabaseEntry).server_id == player.commander) {
+                commanderDisplayName = this.locale.get((availableCommander as CommanderDatabaseEntry)?.locstring.name as any)
                 break;
+            } else if ((availableCommander as BattlegroupDatabaseEntry).upgrade_id == player.battlegroup) {
+                commanderDisplayName = (availableCommander as BattlegroupDatabaseEntry).display_name
             }
         }
 
-        let result = (this.locale.get(commander?.locstring.name as any) || i18n.get('notAvailable'));
+        let result = commanderDisplayName || i18n.get('notAvailable');
         if (noWrap) {
             result = result.replace(/ /g, Char.NoBreakSpace);
         }

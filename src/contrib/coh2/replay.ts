@@ -157,7 +157,7 @@ export interface CoH3ReplayData {
         localized_name_id: string;
         localized_description_id: string;
     },
-    players: {name: string, faction: string, team: string, steam_id: string, profile_id: number, messages: {tick: number, message: string}[]}[];
+    players: {name: string, faction: string, team: string, steam_id: string, profile_id: number, battlegroup: number, messages: {tick: number, message: string}[]}[];
     length: number;
 }
 
@@ -179,6 +179,7 @@ export interface ReplayPlayer {
     team: 0 | 1;
     faction: string;
     commander: number;
+    battlegroup: number;
     items: {
         selection_id: number;
         server_id: number;

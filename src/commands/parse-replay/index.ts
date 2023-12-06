@@ -104,6 +104,7 @@ export default async (message: InputMessage, {forceCompact}: {forceCompact?: boo
                     players: data.players.map((player) => ({
                         name: player.name,
                         commander: 0,
+                        battlegroup: player.battlegroup,
                         faction: player.faction,
                         id: 0,
                         items: [],

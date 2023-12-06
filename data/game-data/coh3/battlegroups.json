@@ -1,0 +1,81 @@
+[
+    {
+        "id": 2044457,
+        "upgrade_id": 182327,
+        "display_name": "Airborne Battlegroup"
+    },
+    {
+        "id": 2044458,
+        "upgrade_id": 196934,
+        "display_name": "Armored Battlegroup"
+    },
+    {
+        "id": 2044459,
+        "upgrade_id": 178732,
+        "display_name": "Advanced Infantry Battlegroup"
+    },
+    {
+        "id": 2044461,
+        "upgrade_id": 201177,
+        "display_name": "Special Operations Battlegroup"
+    },
+
+    
+    {
+        "id": 2044465,
+        "upgrade_id": 198405,
+        "display_name": "Breakthrough Battlegroup"
+    },
+    {
+        "id": 2033184,
+        "upgrade_id": 2033181,
+        "display_name": "Italian Coastal Battlegroup"
+    },
+    {
+        "id": 2044466,
+        "upgrade_id": 200791,
+        "display_name": "Defense Battlegroup"
+    },
+    {
+        "id": 2044467,
+        "upgrade_id": 199200,
+        "display_name": "Luftwaffe Battlegroup"
+    },
+    {
+        "id": 2044468,
+        "upgrade_id": 197799,
+        "display_name": "Mechanized Battlegroup"
+    },
+
+    {
+        "id": 2075341,
+        "upgrade_id": 2075339,
+        "display_name": "Armored Support"
+    },
+    {
+        "id": 2074239,
+        "upgrade_id": 2074236,
+        "display_name": "Italian Combined Arms Battlegroup"
+    },
+    {
+        "id": 2072431,
+        "upgrade_id": 2072430,
+        "display_name": "Italian Infantry Battlegroup"
+    },
+
+    {
+        "id": 2044462,
+        "upgrade_id": 222626,
+        "display_name": "Air and Sea Battlegroup"
+    },
+    {
+        "id": 2044463,
+        "upgrade_id": 202321,
+        "display_name": "Heavy Armor Battlegroup"
+    },
+    {
+        "id": 2044464,
+        "upgrade_id": 201650,
+        "display_name": "Indian Artillery Battlegroup"
+    }
+]

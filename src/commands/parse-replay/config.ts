@@ -38,7 +38,7 @@ export default class ReplaysConfig {
     minVersion: number = 0;
     expandChatPreview: { reaction: string; timeoutSeconds: number; } = {reaction: '', timeoutSeconds: 0};
     flankArgs: string = '';
-    commanderDatabase: CommanderDatabaseEntry[] = [];
+    commanderDatabase: (CommanderDatabaseEntry | BattlegroupDatabaseEntry)[] = [];
     customMapSupportRequestInviteUrl: string = '';
     commanderColumnTitle: string = '';
 
@@ -59,4 +59,10 @@ export interface CommanderDatabaseEntry {
         icon: string;
         icon_secondary: string;
     }
+}
+
+export interface BattlegroupDatabaseEntry {
+    id: number;
+    upgrade_id: number;
+    display_name: string;
 }

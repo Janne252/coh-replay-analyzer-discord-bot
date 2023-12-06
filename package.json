@@ -72,7 +72,7 @@
     "flankExecutablePath": "./.flank.coh3.bin/release/flank",
     "flankArgs": "",
     "scenarioPreviewImageRootPath": "./data/scenario-preview-images/coh3",
-    "commanderDatabaseFilepath": "./data/game-data/coh2/commanders.json",
+    "commanderDatabaseFilepath": "./data/game-data/coh3/battlegroups.json",
     "localeFilePaths": {
       "en": "./data/locale/coh3/English.ucs",
       "fr": "./data/locale/coh3/French.ucs"
@@ -95,7 +95,7 @@
     "dev": "rimraf ./dist && tsc --project ./tsconfig.json --watch",
     "build": "rimraf ./dist && tsc --project ./tsconfig.json",
     "build:flank:coh2": "rimraf ./.flank.coh2.bin && cd flank && git pull origin master --rebase && git checkout v0.6.0 && cd .. && cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.coh2.bin",
-    "build:flank:coh3": "rimraf ./.flank.coh3.bin && cd flank && git pull origin master --rebase && git checkout v1.1.0 && cd .. && cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.coh3.bin",
+    "build:flank:coh3": "rimraf ./.flank.coh3.bin && cd flank && git pull origin master --rebase && git checkout v2.2.0 && cd .. && cargo build --manifest-path flank/Cargo.toml --release --target-dir .flank.coh3.bin",
     "start": "node ./dist/index.js --enable-source-maps",
     "test": "ts-mocha -p ./tsconfig.json ./src/**/*.spec.ts --exit",
     "test:coverage": "nyc --cache false --reporter=text --reporter=html npm test"
@@ -103,13 +103,13 @@
   "author": "Janne Varjo",
   "license": "MIT",
   "dependencies": {
-    "@types/md5": "^2.3.2",
-    "discord.js": "^14.12.1",
+    "@types/md5": "^2.3.5",
+    "discord.js": "^14.14.1",
     "download": "^8.0.0",
-    "fs-extra": "^11.1.1",
+    "fs-extra": "^11.2.0",
     "md5": "^2.3.0",
     "moment": "^2.29.4",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@tsconfig/node12": "^1.0.11",
@@ -123,6 +123,6 @@
     "rimraf": "^3.0.2",
     "ts-mocha": "^7.0.0",
     "type-fest": "^0.16.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.3.2"
   }
 }
