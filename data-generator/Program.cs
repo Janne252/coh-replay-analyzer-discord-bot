@@ -40,9 +40,11 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator
             // new UpdateCustomScenarios("COH2").Run().Wait();
 
             // new GenerateScenarioPreviewImages("COH1").Run();
-            new GenerateScenarioPreviewImages("COH2").Run();
-            // new GenerateScenarioPreviewImages("COH3").Run();
+            // new GenerateScenarioPreviewImages("COH2").Run();
+            new GenerateScenarioPreviewImages("COH3").Run();
 
+            Console.WriteLine("Done. Press any key to exit...");
+            Console.ReadKey();
         }
     }
 }
