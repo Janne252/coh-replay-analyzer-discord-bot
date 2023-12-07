@@ -421,6 +421,15 @@
     <Content Include="assets\scenario-preview-image-icons\coh3\mm_victory_point.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\resource_small_fuel.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\resource_small_manpower.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\resource_small_munition.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_01_blue.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -468,6 +477,24 @@
     </Content>
     <Content Include="assets\scenario-preview-image-icons\coh3\starting_position_slot_08_red.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\tm_ammo_point.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\tm_background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\tm_contour.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\tm_fuel_point.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\tm_territory_point.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\scenario-preview-image-icons\coh3\tm_victory_point.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="assets\scenario-preview-images\coh3\benghazi_6p_mm_generated.tga">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

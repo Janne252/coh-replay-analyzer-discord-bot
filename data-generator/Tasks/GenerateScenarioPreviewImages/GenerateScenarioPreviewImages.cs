@@ -22,6 +22,8 @@ using SixLabors.ImageSharp.Processing;
 using System.Runtime.CompilerServices;
 using SixLabors.ImageSharp.Formats.Pbm;
 using System.Xml.Linq;
+using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreviewImages
 {
@@ -124,6 +126,8 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
             foreach (var scenarioFolder in ScenarioFolders)
             {
                 RenderPreviewImage(scenarioFolder);
+                RenderPreviewImage(scenarioFolder, filenameSuffix: "colored", iconKeySuffix: "colored", iconSizeMultiplier: 1.0);
+                RenderPreviewImage(scenarioFolder, filenameSuffix: "tm",      iconKeySuffix: "large",   iconSizeMultiplier: 1.0);
 
                 if (!scenarioShortNameMap.ContainsKey(scenarioFolder.NormalizedShortName))
                 {
@@ -137,11 +141,13 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
             }
         }
 
-        private void RenderPreviewImage(ScenarioFolder scenario)
+        private void RenderPreviewImage(ScenarioFolder scenario, string filenameSuffix = null, string iconKeySuffix = null, double iconSizeMultiplier = 1.0)
         {
-            var outputImageFilePath = Path.Combine(ScenarioPreviewImageOutputRootPath, $"{scenario.ScenarioName}.{scenario.ScenarioId}.x300.jpg");
-            var outputImageFilePathCompact = Path.Combine(ScenarioPreviewImageOutputRootPath, $"{scenario.ScenarioName}.{scenario.ScenarioId}.x80.jpg");
-            var outputImageFilePathLossless = Path.Combine(ScenarioPreviewImageOutputRootPath, $"{scenario.ScenarioName}.{scenario.ScenarioId}.x300.png");
+            var dottedFilenameSuffix = $"{(filenameSuffix != null ? "." : "")}{filenameSuffix ?? ""}";
+
+            var outputImageFilePath = Path.Combine(ScenarioPreviewImageOutputRootPath, $"{scenario.ScenarioName}.{scenario.ScenarioId}{dottedFilenameSuffix}.x300.jpg");
+            var outputImageFilePathCompact = Path.Combine(ScenarioPreviewImageOutputRootPath, $"{scenario.ScenarioName}.{scenario.ScenarioId}{dottedFilenameSuffix}.x80.jpg");
+            var outputImageFilePathLossless = Path.Combine(ScenarioPreviewImageOutputRootPath, $"{scenario.ScenarioName}.{scenario.ScenarioId}{dottedFilenameSuffix}.x300.png");
             var basePreviewImage = scenario.GetPreviewImageData();
             // Maximum width of Discord embed image
             var targetWidth = 300;
@@ -187,10 +193,14 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
                     continue;
                 }
 
-                var iconImage = GetScenarioIconImage(scenario, icon);
+                var iconImage = GetScenarioIconImage(scenario, icon, iconKeySuffix);
                 if (iconImage == null)
                 {
                     continue;
+                }
+                if (iconSizeMultiplier != 1.0)
+                { 
+                    iconImage = iconImage.Clone(_ => _.Resize((int)Math.Floor(iconImage.Width * iconSizeMultiplier), (int)Math.Floor(iconImage.Height * iconSizeMultiplier)));
                 }
                 var x = (basePreviewImage.Width / 2.0) + scale(icon.X * iconOverlayScale / xScale, scenarioWidthMin, scenarioWidthMax, imageWidthMin, imageWidthMax) - iconImage.Width / 2.0;
                 var y = (basePreviewImage.Height / 2.0) + scale(flip(icon.Y) * iconOverlayScale / yScale, scenarioHeightMin, scenarioHeightMax, imageHeightMin, imageHeightMax) - iconImage.Height / 2.0;
@@ -215,7 +225,7 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
             basePreviewImage.Save(outputImageFilePath, JpegEncoder);
         }
 
-        private Image GetScenarioIconImage(ScenarioFolder scenario, ScenarioFolder.ScenarioIcon icon)
+        private Image GetScenarioIconImage(ScenarioFolder scenario, ScenarioFolder.ScenarioIcon icon, string iconKeySuffix = null)
         {
             var iconKey = icon.EbpName;
             if (icon.OwnerId != 0 && SuffixPreviewImageIconNameWithOwner.Any((ebpName) => ebpName == icon.EbpName))
@@ -231,8 +241,27 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
                 Debug.WriteLine($"Missing icon for entity: {iconKey}=");
                 return null;
             }
+            string fallbackIconKey = null;
 
-            iconKey = Path.Combine(ScenarioPreviewImageIconsRootPath, $"{ScenarioIconsFilenameMap[iconKey]}");
+            if (iconKeySuffix != null)
+            {
+                fallbackIconKey = iconKey;
+                iconKey = $"{iconKey}__{iconKeySuffix}";
+            }
+            if (!ScenarioIconsFilenameMap.ContainsKey(iconKey))
+            {
+                Debug.WriteLine($"Warning! Using fallback icon '{fallbackIconKey}' for '{iconKey}', (suffix '{iconKeySuffix}' variant not configured)");
+                iconKey = fallbackIconKey;
+            }
+            var iconEntry = ScenarioIconsFilenameMap[iconKey];
+            var iconAttributesRegexp = new Regex(@"\[(scale:\s*(?<scale>.*?))?\]");
+            double scale = 1.0;
+            if (iconAttributesRegexp.IsMatch(iconEntry))
+            {
+                scale = double.Parse(iconAttributesRegexp.Match(iconEntry).Groups["scale"].Value, CultureInfo.InvariantCulture);
+                iconEntry = iconAttributesRegexp.Replace(iconEntry, "");
+            }
+            iconKey = Path.Combine(ScenarioPreviewImageIconsRootPath, $"{iconEntry}");
 
             if (!ScenarioIconCache.ContainsKey(iconKey))
             {
@@ -243,6 +272,10 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
                     image.Mutate(_ => _
                         .Resize(24, 24)
                     );
+                }
+                if (scale != 1.0)
+                {
+                    image.Mutate(_ => _.Resize((int)Math.Floor(image.Width * scale), (int)Math.Floor(image.Height * scale)));
                 }
             }
 
