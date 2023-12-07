@@ -70,7 +70,7 @@
     "magic": "COH3_RE",
     "minVersion": 8369,
     "flankExecutablePath": "./.flank.coh3.bin/release/flank",
-    "flankArgs": "",
+    "flankArgs": "-c",
     "scenarioPreviewImageRootPath": "./data/scenario-preview-images/coh3",
     "commanderDatabaseFilepath": "./data/game-data/coh3/battlegroups.json",
     "localeFilePaths": {
