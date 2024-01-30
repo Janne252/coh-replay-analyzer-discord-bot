@@ -2,7 +2,6 @@ import * as Discord from 'discord.js';
 import { getGuildUrl, truncatedEmbedCodeField } from './index';
 import { DiagnosticsConfig } from './config';
 import os from 'os';
-import { client } from '../..';
 import i18n from '../i18n';
 import Util from './util'
 import {DiscordErrorCode} from './constants'
@@ -181,7 +180,7 @@ export class ChannelLogger {
             case DiscordErrorCode.MISSING_PERMISSIONS: 
                 await message.author.send({embeds: [new Discord.EmbedBuilder({
                     description: i18n.get('errors.missingPermissions', {format: {
-                        '@bot': String(client.user),
+                        '@bot': String(this.client.user),
                         'channel': String(message.channel),
                         'server': String(message.guild),
                     }}), 

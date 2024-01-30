@@ -82,12 +82,13 @@ describe('contrib.coh2.replay', () => {
     });
 
     it('resolveScenarioId', () => {
-        assert.strictEqual(resolveScenarioId(mockReplay({file: 'Data://scenarios\\mp\\2p_map//2p_map'})), 'scenarios-mp-2p-map-2p-map');
-        assert.strictEqual(resolveScenarioId(mockReplay({file: 'Data:\\scenarios\\mp\\2p_map\\2p_map'})), 'scenarios-mp-2p-map-2p-map');
-        assert.strictEqual(resolveScenarioId(mockReplay({file: 'Data:\\scenarios\\mp\\2p map\\2p map'})), 'scenarios-mp-2p-map-2p-map');
-        assert.strictEqual(resolveScenarioId(mockReplay({file: 'Data:\\scenarios\\mp\\2p _map\\2p map'})), 'scenarios-mp-2p-map-2p-map');
-        assert.strictEqual(resolveScenarioId(mockReplay({file: 'Data:\\scenarios\\mp\\2p--map\\2p map'})), 'scenarios-mp-2p-map-2p-map');
-        assert.strictEqual(resolveScenarioId(mockReplay({file: 'Data:\\scenarios\\mp\\ _ 2p--map\\2p map'})), 'scenarios-mp-2p-map-2p-map');
+        // Previously this test made sure that various inputs for map's filepath resulted in the same "normalized" file name
+        assert.strictEqual(resolveScenarioId(mockReplay({file: 'Data://scenarios\\mp\\2p_map//2p_map'})), '2p_map.490f78084d5ce70671de48d49accde39');
+        assert.strictEqual(resolveScenarioId(mockReplay({file: 'Data:\\scenarios\\mp\\3p_map\\3p_map'})), '3p_map.5f3ea74518d662d9c564f26c60af0f76');
+        assert.strictEqual(resolveScenarioId(mockReplay({file: 'Data:\\scenarios\\mp\\4p map\\4p map'})), '4p map.8f372802d6cd7c19ff5e73735834db36');
+        assert.strictEqual(resolveScenarioId(mockReplay({file: 'Data:\\scenarios\\mp\\5p _map\\5p map'})), '5p map.2e0ca52cae5962e89eefda3e3aa00077');
+        assert.strictEqual(resolveScenarioId(mockReplay({file: 'Data:\\scenarios\\mp\\6p--map\\6p map'})), '6p map.4f13373f5917e3d1e7b8c0d7d77c79be');
+        assert.strictEqual(resolveScenarioId(mockReplay({file: 'Data:\\scenarios\\mp\\ _ 7p--map\\7p map'})), '7p map.cfd054d04de4009e0355ef2ccce0de8e');
     });
 
     it('getReplayTimestamp', () => {

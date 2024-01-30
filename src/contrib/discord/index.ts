@@ -18,6 +18,19 @@ export function truncatedEmbedCodeField(
         value: prefix + (value.length > max ? value.substring(0, max) : value) + suffix,
     };
 }
+export function truncatedEmbedMonospaceField(
+    {name, value, inline}: {name: string, value: string, inline?: boolean}, 
+    {maxLength}: {maxLength: number} = {maxLength: 1024}
+): Discord.APIEmbedField {
+    const prefix = '`';
+    const suffix = '`';
+    const max = maxLength - (prefix.length + suffix.length);
+    return {
+        name,
+        inline,
+        value: prefix + (value.length > max ? value.substring(0, max) : value) + suffix,
+    };
+}
 
 /* istanbul ignore next */
 /**

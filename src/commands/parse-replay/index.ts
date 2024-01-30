@@ -28,14 +28,13 @@ export interface InputMessage {
 export default async (message: InputMessage, {forceCompact}: {forceCompact?: boolean} = {}): Promise<boolean> => {
     let config = new ReplaysConfig();
     PackageJsonConfig.assign(config, 'replays.common');
-    const attachments = [...message.attachments].map(([id, attachment]) => attachment);
+    const attachments = [...message.attachments]
+        .map(([id, attachment]) => attachment)
+        .filter((attachment) => !!attachment && !!attachment.name && attachment.name.endsWith('.rec'))
+    ;
     let isHandled = false;
 
     for (const attachment of attachments) {
-        if (!attachment || !attachment.name || !attachment.name.endsWith('.rec')) {
-            continue;
-        }
-
         const command = MessageHelpers.strip(message);
         // Mark message as handled - no other handler should attempt to process it
         isHandled = true;
@@ -135,7 +134,7 @@ export default async (message: InputMessage, {forceCompact}: {forceCompact?: boo
             } else {
                 EmbedType = CompactReplayEmbed;
             }
-            const embed = new EmbedType(client, message, attachment, replay, config, locales[magic]);
+            const embed = new EmbedType(client, message, attachment, replay, config, locales[magic], { includeReplayFilename: attachments.length > 1});
             await embed.submit();
         } catch (error) {
             // Propagate

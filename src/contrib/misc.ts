@@ -26,7 +26,7 @@ export function capitalize(str: string) {
 }
 
 export interface StringFormatArgs {
-    [key: string]: number | string;
+    [key: string]: number | string | null | undefined;
 }
 
 /**
@@ -61,4 +61,20 @@ export function ensureAbsolutePath(input: string, root = process.cwd()) {
 export enum Char {
     ZeroWidthSpace = '\u200b',
     NoBreakSpace = '\xa0',
+}
+
+export const autoTruncateString = (str: string, maxLength: number, { overflowChars = '…', trimEndOnOverflow = '' }: { overflowChars?: string, trimEndOnOverflow?: string } = {}) => {
+    if (maxLength <= 0) {
+        return ''
+    } else if (str.length <= maxLength) {
+        return str
+    } else if (overflowChars.length > maxLength) {
+        return overflowChars.substring(overflowChars.length - maxLength);
+    }
+    return (str.endsWith(trimEndOnOverflow) ? 
+        str.substring(0, str.length - trimEndOnOverflow.length) : 
+        str
+    )
+    .substring(0, maxLength - overflowChars.length) 
+    + overflowChars;
 }

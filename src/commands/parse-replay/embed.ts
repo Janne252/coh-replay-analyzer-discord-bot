@@ -2,13 +2,13 @@ import Discord, { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonStyle, Compo
 import * as Replay from '../../contrib/coh2/replay';
 import i18n from '../../contrib/i18n';
 import ReplaysConfig, { BattlegroupDatabaseEntry, CommanderDatabaseEntry } from './config';
-import fs from 'fs-extra';
+import fs, { truncate } from 'fs-extra';
 import path from 'path';
 import { AttachmentStub, InputData } from '../../types';
 import { ReplayPlayer } from '../../contrib/coh2/replay';
-import { autoDeleteRelatedMessages, truncatedEmbedCodeField } from '../../contrib/discord';
+import { autoDeleteRelatedMessages, truncatedEmbedCodeField, truncatedEmbedMonospaceField } from '../../contrib/discord';
 import { logger, replaysConfig } from '../..';
-import { Char } from '../../contrib/misc';
+import { Char, autoTruncateString } from '../../contrib/misc';
 import { InputMessage } from '.';
 import { LogLevel } from '../../contrib/discord/logging';
 import Util from '../../contrib/discord/util';
@@ -36,6 +36,7 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
         protected readonly replay: InputReplay, 
         private readonly config: ReplaysConfig,
         protected readonly locale: Locale,
+        protected readonly options?: { includeReplayFilename?: boolean }
     ) {
         super();
     }
@@ -49,7 +50,11 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
     }
 
     protected appendTitle() {
-        this.setTitle(`${Replay.resolveScenarioDisplayName(this.replay, this.locale)}`);
+        this.setTitle(`${autoTruncateString(Replay.resolveScenarioDisplayName(this.replay, this.locale), 256)}`)
+    }
+
+    protected setUrl() {
+        this.setURL(this.userMessage.url);
     }
 
     protected disguiseCommanderName(name: string) {
@@ -136,7 +141,7 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
     protected appendMetadata({duration, gameVersion}: {duration?: boolean, gameVersion?: boolean} = {}) {
         if (duration ?? true) {
             this.addFields(
-                { name: i18n.get('replay.matchDuration'), value: `||${this.getDurationDisplay()}||`, inline: true},
+                { name: i18n.get('replay.matchDuration'), value: `${this.getSpoilerMaskedDurationDisplay()}`, inline: true},
             );
         }
         if (gameVersion ?? true) {
@@ -146,10 +151,26 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
         }
     }
 
+    protected getReplayFileNameDisplay({ attachmentFileNameMaxLength }: { attachmentFileNameMaxLength?: number } = {}) {
+        const truncatedFileName = autoTruncateString(this.sourceAttachment.name, attachmentFileNameMaxLength ?? Number.MAX_SAFE_INTEGER, { 
+            trimEndOnOverflow: '.rec', 
+            overflowChars: '….rec'
+        });
+        return this.sourceAttachment.url ?
+            `\xa0 🎬 \xa0[\`${truncatedFileName}\`](${this.sourceAttachment.url})` : 
+            `\xa0 🎬 \xa0\`${truncatedFileName}\``
+    }
+    protected appendReplayFilename() {
+        this.addFields({
+            name: Char.ZeroWidthSpace,
+            value: this.getReplayFileNameDisplay({ attachmentFileNameMaxLength: 40 }),
+        })
+    }
+
     protected appendFooter() {
         this.setFooter({text: `${this.client.user?.username}`, iconURL: this.client.user?.avatarURL() as string});
     }
-       
+
     public async submit() {
         await this.build();
         const message: Discord.MessageCreateOptions = {
@@ -223,8 +244,8 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
             this.appendNoScenarioPreviewImageAvailable();
         }
     }
-    protected getDurationDisplay({units}: {units?: boolean} = {units: true}) {
-        return Replay.getReplayDurationDisplay(this.replay.duration, {units});
+    protected getSpoilerMaskedDurationDisplay({units}: {units?: boolean} = {units: true}) {
+        return `||\`${Replay.getReplayDurationDisplay(this.replay.duration, {units}).padEnd('59 minutes 59 seconds'.length, Char.NoBreakSpace)}\`||`
     }
    
     protected async expandChatPreview() {
@@ -357,12 +378,21 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
        }
     }
 
+    protected appendReplayDurationAndFileName() {
+        this.addFields({ 
+            name: Char.ZeroWidthSpace,  
+            // Always pad masked match duration to minimum length of '59 minutes 59 seconds'
+            value: `\xa0 ⏱ \xa0${this.getSpoilerMaskedDurationDisplay({units: true})} ${this.getReplayFileNameDisplay({ attachmentFileNameMaxLength: 20 })}` 
+        })
+    }
+
     public abstract build(): void;
 }
 
 export class ReplayEmbed extends ReplayBaseEmbed {
     public build() {
         this.appendTitle();
+        this.setUrl();
         // Embeds with image are limited to width of ~ 300px. Having
         // players and commanders split into separate columns leads to wrapped text; 300px is not enough to
         // display both player name and the commander name on the same line.
@@ -380,24 +410,27 @@ export class ReplayEmbed extends ReplayBaseEmbed {
         this.appendChat();
         this.appendMetadata();
         this.tryAppendScenarioPreviewImage(ScenarioPreviewDisplay.Image);
+        this.appendReplayFilename();
         this.appendFooter();
         this.appendErrors();
     }
 }
 
 export class CompactReplayEmbed extends ReplayBaseEmbed {
-    protected appendTitle() {
-        this.setTitle(`${Replay.resolveScenarioDisplayName(this.replay, this.locale)} \xa0 ⏱ \xa0||\`${this.getDurationDisplay({units: false})}\`||`);
+    protected appendNoScenarioPreviewImageAvailable() {
+        // NOOP
     }
 
-    protected appendNoScenarioPreviewImageAvailable() {
-        // noop
+    protected appendReplayFilename() {
+        // NOOP
     }
-    
+
     public build() {
         this.appendTitle();
+        this.setUrl();
         this.appendPlayers(PlayerAppendType.PlayerAndCommanderInSeparateColumns);
         this.tryAppendScenarioPreviewImage(ScenarioPreviewDisplay.Thumbnail);
+        this.appendReplayDurationAndFileName();
         this.appendErrors();
     }
 }
