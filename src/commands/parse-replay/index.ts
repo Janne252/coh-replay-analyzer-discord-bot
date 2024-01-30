@@ -123,6 +123,7 @@ export default async (message: InputMessage, {forceCompact}: {forceCompact?: boo
                         name: player.name
                     })))
                 }
+                replay.chat.sort((a, b) => a.tick - b.tick)
             } else {
                 replay = rawData 
             }
