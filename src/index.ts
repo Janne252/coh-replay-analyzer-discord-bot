@@ -15,6 +15,7 @@ import { ChannelLogger, Color, LogLevel } from './contrib/discord/logging';
 import i18n, { I18n } from './contrib/i18n';
 import { PackageJsonConfig } from './contrib/config';
 import { ApplicationCommandScope } from './types';
+import stringify from 'safe-stable-stringify';
 
 // Instances
 export const client = new Discord.Client({
@@ -155,7 +156,7 @@ client.on(Discord.Events.InteractionCreate, async (interaction) => {
     if (interaction.isMessageContextMenuCommand() && interaction.commandName === tryParseReplayViaInteraction.commandName) {
         await tryParseReplayViaInteraction.handler(interaction as any as Discord.MessageContextMenuCommandInteraction);
     } else {
-        console.warn(`Unknown interaction`, JSON.stringify(interaction.toJSON(), null, 4))
+        console.warn(`Unknown interaction`, stringify(interaction.toJSON(), null, 4))
     }
 });
 
