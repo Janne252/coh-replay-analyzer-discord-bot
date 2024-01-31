@@ -8,7 +8,7 @@ import { AttachmentStub, InputData } from '../../types';
 import { ReplayPlayer } from '../../contrib/coh2/replay';
 import { autoDeleteRelatedMessages, truncatedEmbedCodeField, truncatedEmbedMonospaceField } from '../../contrib/discord';
 import { logger, replaysConfig } from '../..';
-import { Char, autoTruncateString } from '../../contrib/misc';
+import { Char, autoTruncateString, nonWrappingString } from '../../contrib/misc';
 import { InputMessage } from '.';
 import { LogLevel } from '../../contrib/discord/logging';
 import Util from '../../contrib/discord/util';
@@ -152,13 +152,13 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
     }
 
     protected getReplayFileNameDisplay({ attachmentFileNameMaxLength }: { attachmentFileNameMaxLength?: number } = {}) {
-        const truncatedFileName = autoTruncateString(this.sourceAttachment.name, attachmentFileNameMaxLength ?? Number.MAX_SAFE_INTEGER, { 
+        const truncatedFileName = autoTruncateString(nonWrappingString(this.sourceAttachment.name), attachmentFileNameMaxLength ?? Number.MAX_SAFE_INTEGER, { 
             trimEndOnOverflow: '.rec', 
             overflowChars: '….rec'
         });
         return this.sourceAttachment.url ?
-            `\xa0 🎬 \xa0[\`${truncatedFileName}\`](${this.sourceAttachment.url})` : 
-            `\xa0 🎬 \xa0\`${truncatedFileName}\``
+            `\xa0🎬\xa0[\`${truncatedFileName}\`](${this.sourceAttachment.url})` : 
+            `\xa0🎬\xa0\`${truncatedFileName}\``
     }
     protected appendReplayFilename() {
         this.addFields({
@@ -245,7 +245,7 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
         }
     }
     protected getSpoilerMaskedDurationDisplay({units}: {units?: boolean} = {units: true}) {
-        return `||\`${Replay.getReplayDurationDisplay(this.replay.duration, {units}).padEnd('59 minutes 59 seconds'.length, Char.NoBreakSpace)}\`||`
+        return `||\`${Replay.getReplayDurationDisplay(this.replay.duration, {units}).padEnd((units ? '59 minutes 59 seconds' : '00:00:00').length, Char.NoBreakSpace)}\`||`
     }
    
     protected async expandChatPreview() {
@@ -319,11 +319,10 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
             }
         }
 
-        return `${player.faction in this.config.factionEmojis ? (this.config.factionEmojis[player.faction]) : ''}${playerNameDisplay}`;
+        return `${player.faction in this.config.factionEmojis ? (`${this.config.factionEmojis[player.faction]}\xa0`) : ''}${playerNameDisplay}`;
     }
 
     protected formatPlayerCommander(player: InputPlayer, {fixedWidth, disguise, noWrap, monospace}: {fixedWidth: boolean | number, disguise: boolean, noWrap?: boolean, monospace?: boolean}) {
-        let commander: CommanderDatabaseEntry | null = null;
         let commanderDisplayName: string = ''
         for (const availableCommander of this.config.commanderDatabase) {
             if ((availableCommander as CommanderDatabaseEntry).server_id == player.commander) {
@@ -381,8 +380,7 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
     protected appendReplayDurationAndFileName() {
         this.addFields({ 
             name: Char.ZeroWidthSpace,  
-            // Always pad masked match duration to minimum length of '59 minutes 59 seconds'
-            value: `\xa0 ⏱ \xa0${this.getSpoilerMaskedDurationDisplay({units: true})} ${this.getReplayFileNameDisplay({ attachmentFileNameMaxLength: 20 })}` 
+            value: `\xa0⏱\xa0${this.getSpoilerMaskedDurationDisplay({units: false})} ${this.getReplayFileNameDisplay({ attachmentFileNameMaxLength: 20 })}`,
         })
     }
 

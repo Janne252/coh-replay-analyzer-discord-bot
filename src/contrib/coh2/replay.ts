@@ -1,5 +1,5 @@
 import path from 'path';
-import { capitalize } from '../misc';
+import { Char, capitalize } from '../misc';
 import { LocaleLike } from '.';
 import { InputData } from '../../types';
 import ReplaysConfig from '../../commands/parse-replay/config';
@@ -70,7 +70,7 @@ export function getReplayDurationDisplay(ticks: number, {units}: {units?: boolea
     hh = (hh != '00') ? `${Number(hh)}${(Number(hh) == 1 ? ` ${i18n.get('time.hour')}` : ` ${i18n.get('time.hours')}`)}` : '';
     mm = (mm != '00') ? `${Number(mm)}${(Number(mm) == 1 ? ` ${i18n.get('time.minute')}` : ` ${i18n.get('time.minutes')}`)}` : '';
     ss = (ss != '00' || (hh == '' && mm == '')) ? `${Number(ss)}${(Number(ss) == 1 ? ` ${i18n.get('time.second')}` : ` ${i18n.get('time.seconds')}`)}` : '';
-    return [hh, mm, ss].filter(o => !!o).join(' ');
+    return [hh, mm, ss].filter(o => !!o).join(Char.NoBreakSpace);
 }
 
 export function resolveScenarioNormalizedFilepath(replay: {map: {file: string}}) {

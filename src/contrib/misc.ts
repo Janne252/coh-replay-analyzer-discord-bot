@@ -61,6 +61,8 @@ export function ensureAbsolutePath(input: string, root = process.cwd()) {
 export enum Char {
     ZeroWidthSpace = '\u200b',
     NoBreakSpace = '\xa0',
+    /* Same as '-' but does not allow text wrapping */
+    NoBreakHyphen = '\u2011',
 }
 
 export const autoTruncateString = (str: string, maxLength: number, { overflowChars = '…', trimEndOnOverflow = '' }: { overflowChars?: string, trimEndOnOverflow?: string } = {}) => {
@@ -77,4 +79,10 @@ export const autoTruncateString = (str: string, maxLength: number, { overflowCha
     )
     .substring(0, maxLength - overflowChars.length) 
     + overflowChars;
+}
+
+export const nonWrappingString = (str: string) => {
+    return str
+        .replaceAll(' ', Char.NoBreakSpace)
+        .replaceAll('-', Char.NoBreakHyphen)
 }
