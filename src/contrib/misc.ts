@@ -61,6 +61,7 @@ export function ensureAbsolutePath(input: string, root = process.cwd()) {
 export enum Char {
     ZeroWidthSpace = '\u200b',
     NoBreakSpace = '\xa0',
+    DoubleNoBreakSpace = '\xa0\xa0',
     /* Same as '-' but does not allow text wrapping */
     NoBreakHyphen = '\u2011',
 }

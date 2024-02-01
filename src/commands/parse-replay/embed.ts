@@ -141,7 +141,7 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
     protected appendMetadata({duration, gameVersion}: {duration?: boolean, gameVersion?: boolean} = {}) {
         if (duration ?? true) {
             this.addFields(
-                { name: i18n.get('replay.matchDuration'), value: `${this.getSpoilerMaskedDurationDisplay()}`, inline: true},
+                { name: i18n.get('replay.matchDuration'), value: `${this.getMaskedReplayDurationDisplay()}`, inline: true},
             );
         }
         if (gameVersion ?? true) {
@@ -151,19 +151,27 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
         }
     }
 
-    protected getReplayFileNameDisplay({ attachmentFileNameMaxLength }: { attachmentFileNameMaxLength?: number } = {}) {
+    protected getEmojiPrefixedReplayFileNameDisplay({ attachmentFileNameMaxLength }: { attachmentFileNameMaxLength?: number } = {}) {
         const truncatedFileName = autoTruncateString(nonWrappingString(this.sourceAttachment.name), attachmentFileNameMaxLength ?? Number.MAX_SAFE_INTEGER, { 
             trimEndOnOverflow: '.rec', 
             overflowChars: '….rec'
         });
+        // No leading whitespace because Discord seems to trim it at the beginning of an embed field value
         return this.sourceAttachment.url ?
-            `\xa0🎬\xa0[\`${truncatedFileName}\`](${this.sourceAttachment.url})` : 
-            `\xa0🎬\xa0\`${truncatedFileName}\``
+            `🎬${Char.DoubleNoBreakSpace}[\`${truncatedFileName}\`](${this.sourceAttachment.url})` : 
+            `🎬${Char.DoubleNoBreakSpace}\`${truncatedFileName}\``
     }
+
+    protected getEmojiPrefixedMaskedReplayDurationDisplay({ units = true } : { units?: boolean} = {}) {
+        // No leading whitespace because Discord seems to trim it at the beginning of an embed field value
+        // ⏱ emoji itself doesn't seem to convert to Discord's built-in :stopwatch: emoji. We'll have to reference it manually
+        return `:stopwatch:${Char.DoubleNoBreakSpace}${this.getMaskedReplayDurationDisplay({units})}`
+    }
+
     protected appendReplayFilename() {
         this.addFields({
             name: Char.ZeroWidthSpace,
-            value: this.getReplayFileNameDisplay({ attachmentFileNameMaxLength: 40 }),
+            value: this.getEmojiPrefixedReplayFileNameDisplay({ attachmentFileNameMaxLength: 40 }),
         })
     }
 
@@ -244,7 +252,7 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
             this.appendNoScenarioPreviewImageAvailable();
         }
     }
-    protected getSpoilerMaskedDurationDisplay({units}: {units?: boolean} = {units: true}) {
+    protected getMaskedReplayDurationDisplay({units}: {units?: boolean} = {units: true}) {
         return `||\`${Replay.getReplayDurationDisplay(this.replay.duration, {units}).padEnd((units ? '59 minutes 59 seconds' : '00:00:00').length, Char.NoBreakSpace)}\`||`
     }
    
@@ -380,7 +388,7 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
     protected appendReplayDurationAndFileName() {
         this.addFields({ 
             name: Char.ZeroWidthSpace,  
-            value: `\xa0⏱\xa0${this.getSpoilerMaskedDurationDisplay({units: false})} ${this.getReplayFileNameDisplay({ attachmentFileNameMaxLength: 20 })}`,
+            value: `${this.getEmojiPrefixedMaskedReplayDurationDisplay({ units: false })} ${Char.DoubleNoBreakSpace} ${this.getEmojiPrefixedReplayFileNameDisplay({ attachmentFileNameMaxLength: 20 })}`,
         })
     }
 
