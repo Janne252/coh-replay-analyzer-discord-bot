@@ -26,10 +26,11 @@ This mode is controlled by the `Manage Messages` permission or by the message co
 Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault](https://github.com/ryantaylor/vault) and [ryantaylor/flank](https://github.com/ryantaylor/flank).
 
 # Installation
-- Bot authentication link: https://discord.com/api/oauth2/authorize?client_id=753206700655378523&permissions=2147805184&scope=bot
+- Bot authentication link: https://discord.com/oauth2/authorize?client_id=753206700655378523&permissions=2147870720&scope=bot
     | Scope/permission | Purpose |
     |-------|---------|
     |`Send Messages`| Send replay info embeds. |
+    |`Read Message History`| Reply to the original messag containing the replay attachment(s). |
     |`Manage Messages`| Manage interactions (e.g. buttons) added to replay embeds. |
     |`Embed Links`| Embed markdown links (chat expansion link). |
     |`Attach Files`| Attach map preview images to embeds. |
