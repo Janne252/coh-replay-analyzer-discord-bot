@@ -27,7 +27,7 @@ Replay parsing is based on Ryan Tailor's excellent libraries: [ryantaylor/vault]
 
 # Installation
 - Bot authentication link: https://discord.com/oauth2/authorize?client_id=753206700655378523&permissions=2147870720&scope=bot
-    | Scope/permission | Purpose |
+    | Required bot permission | Purpose |
     |-------|---------|
     |`Send Messages`| Send replay info embeds. |
     |`Read Message History`| Reply to the original messag containing the replay attachment(s). |
