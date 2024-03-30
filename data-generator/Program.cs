@@ -27,7 +27,7 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator
             baseEnv.AppendLine($"STARTUP_ROOT_PATH={rootPath}");
             baseEnv.AppendLine($"ASSETS_ROOT_PATH={Path.Combine(rootPath, "assets")}");
             DotNetEnv.Env.LoadContents(baseEnv.ToString());
-            DotNetEnv.Env.Load(".secrets");
+            // DotNetEnv.Env.Load(".secrets");
             DotNetEnv.Env.Load(".env.local");
             DotNetEnv.Env.Load(".env");
 
