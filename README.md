@@ -44,6 +44,9 @@ Custom map support is based on a curated list of maps in [`data-generator/assets
 To add a new custom map to the list, open a pull request that targets `data-generator/assets/custom-scenarios/coh2.json` (preferred).
 Alternatively you can request support fora custom map on the [support Discord server](https://discord.gg/nBQQ4Xh5RR) or by opening an issue on the GitHub repository.
 
+# Game updates
+CoH3 is likely to receive updates that add new maps or battlegroups. The author of the repository usually adds support for new content after a patch but _you_ may also contribute these updates via pull requests. Rough instructions for this are available in the `data-generator` [app readme](./data-generator/readme.md).
+
 # Support
 [Support server (Discord)](https://discord.gg/nBQQ4Xh5RR)
 
