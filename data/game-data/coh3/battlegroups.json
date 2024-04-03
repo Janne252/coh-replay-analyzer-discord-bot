@@ -77,5 +77,15 @@
         "id": 2044464,
         "upgrade_id": 201650,
         "display_name": "Indian Artillery Battlegroup"
+    },
+    {
+        "id": 2031381,
+        "upgrade_id": 2031370,
+        "display_name": "Australian Defense Battlegroup"
+    },
+    {
+        "id": 2151627,
+        "upgrade_id": 2151629,
+        "display_name": "Battlefield Espionage Battlegroup"
     }
 ]
