@@ -115,6 +115,7 @@ export class ChannelLogger {
      * Writes an error message.
      */
     async error(error: Error, context?: LoggerContext) {
+        console.error(error);
         const fields: Discord.APIEmbedField[] = [
             truncatedEmbedCodeField({name: 'Name', value: error.name || '_No error available._'}),
             truncatedEmbedCodeField({name: 'Message', value: error.message || '_No message available._'}),

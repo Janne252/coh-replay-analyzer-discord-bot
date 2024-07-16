@@ -104,7 +104,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/md5": "^2.3.5",
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.15.3",
     "download": "^8.0.0",
     "fs-extra": "^11.2.0",
     "md5": "^2.3.0",

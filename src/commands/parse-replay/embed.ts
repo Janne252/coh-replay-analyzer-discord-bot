@@ -50,7 +50,11 @@ export abstract class ReplayBaseEmbed extends Discord.EmbedBuilder {
     }
 
     protected appendTitle() {
-        this.setTitle(`${autoTruncateString(Replay.resolveScenarioDisplayName(this.replay, this.locale), 256)}`)
+        let replayTitle = Replay.resolveScenarioDisplayName(this.replay, this.locale);
+        if (!replayTitle) {
+            replayTitle = this.sourceAttachment.name;
+        }
+        this.setTitle(`${autoTruncateString(replayTitle, 256)}`)
     }
 
     protected setUrl() {
