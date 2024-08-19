@@ -33,6 +33,7 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
 
         public Dictionary<string, string> ScenarioIconsFilenameMap { get; private set; }
         public Dictionary<string, string> ScenarioPreviewImageIconExclusions { get; private set; }
+        public string[] ScenarioPreviewImageIconCommonSuffixes { get; private set; }
 
         /// <summary>
         /// Runtime cache of scenario icon Image instances.
@@ -83,6 +84,7 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
             ScenarioIconsFilenameMap = parseEnvDictionary(Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_ENTITY_ICONS"));
 
             ScenarioPreviewImageIconExclusions = parseEnvDictionary(Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_ICON_EXCLUSIONS", fallback: ""));
+            ScenarioPreviewImageIconCommonSuffixes = Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_ICON_COMMON_SUFFIXES", fallback: "").Split(',');
 
             SuffixPreviewImageIconNameWithOwner = Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_ICON_SUFFIX_OWNER", fallback: "").Split(',');
             SuffixPreviewImageIconNameWithPlayerCount = Env.GetString($"{envSuffix}_SCENARIO_PREVIEW_IMAGE_ICON_SUFFIX_PLAYER_COUNT", fallback: "").Split(',');
@@ -236,9 +238,17 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.GenerateScenarioPreview
             {
                 iconKey = $"{iconKey}__{scenario.PlayerCount}p";
             }
+            foreach (var commonSuffix in ScenarioPreviewImageIconCommonSuffixes)
+            {
+                if (iconKey.EndsWith(commonSuffix))
+                {
+                    iconKey = iconKey.Substring(0, iconKey.Length - commonSuffix.Length);
+                    break;
+                }
+            }
             if (!ScenarioIconsFilenameMap.ContainsKey(iconKey))
             {
-                Debug.WriteLine($"Missing icon for entity: {iconKey}=");
+                Debug.WriteLine($"Missing icon for entity: {iconKey} in scenario {scenario.NormalizedShortName}");
                 return null;
             }
             string fallbackIconKey = null;
