@@ -317,7 +317,13 @@
     <None Include="assets\scenario-preview-images\coh3\gothic_line_8p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="assets\scenario-preview-images\coh3\halfa_8p_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="assets\scenario-preview-images\coh3\industrial_railyard_6p_mkii_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\scenario-preview-images\coh3\longstop_hill_6p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\monte_cavo_8p_mm_handmade.tga">
@@ -336,6 +342,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\pachino_2p_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\scenario-preview-images\coh3\primosole_4p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\rails_and_sand_4p_mm_handmade.tga">

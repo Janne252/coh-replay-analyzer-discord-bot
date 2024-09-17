@@ -13,7 +13,7 @@
 1. Export all  `_handmade.rrtex` to `data-generator/assets/scenario-preview-images/coh3` with Essence Editor
     1. Launch `SteamLibrary/steamapps/common/Company of Heroes 3/EssenceEditor.exe` 
     1. Choose "Continue without a mod"
-    1. Drag and drop `SteamLibrary/steamapps/common/Company of Heroes 3/anvil/archives/ScenariosSP.sga` into the Essence Editor
+    1. Drag and drop `SteamLibrary/steamapps/common/Company of Heroes 3/anvil/archives/ScenariosMP.sga` into the Essence Editor
     1. Expand the folder path `data/scenarios/multiplayer/benghazi_6p/`
     1. Double-click the `benghazi_6p_mm_handmade.rrtex` file
     1. Click the 💾 save button in the image preview tool
