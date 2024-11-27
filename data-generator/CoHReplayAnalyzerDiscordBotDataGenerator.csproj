@@ -350,6 +350,9 @@
     <None Include="assets\scenario-preview-images\coh3\rails_and_sand_4p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="assets\scenario-preview-images\coh3\rapido_river_8p_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="assets\scenario-preview-images\coh3\rural_castle_4p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -357,6 +360,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\sangro_river_crossing_6p_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\scenario-preview-images\coh3\santuario_4p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\semois_2p_mm_handmade.tga">
