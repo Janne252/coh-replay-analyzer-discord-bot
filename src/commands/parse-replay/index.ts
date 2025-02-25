@@ -47,7 +47,7 @@ export default async (message: InputMessage, {forceCompact}: {forceCompact?: boo
         if (data.length < config.minDataLength) {
             throw new Error(`Invalid replay file data length ${data.length}, expected at least ${config.minDataLength}`);
         }
-        const [, , version, magic] = [data[0], data[1], data.readInt16LE(2), String.fromCharCode.apply(null, [...data.slice(4, 12)]).replace(/\0$/, '')];
+        const [, , version, magic] = [data[0], data[1], data.readUInt16LE(2), String.fromCharCode.apply(null, [...data.slice(4, 12)]).replace(/\0$/, '')];
         
         config = new ReplaysConfig();
         await PackageJsonConfig.assign(config, 'replays.common');
