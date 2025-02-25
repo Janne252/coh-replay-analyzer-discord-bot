@@ -19,8 +19,12 @@
         "upgrade_id": 201177,
         "display_name": "Special Operations Battlegroup"
     },
+    {
+        "id": 2164586,
+        "upgrade_id": 2164584,
+        "display_name": "Heavy Weapons Battlegroup"
+    },
 
-    
     {
         "id": 2044465,
         "upgrade_id": 198405,
@@ -46,6 +50,11 @@
         "upgrade_id": 197799,
         "display_name": "Mechanized Battlegroup"
     },
+    {
+        "id": 2163772,
+        "upgrade_id": 2163771,
+        "display_name": "Terror Battlegroup"
+    },
 
     {
         "id": 2075341,
@@ -61,6 +70,11 @@
         "id": 2072431,
         "upgrade_id": 2072430,
         "display_name": "Italian Infantry Battlegroup"
+    },
+    {
+        "id": 2164391,
+        "upgrade_id": 2164378,
+        "display_name": "Panzerjäger Kommand Battlegroup"
     },
 
     {
@@ -87,5 +101,10 @@
         "id": 2151627,
         "upgrade_id": 2151629,
         "display_name": "Battlefield Espionage Battlegroup"
+    },
+    {
+        "id": 2164116,
+        "upgrade_id": 2164107,
+        "display_name": "Canadian Shock Battlegroup"
     }
 ]
