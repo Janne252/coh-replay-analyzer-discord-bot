@@ -19,7 +19,7 @@ export interface InputMessage {
     id: Discord.Snowflake;
     content: string;
     attachments: Discord.Collection<Discord.Snowflake, AttachmentStub>;
-    channel: Discord.Message['channel'];
+    channel: Discord.SendableChannels;
     author: Discord.User;
     url: string;
     reply?: Discord.Message['reply']
@@ -69,7 +69,8 @@ export default async (message: InputMessage, {forceCompact}: {forceCompact?: boo
         }
 
         try {
-            await fs.writeFile(replayFilename, data);
+            // Safe forced type cast; `Buffer` extends `Uint8Array`
+            await fs.writeFile(replayFilename, data as unknown as Uint8Array);
             
             /**
                 FLAGS:
