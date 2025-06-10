@@ -129,24 +129,22 @@ client.on(Discord.Events.ClientReady, async () => {
 });
 
 client.on(Discord.Events.MessageCreate, async message => {
-    // Filter out non-text channel message
-    if (!(message.channel instanceof Discord.TextChannel)) {
+    // Filter out channels that don't support sending messages
+    if (!(message.channel.isSendable())) {
         return;
     }
-
-    const textMessage = message as Discord.Message & {channel: Discord.TextChannel};
-    const restoreLocale = i18n.activate((textMessage.guild?.preferredLocale as string || 'en'));
+    const restoreLocale = i18n.activate((message.guild?.preferredLocale as string || 'en'));
     try {
-        if (await tryParseReplay(textMessage))
+        if (await tryParseReplay(message))
             return;
         
-        if (await tryExecuteAdminCommand(textMessage, client, logger, diagnosticsConfig))
+        if (await tryExecuteAdminCommand(message, client, logger, diagnosticsConfig))
             return;
     } catch (error) {
         // Catch errors with context
-        await logger.error(error as Error, textMessage);
+        await logger.error(error as Error, message);
         // Try reporting to the end user 
-        await logger.tryNotifyEndUser(error as Discord.DiscordAPIError, textMessage);
+        await logger.tryNotifyEndUser(error as Discord.DiscordAPIError, message);
     } finally {
         restoreLocale();
     }
@@ -154,7 +152,12 @@ client.on(Discord.Events.MessageCreate, async message => {
 
 client.on(Discord.Events.InteractionCreate, async (interaction) => {
     if (interaction.isMessageContextMenuCommand() && interaction.commandName === tryParseReplayViaInteraction.commandName) {
-        await tryParseReplayViaInteraction.handler(interaction as any as Discord.MessageContextMenuCommandInteraction);
+        const message = interaction.targetMessage;
+        // Filter out channels that don't support sending messages
+        if (!message.channel.isSendable()) {
+            return
+        }
+        await tryParseReplayViaInteraction.handler(interaction as Discord.MessageContextMenuCommandInteraction);
     } else {
         console.warn(`Unknown interaction`, stringify(interaction.toJSON(), null, 4))
     }

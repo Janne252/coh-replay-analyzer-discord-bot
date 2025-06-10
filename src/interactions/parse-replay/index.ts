@@ -16,9 +16,8 @@ export const getOptions = (i18n: I18n, scope: ApplicationCommandScope) => {
 
 export const handler = async (interaction: Discord.MessageContextMenuCommandInteraction) => {
     const reply = await interaction.deferReply();
-    const message = interaction.targetMessage;
     try {
-        await tryParseReplay(message);
+        await tryParseReplay(interaction.targetMessage as Discord.Message & { channel: Discord.SendableChannels });
     } finally {
         await reply.delete();
     }
