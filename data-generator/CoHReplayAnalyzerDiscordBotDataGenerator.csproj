@@ -281,6 +281,9 @@
     <None Include="assets\custom-scenarios\coh2.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="assets\scenario-preview-images\coh3\alamein_4p_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="assets\scenario-preview-images\coh3\angoville_farms_2p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -323,6 +326,9 @@
     <None Include="assets\scenario-preview-images\coh3\faymonville_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="assets\scenario-preview-images\coh3\gabes_gap_6p_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="assets\scenario-preview-images\coh3\gardens_2p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -339,6 +345,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\longstop_hill_6p_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\scenario-preview-images\coh3\lorraine_4p_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\scenario-preview-images\coh3\mignano_6p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\monte_cavo_8p_mm_handmade.tga">
@@ -368,6 +380,9 @@
     <None Include="assets\scenario-preview-images\coh3\rapido_river_8p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="assets\scenario-preview-images\coh3\red_ball_express_8p_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="assets\scenario-preview-images\coh3\rural_castle_4p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -393,6 +408,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\torrente_4p_mkiii_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\scenario-preview-images\coh3\tuscan_vineyard_2p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\twin_beach_2p_mkii_mm_handmade.tga">
