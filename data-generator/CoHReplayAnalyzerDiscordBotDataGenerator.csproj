@@ -293,6 +293,9 @@
     <None Include="assets\scenario-preview-images\coh3\black_gold_8p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="assets\scenario-preview-images\coh3\bologna_2p_mm_handmade.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="assets\scenario-preview-images\coh3\catania_crossing_6p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -316,6 +319,9 @@
     </None>
     <None Include="assets\scenario-preview-images\coh3\djebel_2p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\scenario-preview-images\coh3\djebel_4p_mm_handmade.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\eindhoven_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -368,11 +374,20 @@
     <None Include="assets\scenario-preview-images\coh3\oasis_depot_8p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="assets\scenario-preview-images\coh3\oliveto_citra_8p_mm_handmade.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="assets\scenario-preview-images\coh3\pachino_2p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="assets\scenario-preview-images\coh3\powderkeg_8p_mm_handmade.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="assets\scenario-preview-images\coh3\primosole_4p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\scenario-preview-images\coh3\primosole_6p_mm_handmade.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\rails_and_sand_4p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -398,6 +413,9 @@
     <None Include="assets\scenario-preview-images\coh3\semois_2p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="assets\scenario-preview-images\coh3\semois_4p_mm_handmade.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="assets\scenario-preview-images\coh3\sousse_stronghold_8p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -418,6 +436,9 @@
     </None>
     <None Include="assets\scenario-preview-images\coh3\villa_fiore_2p_mkii_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\scenario-preview-images\coh3\wadi_darnah_4p_mm_handmade.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\winter_line_8p_mkii_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

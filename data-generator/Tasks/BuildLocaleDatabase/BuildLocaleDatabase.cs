@@ -1,14 +1,15 @@
-﻿using System;
+﻿using DotNetEnv;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Archive = Essence.Core.IO.Archive.Archive;
-using ArchiveFolder = Essence.Core.IO.Archive.Folder;
 using ArchiveFile = Essence.Core.IO.Archive.File;
-using DotNetEnv;
-using System.IO;
-using System.Text.RegularExpressions;
+using ArchiveFolder = Essence.Core.IO.Archive.Folder;
 
 namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.BuildLocaleDatabase
 {
@@ -58,7 +59,10 @@ namespace CoHReplayAnalyzerDiscordBotDataGenerator.Tasks.BuildLocaleDatabase
                     var archive = new Archive(archiveFilepath);
                     if (ArchiveDecryptionKey != null)
                     {
-                        archive.Key = Archive.RandomizeKey(ArchiveDecryptionKey, archive.NiceName);
+                        archive.Key = (byte[])typeof(Archive).GetMethod("RandomizeKey", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, new object[] {
+                            ArchiveDecryptionKey,
+                            archive.NiceName,
+                        });
                     }
 
                     ArchiveIterator.EachFile(archive, (file) =>

@@ -106,5 +106,25 @@
         "id": 2164116,
         "upgrade_id": 2164107,
         "display_name": "Canadian Shock Battlegroup"
+    },
+    {
+        "id": 2166944,
+        "upgrade_id": 2166940,
+        "display_name": "Italian Partisan Battlegroup"
+    },
+    {
+        "id": 2166740,
+        "upgrade_id": 2166739,
+        "display_name": "Last Stand Battlegroup"
+    },
+    {
+        "id": 2166231,
+        "upgrade_id": 2166225,
+        "display_name": "Polish Cavalry Battlegroup"
+    },
+    {
+        "id": 2166451,
+        "upgrade_id": 2166439,
+        "display_name": "Kriegsmarine Battlegroup"
     }
 ]
