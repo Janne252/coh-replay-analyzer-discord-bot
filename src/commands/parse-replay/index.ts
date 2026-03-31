@@ -83,6 +83,10 @@ export default async (message: InputMessage, {forceCompact}: {forceCompact?: boo
             */
             const {stdout} = await exec(`${config.flankExecutablePath} ${config.flankArgs} ${replayFilename}`);
             let rawData = JSON.parse(stdout);
+
+            if (rawData.error) {
+                throw new Error(`Flank failed to parse the replay: ${JSON.stringify(rawData.error)}`)
+            }
             let replay: Replay.Data;
 
             if (magic == 'COH3_RE') {
