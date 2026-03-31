@@ -296,6 +296,9 @@
     <None Include="assets\scenario-preview-images\coh3\bologna_2p_mm_handmade.tga">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="assets\scenario-preview-images\coh3\castello_8p_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="assets\scenario-preview-images\coh3\catania_crossing_6p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -322,6 +325,9 @@
     </None>
     <None Include="assets\scenario-preview-images\coh3\djebel_4p_mm_handmade.tga">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\scenario-preview-images\coh3\egletons_2p_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\eindhoven_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -380,6 +386,9 @@
     <None Include="assets\scenario-preview-images\coh3\pachino_2p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="assets\scenario-preview-images\coh3\pisa_centrale_4p_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="assets\scenario-preview-images\coh3\powderkeg_8p_mm_handmade.tga">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -408,6 +417,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\santuario_4p_mm_handmade.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\scenario-preview-images\coh3\sedjenane_6p_mm_handmade.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="assets\scenario-preview-images\coh3\semois_2p_mm_handmade.tga">
