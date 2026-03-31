@@ -14,12 +14,9 @@
     1. Launch `SteamLibrary/steamapps/common/Company of Heroes 3/EssenceEditor.exe` 
     1. Choose "Continue without a mod"
     1. Drag and drop `SteamLibrary/steamapps/common/Company of Heroes 3/anvil/archives/ScenariosMP.sga` into the Essence Editor
-    1. Expand the folder path `data/scenarios/multiplayer/benghazi_6p/`
-    1. Double-click the `benghazi_6p_mm_handmade.rrtex` file
-    1. Click the 💾 save button in the image preview tool
-    1. Save it as `.tga` to `data-generator/assets/scenario-preview-images/coh3` (default)
-    1. Repeat for all maps
-    1. You can open a PR at this stage if you want to skip the Visual Studio part since exporting the map preview images is the most labor intensive part.
+    1. Search archive files using search text `_handmade.rrtex`, regexp enabled
+    1. Select all files and extract them to a folder
+    1. Use https://github.com/cohstats/coh3-image-extractor to convert all the extracted `.rrtex` files to `.tga`
 
 1. Create `./.env.local` based on [`./env.local.template`](./.env.local.template)
 1. Open The solution `CoHReplayAnalyzerDiscordBotDataGenerator.sln` in Visual Studio 2022
