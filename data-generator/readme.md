@@ -25,6 +25,8 @@
 ## Updating Commander / Battlegroup databases
 
 ### CoH3
+- New method: use convert-maps.bat from image-extractor repo. Use a folder where all files from ScenariosMP.sga matching "handmade" have been extracted.
+
 > This process is currently manual and the battlegroup display names are not obtained from the game's localization. Instead we're maintaining a JSON file for now.
 1. Open `data/game-data/coh3/battlegroups.json` in a code editor, e.g. VS Code or NotePad++
 1. Launch `SteamLibrary/steamapps/common/Company of Heroes 3/EssenceEditor.exe` 
